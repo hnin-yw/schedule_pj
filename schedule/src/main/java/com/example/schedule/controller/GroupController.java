@@ -41,7 +41,7 @@ public class GroupController {
 		Group gp = new Group();
 		model.addAttribute("group", gp);
 
-		return "create";
+		return "groups/create";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)

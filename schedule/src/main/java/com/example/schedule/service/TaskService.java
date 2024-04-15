@@ -4,16 +4,14 @@ import java.util.List;
 
 import com.example.schedule.entity.*;
 
-public interface GroupService {
-	public List<Group> findAlls();
+public interface TaskService {
+	public List<Task> findAlls();
 
 	public String findById(int id);
 
-	public Group findGroupById(int id);
+	public Task findTaskById(int id);
 
-	public Group save(Group group);
+	public Task save(Task task);
 
 	public int deleteById(int id);
-
-	public Group findGroupCodeByDesc();
 }

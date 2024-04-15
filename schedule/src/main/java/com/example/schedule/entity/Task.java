@@ -56,6 +56,9 @@ public class Task {
 	@Column(name = "task_theme_color")
 	private String taskThemeColor;
 
+	@Column(name = "event_flg")
+	private Boolean eventFlg;
+
 	@Column(name = "del_flg")
 	private Boolean delFlg;
 
@@ -77,7 +80,7 @@ public class Task {
 	public Task(int id, String groupCode, String userCode, String userName, String taskTitle,
 			LocalDateTime taskDueDateTme, Boolean allDayFlg, int repeatType, int repeatUntil, int repeatInterval,
 			int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth, Boolean taskStatusFlg, String taskDescription,
-			String taskThemeColor, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
+			String taskThemeColor, Boolean delFlg, Boolean eventFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
 			LocalDateTime updatedAt, TaskReminder taskReminder) {
 		this.id = id;
 		this.groupCode = groupCode;
@@ -94,6 +97,7 @@ public class Task {
 		this.taskStatusFlg = taskStatusFlg;
 		this.taskDescription = taskDescription;
 		this.taskThemeColor = taskThemeColor;
+		this.eventFlg = eventFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
@@ -221,6 +225,14 @@ public class Task {
 		this.taskThemeColor = taskThemeColor;
 	}
 
+	public Boolean getEventFlg() {
+		return eventFlg;
+	}
+
+	public void setEventFlg(Boolean eventFlg) {
+		this.eventFlg = eventFlg;
+	}
+
 	public Boolean getDelFlg() {
 		return delFlg;
 	}
@@ -268,4 +280,20 @@ public class Task {
 	public void setTaskReminder(TaskReminder taskReminder) {
 		this.taskReminder = taskReminder;
 	}
+	
+	@PrePersist
+    protected void onCreate() {
+		this.eventFlg = false;
+		this.delFlg = false;
+		this.createdAt = LocalDateTime.now();
+		this.createdBy = "U000001";
+		this.updatedAt = LocalDateTime.now();
+		this.updatedBy = "U000001";
+    }
+	
+	@PreUpdate
+    protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
+		this.updatedBy = "U000011";
+    }
 }

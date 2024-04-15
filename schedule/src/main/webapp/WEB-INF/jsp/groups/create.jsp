@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org">
@@ -7,24 +9,31 @@
 </head>
 <body>
 	<div align="center">
-		<h1>Create New Group</h1>
+		<h1>Create Group</h1>
 		<br />
-		<form method="POST" action="/demo/groups/save" modelAttribute="group">
-			<table>
-				<tr>
-					<td>Group Code:</td>
-					<td><input type='text' id='groupCode' name='groupCode'
-						class='form-control' value="" /></td>
-				</tr>
+		<form action='/schedule/groups/save' method='post'>
+
+			<table class='table table-hover table-responsive table-bordered'>
 				<tr>
 					<td>Group Name:</td>
-					<td><input type='text' id='groupName' name='groupName'
-						class='form-control' value="" /></td>
+					<td>
+					<input type="text" id="groupName" name="groupName"
+						placeholder="Group Name" class="form-control "> <span
+						style="color: red;"><c:out
+								value="${result.hasFieldErrors('groupName') == false ? result.getFieldError('groupName').getDefaultMessage() : ''}" /></span>
+
+					</td>
 				</tr>
 				<tr>
-				<tr>
-					<td colspan="2"><button type="submit">Save</button></td>
+					<td></td>
+					<td>
+						<button type="submit" class="btn btn-primary">Save Group</button>
+						<a href="/schedule/groups">
+							<button type="button" class="btn btn-primary">Cancel</button>
+					</a>
+					</td>
 				</tr>
+
 			</table>
 		</form>
 	</div>

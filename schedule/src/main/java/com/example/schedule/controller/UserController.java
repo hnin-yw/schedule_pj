@@ -9,65 +9,61 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.schedule.business.GroupBusiness;
+import com.example.schedule.business.UserBusiness;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 
 @Controller
-@RequestMapping("/groups")
-public class GroupController {
-	private final GroupBusiness groupBusiness;
+@RequestMapping("/users")
+public class UserController {
+	private final UserBusiness userBusiness;
 
 	@Autowired
-	public GroupController(GroupBusiness groupBusiness) {
-		this.groupBusiness = groupBusiness;
+	public UserController(UserBusiness userBusiness) {
+		this.userBusiness = userBusiness;
 	}
 
 	@GetMapping()
 	public String list(Model model) {
-		List<Group> listGroups = groupBusiness.list();
-		model.addAttribute("listGroups", listGroups);
-		return "groups/list";
+		List<User> listUsers = userBusiness.list();
+		model.addAttribute("listUsers", listUsers);
+		return "Users/list";
 	}
 
 	@RequestMapping("/create")
 	public String create(Model model) {
-		Group gp = new Group();
-		model.addAttribute("group", gp);
+		User user = new User();
+		model.addAttribute("user", user);
 
-		return "groups/create";
+		return "Users/create";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result, Model model) {
-//		if (result.hasErrors()) {
-//			System.out.println(result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage() : "test");
-//			return "groups/create";
-//		}
-		groupBusiness.saveGroup(group);
-		return "redirect:/groups";
+	public String save(@ModelAttribute("User") @Validated User user, BindingResult result, Model model) {
+		userBusiness.saveUser(user);
+		return "redirect:/Users";
 	}
 
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
-		ModelAndView mav = new ModelAndView("groups/edit");
-		Group group = groupBusiness.findGroupById(id);
-		mav.addObject("group", group);
+		ModelAndView mav = new ModelAndView("users/edit");
+		User user = userBusiness.findUserById(id);
+		mav.addObject("user", user);
 
 		return mav;
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Group group) {
-		groupBusiness.updateGroup(group);
-		return "redirect:/groups";
+	public String update(User user) {
+		userBusiness.updateUser(user);
+		return "redirect:/users";
 	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id) {
-		groupBusiness.deleteGroup(id);
-		return "redirect:/groups";
+		userBusiness.deleteUser(id);
+		return "redirect:/users";
 	}
 }

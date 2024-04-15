@@ -12,4 +12,6 @@ public interface GroupDao {
 	Group save(Group group);
 
 	void deleteById(int id);
+
+	Group findGroupCodeByDesc();
 }

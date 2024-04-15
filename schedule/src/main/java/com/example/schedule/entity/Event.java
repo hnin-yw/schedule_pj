@@ -68,6 +68,9 @@ public class Event {
 	@Column(name = "other_visibility_flg")
 	private Boolean otherVisibilityFlg;
 
+	@Column(name = "event_flg")
+	private Boolean eventFlg;
+
 	@Column(name = "del_flg")
 	private Boolean delFlg;
 
@@ -90,7 +93,7 @@ public class Event {
 			LocalDateTime eventStartDateTime, LocalDateTime eventEndDateTime, Boolean allDayFlg, int repeatType,
 			int repeatUntil, int repeatInterval, int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth,
 			Boolean eventDisplayFlg, String location, String meetLink, String eventDescription, String eventThemeColor,
-			Boolean otherVisibilityFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
+			Boolean otherVisibilityFlg, Boolean eventFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
 			LocalDateTime updatedAt, EventReminder eventReminder) {
 		this.id = id;
 		this.groupCode = groupCode;
@@ -111,6 +114,7 @@ public class Event {
 		this.eventDescription = eventDescription;
 		this.eventThemeColor = eventThemeColor;
 		this.otherVisibilityFlg = otherVisibilityFlg;
+		this.eventFlg = eventFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
@@ -274,6 +278,14 @@ public class Event {
 		this.otherVisibilityFlg = otherVisibilityFlg;
 	}
 
+	public Boolean getEventFlg() {
+		return eventFlg;
+	}
+
+	public void setEventFlg(Boolean eventFlg) {
+		this.eventFlg = eventFlg;
+	}
+
 	public Boolean getDelFlg() {
 		return delFlg;
 	}
@@ -321,4 +333,20 @@ public class Event {
 	public void setEventReminder(EventReminder eventReminder) {
 		this.eventReminder = eventReminder;
 	}
+	
+	@PrePersist
+    protected void onCreate() {
+		this.eventFlg = true;
+		this.delFlg = false;
+		this.createdAt = LocalDateTime.now();
+		this.createdBy = "U000001";
+		this.updatedAt = LocalDateTime.now();
+		this.updatedBy = "U000001";
+    }
+	
+	@PreUpdate
+    protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
+		this.updatedBy = "U000011";
+    }
 }

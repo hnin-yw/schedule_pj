@@ -9,27 +9,22 @@
 	<div align="center">
 		<h1>Edit Group</h1>
 		<br />
-		<form action='/demo/groups/update' method='post'>
+		<form action='/schedule/groups/update' method='post'>
 
 			<table class='table table-hover table-responsive table-bordered'>
 				<tr>
-					<td>Group Code:</td>
-					<td><input type='text' name='group_code' class='form-control'
-						value="${group.getGroupCode()}" /></td>
-				</tr>
-				<tr>
 					<td>Group Name:</td>
-					<td><input type='text' name='group_name' class='form-control'
-						value="${group.getGroupName()}" /></td>
+					<td><input type='text' name='groupName' id='groupName'
+						class='form-control' value="${group.getGroupName()}" /></td>
 				</tr>
-
-
-				<input type='hidden' id='id' rows='5' class='form-control' name='id'
-					value="${group.id}" />
 				<tr>
-					<td></td>
+					<td><input type='hidden' id='id' class='form-control'
+						name='id' value="${group.id}" /></td>
 					<td>
-						<button type="submit" class="btn btn-primary">Update</button>
+						<button type="submit" class="btn btn-primary">Update</button> <a
+						href="/schedule/groups">
+							<button type="button" class="btn btn-primary">Cancel</button>
+					</a>
 					</td>
 				</tr>
 

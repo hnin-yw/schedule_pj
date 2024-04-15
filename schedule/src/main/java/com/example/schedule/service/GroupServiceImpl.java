@@ -47,4 +47,10 @@ public class GroupServiceImpl implements GroupService {
 		groupDao.deleteById(id);
 		return id;
 	}
+
+	@Override
+	@Transactional
+	public Group findGroupCodeByDesc() {
+		return groupDao.findGroupCodeByDesc();
+	}
 }

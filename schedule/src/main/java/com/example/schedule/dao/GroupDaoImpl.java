@@ -23,6 +23,7 @@ public class GroupDaoImpl implements GroupDao {
 
 	// get all the transactions from the database
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Group> getAlls() {
 		Query q = (Query) entityManager.createQuery("from Group");
 		List<Group> transactions = q.getResultList();
@@ -49,5 +50,17 @@ public class GroupDaoImpl implements GroupDao {
 		Query q = (Query) entityManager.createQuery("delete from Group where id=:groupId");
 		q.setParameter("groupId", id);
 		q.executeUpdate();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Group findGroupCodeByDesc() {
+		Query query = (Query) entityManager.createQuery("from Group ORDER BY groupCode DESC LIMIT 1");
+		List<Group> groups = query.getResultList();
+		if (groups.isEmpty()) {
+	        return null;
+	    } else {
+	        return groups.get(0);
+	    }
 	}
 }

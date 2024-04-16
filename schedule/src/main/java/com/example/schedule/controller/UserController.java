@@ -2,14 +2,17 @@ package com.example.schedule.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.schedule.business.UserBusiness;
+import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,36 +22,44 @@ import org.springframework.validation.annotation.Validated;
 @RequestMapping("/users")
 public class UserController {
 	private final UserBusiness userBusiness;
+	private final GroupBusiness groupBusiness;
 
 	@Autowired
-	public UserController(UserBusiness userBusiness) {
+	public UserController(UserBusiness userBusiness,GroupBusiness groupBusiness) {
 		this.userBusiness = userBusiness;
+		this.groupBusiness = groupBusiness;
 	}
 
 	@GetMapping()
-	public String list(Model model) {
-		List<User> listUsers = userBusiness.list();
-		model.addAttribute("listUsers", listUsers);
-		return "Users/list";
+	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
+		Page<User> listUsers = userBusiness.list(PageRequest.of(page, 10));
+        model.addAttribute("listUsers", listUsers);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", listUsers.getTotalPages());
+		return "users/list";
 	}
 
 	@RequestMapping("/create")
 	public String create(Model model) {
+		List<Group> gpLists = groupBusiness.getGroupLists();
+		model.addAttribute("gpLists", gpLists);
 		User user = new User();
 		model.addAttribute("user", user);
 
-		return "Users/create";
+		return "users/create";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("User") @Validated User user, BindingResult result, Model model) {
+	public String save(@ModelAttribute("user") @Validated User user, BindingResult result, Model model) {
 		userBusiness.saveUser(user);
-		return "redirect:/Users";
+		return "redirect:/users";
 	}
 
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
 		ModelAndView mav = new ModelAndView("users/edit");
+		List<Group> gpLists = groupBusiness.getGroupLists();
+		mav.addObject("gpLists", gpLists);
 		User user = userBusiness.findUserById(id);
 		mav.addObject("user", user);
 

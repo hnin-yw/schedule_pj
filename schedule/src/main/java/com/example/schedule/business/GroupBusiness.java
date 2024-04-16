@@ -1,9 +1,12 @@
 package com.example.schedule.business;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.GroupService;
@@ -18,13 +21,13 @@ public class GroupBusiness {
 		this.groupService = groupService;
 	}
 
-	private List<Group> getGroupLists() {
-		List<Group> listGroups = groupService.findAlls();
+	public List<Group> getGroupLists() {
+		List<Group> listGroups = groupService.getGroupLists();
 		return listGroups;
 	}
 
-	public List<Group> list() {
-		List<Group> listGroups = getGroupLists();
+	public Page<Group> list(Pageable pageable) {
+		Page<Group> listGroups = groupService.findAlls(pageable);
 		return listGroups;
 	}
 

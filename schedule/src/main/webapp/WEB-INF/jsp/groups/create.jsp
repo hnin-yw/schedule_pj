@@ -20,7 +20,7 @@
 					<input type="text" id="groupName" name="groupName"
 						placeholder="Group Name" class="form-control "> <span
 						style="color: red;"><c:out
-								value="${result.hasFieldErrors('groupName') == false ? result.getFieldError('groupName').getDefaultMessage() : ''}" /></span>
+								value="${result.hasFieldErrors('groupName') == true ? result.getFieldError('groupName').getDefaultMessage() : ''}" /></span>
 
 					</td>
 				</tr>

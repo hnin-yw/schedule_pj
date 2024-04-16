@@ -34,6 +34,12 @@ public class ScheduleTaskController {
 		return "redirect:/tasks";
 	}
 
+	@RequestMapping(value = "/status/update", method = RequestMethod.POST)
+	public String updateStatus(Task task) {
+		scheduleTaskBusiness.updateTask(task);
+		return "redirect:/tasks";
+	}
+
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id) {
 		return "redirect:/tasks";

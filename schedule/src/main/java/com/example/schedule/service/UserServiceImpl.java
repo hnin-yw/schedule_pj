@@ -3,6 +3,8 @@ package com.example.schedule.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.schedule.dao.UserDao;
 import com.example.schedule.entity.*;
@@ -20,8 +22,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> findAlls() {
-		return userDao.getAlls();
+	public Page<User> findAlls(Pageable pageable) {
+		return userDao.getAlls(pageable);
 	}
 
 	@Override
@@ -47,4 +49,10 @@ public class UserServiceImpl implements UserService {
 	public User findUserCodeByDesc() {
 		return userDao.findUserCodeByDesc();
 	}
+	
+    @Override
+    public User findUserByUsername(String username){
+        User user = userDao.findUserByUsername(username);
+        return user;
+    }
 }

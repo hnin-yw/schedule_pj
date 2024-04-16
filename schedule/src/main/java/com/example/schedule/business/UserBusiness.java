@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.UserService;
@@ -12,23 +14,28 @@ import com.example.schedule.service.UserService;
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class UserBusiness {
 	private final UserService userService;
-
+	
 	@Autowired
 	public UserBusiness(UserService userService) {
-		this.userService = userService;
+        this.userService = userService;
 	}
 
-	private List<User> getUserLists() {
-		List<User> listUsers = userService.findAlls();
-		return listUsers;
+	public User login(User user) {
+		if (user.getUserName() == null || user.getPassword() == null) {
+			return user;
+		} else {
+			user = userService.findUserByUsername(user.getUserName());
+		}
+		return user;
 	}
 
-	public List<User> list() {
-		List<User> listUsers = getUserLists();
+	public Page<User> list(Pageable pageable) {
+		Page<User> listUsers = userService.findAlls(pageable);
 		return listUsers;
 	}
 
 	public User saveUser(User user) {
+		//user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setUserCode(this.getUserCode());
 		return userService.save(user);
 	}
@@ -44,6 +51,12 @@ public class UserBusiness {
 			throw new RuntimeException("User to update doesn't exist");
 		}
 		updUser.setUserName(user.getUserName());
+		updUser.setUserFirstName(user.getUserFirstName());
+		updUser.setUserLastName(user.getUserLastName());
+		updUser.setPostCode(user.getPostCode());
+		updUser.setAddress(user.getAddress());
+		updUser.setTelNumber(user.getTelNumber());
+		updUser.setEmail(user.getEmail());
 		userService.save(updUser);
 		return "redirect:/users";
 	}
@@ -54,7 +67,7 @@ public class UserBusiness {
 			throw new RuntimeException("User Id not found");
 		}
 		userService.deleteById(id);
-		return "redirect:/Users";
+		return "redirect:/users";
 	}
 
 	public String getUserCode() {
@@ -72,5 +85,13 @@ public class UserBusiness {
 			userCode = "U000001";
 		}
 		return userCode;
+	}
+
+	public Boolean findByUsername(User user) {
+		User userdb = userService.findUserByUsername(user.getUserName());
+        if (user != null) {
+            //return passwordEncoder.matches(user.getPassword(), userdb.getPassword());
+        }
+        return false;
 	}
 }

@@ -4,17 +4,19 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import com.example.schedule.entity.*;
+import com.example.schedule.entity.Group;
 
 public class GroupValidator implements Validator {
 
-	@Override
-	public boolean supports(Class<?> clazz) {
-		return Group.class.isAssignableFrom(clazz);
-	}
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Group.class.equals(clazz);
+    }
 
-	@Override
-	public void validate(Object target, Errors errors) {
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.required");
-	}
+    @Override
+    public void validate(Object target, Errors errors) {
+    	Group group = (Group) target;
+
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "groupName", "NotEmpty");
+    }
 }

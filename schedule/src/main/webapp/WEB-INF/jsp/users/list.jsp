@@ -16,27 +16,33 @@
 <body>
 	<div class="container">
 		<div align="center">
-			<h3>List of Groups</h3>
+			<h3>List of Users</h3>
 			<br>
 			<c:choose>
-				<c:when test="${listGroups.getTotalElements() > 0}">
+				<c:when test="${listUsers.getTotalElements() > 0}">
 					<table class="table table-bordered">
 						<thead>
 							<tr>
+								<th><b>User Name</b></th>
+								<th><b>User First Name</b></th>
+								<th><b>User Last Name</b></th>
 								<th><b>Group Name</b></th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach items="${listGroups.content}" var="group">
+							<c:forEach items="${listUsers.content}" var="user">
 								<tr>
-									<td>${group.getGroupName()}</td>
+									<td>${user.getUserName()}</td>
+									<td>${user.getUserFirstName()}</td>
+									<td>${user.getUserLastName()}</td>
+									<td>${user.getGroup().getGroupName()}</td>
 
 									<td>
-										<a href="/schedule/groups/edit/${group.getId()}">
+										<a href="/schedule/users/edit/${user.getId()}">
 											<button type="submit" class="btn btn-primary">Edit</button>
 										</a>
-										<a href="/schedule/groups/delete/${group.getId()}">
+										<a href="/schedule/users/delete/${user.getId()}">
 											<button type="submit" class="btn btn-danger">Delete</button>
 										</a>
 									</td>
@@ -54,8 +60,8 @@
 			</c:choose>
 		</div>
 		<div>
-			<a href="/schedule/groups/create">
-				<button type="button" class="btn btn-primary">Create Group</button>
+			<a href="/schedule/users/create">
+				<button type="button" class="btn btn-primary">Create User</button>
 			</a>
 		</div>
 	</div>

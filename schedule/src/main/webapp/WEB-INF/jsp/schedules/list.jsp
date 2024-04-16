@@ -16,10 +16,10 @@
 <body>
 	<div class="container">
 		<div align="center">
-			<h3>List of Groups</h3>
+			<h3>List of Schedules</h3>
 			<br>
 			<c:choose>
-				<c:when test="${listGroups.getTotalElements() > 0}">
+				<c:when test="${listSchedules.size() > 0}">
 					<table class="table table-bordered">
 						<thead>
 							<tr>
@@ -28,34 +28,30 @@
 							</tr>
 						</thead>
 						<tbody>
-							<c:forEach items="${listGroups.content}" var="group">
+							<c:forEach items="${listSchedules}" var="schedule">
 								<tr>
-									<td>${group.getGroupName()}</td>
+									<td>${schedule.getScheduleTitle()}</td>
 
-									<td>
-										<a href="/schedule/groups/edit/${group.getId()}">
+									<td><a href="/schedule/edit/${schedule.getId()}">
 											<button type="submit" class="btn btn-primary">Edit</button>
-										</a>
-										<a href="/schedule/groups/delete/${group.getId()}">
+									</a><a href="/schedule/delete/${schedule.getId()}">
 											<button type="submit" class="btn btn-danger">Delete</button>
-										</a>
-									</td>
+									</a></td>
 								</tr>
 							</c:forEach>
 						</tbody>
 					</table>
-					<%@ include file="/WEB-INF/jsp/pagination.jsp" %>
 				</c:when>
 				<c:otherwise>
 					<div>
-						<p>There is no group.</p>
+						<p>There is no schedule.</p>
 					</div>
 				</c:otherwise>
 			</c:choose>
 		</div>
 		<div>
-			<a href="/schedule/groups/create">
-				<button type="button" class="btn btn-primary">Create Group</button>
+			<a href="/schedule/schedules/create">
+				<button type="button" class="btn btn-primary">Create Schedule</button>
 			</a>
 		</div>
 	</div>

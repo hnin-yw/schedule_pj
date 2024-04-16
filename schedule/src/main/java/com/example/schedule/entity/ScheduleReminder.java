@@ -1,20 +1,25 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user_groups")
-public class Group {
+@Table(name = "schedule_reminders")
+public class ScheduleReminder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@Column(name = "group_code")
-	private String groupCode;
+	@Column(name = "schedule_id")
+	private int scheduleId;
 
-	@Column(name = "group_name")
-	private String groupName;
+	@Column(name = "schedule_reminder_time")
+	private LocalTime scheduleReminderTime;
+
+	@Column(name = "noti_method_flg")
+	private Boolean notiMethodFlg;
 
 	@Column(name = "del_flg")
 	private Boolean delFlg;
@@ -31,14 +36,15 @@ public class Group {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	public Group() {
+	public ScheduleReminder() {
 	}
 
-	public Group(int id, String groupCode, String groupName, Boolean delFlg, String createdBy, LocalDateTime createdAt,
-			String updatedBy, LocalDateTime updatedAt) {
+	public ScheduleReminder(int id, int scheduleId, LocalTime scheduleReminderTime, Boolean notiMethodFlg, Boolean delFlg,
+			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt) {
 		this.id = id;
-		this.groupCode = groupCode;
-		this.groupName = groupName;
+		this.scheduleId = scheduleId;
+		this.scheduleReminderTime = scheduleReminderTime;
+		this.notiMethodFlg = notiMethodFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
@@ -57,20 +63,28 @@ public class Group {
 		this.id = id;
 	}
 
-	public String getGroupCode() {
-		return groupCode;
+	public int getScheduleId() {
+		return scheduleId;
 	}
 
-	public void setGroupCode(String groupCode) {
-		this.groupCode = groupCode;
+	public void setScheduleId(int scheduleId) {
+		this.scheduleId = scheduleId;
 	}
 
-	public String getGroupName() {
-		return groupName;
+	public LocalTime getScheduleReminderTime() {
+		return scheduleReminderTime;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void setScheduleReminderTime(LocalTime scheduleReminderTime) {
+		this.scheduleReminderTime = scheduleReminderTime;
+	}
+
+	public Boolean getNotiMethodFlg() {
+		return notiMethodFlg;
+	}
+
+	public void setNotiMethodFlg(Boolean notiMethodFlg) {
+		this.notiMethodFlg = notiMethodFlg;
 	}
 
 	public Boolean getDelFlg() {

@@ -4,57 +4,66 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.schedule.business.UserBusiness;
+import com.example.schedule.business.ScheduleBusiness;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 
 @Controller
 @RequestMapping("/schedules")
 public class ScheduleController {
-	private final UserBusiness userBusiness;
+	private final ScheduleBusiness scheduleBusiness;
 
 	@Autowired
-	public ScheduleController(UserBusiness userBusiness) {
-		this.userBusiness = userBusiness;
+	public ScheduleController(ScheduleBusiness scheduleBusiness) {
+		this.scheduleBusiness = scheduleBusiness;
 	}
 
 	@GetMapping()
 	public String list(Model model) {
-		List<User> listUsers = userBusiness.list();
-		model.addAttribute("listUsers", listUsers);
-		return "Users/list";
+		List<Schedule> listSchedules = scheduleBusiness.list();
+		model.addAttribute("listSchedules", listSchedules);
+		return "schedules/list";
 	}
 
 	@RequestMapping("/create")
 	public String create(Model model) {
-		User gp = new User();
-		model.addAttribute("User", gp);
+		Schedule schedule = new Schedule();
+		model.addAttribute("schedule", schedule);
 
-		return "Users/create";
+		return "schedules/create";
+	}
+
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String save(@ModelAttribute("schedule") @Validated Schedule schedule, BindingResult result, Model model) {
+		scheduleBusiness.saveSchedule(schedule);
+		return "redirect:/schedules";
 	}
 
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
-		ModelAndView mav = new ModelAndView("users/edit");
-		User user = userBusiness.findUserById(id);
-		mav.addObject("User", user);
+		ModelAndView mav = new ModelAndView("schedules/edit");
+		Schedule schedule = scheduleBusiness.findScheduleById(id);
+		mav.addObject("schedule", schedule);
 
 		return mav;
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(User User) {
-		userBusiness.updateUser(User);
-		return "redirect:/users";
+	public String update(Schedule Schedule) {
+		scheduleBusiness.updateSchedule(Schedule);
+		return "redirect:/schedules";
 	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id) {
-		userBusiness.deleteUser(id);
-		return "redirect:/users";
+		scheduleBusiness.deleteSchedule(id);
+		return "redirect:/schedules";
 	}
 }

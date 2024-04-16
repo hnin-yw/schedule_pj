@@ -19,7 +19,7 @@
 				</tr>
 				<tr>
 					<td><input type='hidden' id='id' class='form-control'
-						name='id' value="${group.getId()}" /></td>
+						name='id' value="${group.id}" /></td>
 					<td>
 						<button type="submit" class="btn btn-primary">Update</button> <a
 						href="/schedule/groups">

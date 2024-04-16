@@ -1,11 +1,13 @@
 package com.example.schedule.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.schedule.entity.*;
 
 public interface UserService {
-	public List<User> findAlls();
+
+	Page<User> findAlls(Pageable pageable);
 
 	public User findUserById(int id);
 
@@ -14,4 +16,6 @@ public interface UserService {
 	public int deleteById(int id);
 
 	public User findUserCodeByDesc();
+
+	User findUserByUsername(String username);
 }

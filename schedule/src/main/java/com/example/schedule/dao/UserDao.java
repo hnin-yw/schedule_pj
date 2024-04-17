@@ -1,5 +1,7 @@
 package com.example.schedule.dao;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,5 +19,7 @@ public interface UserDao {
 
 	User findUserCodeByDesc();
 
-	User findUserByUsername(String username);
+	User findUserByLoginData(String userName,String password);
+
+	List<User> findUserListByGroupId(int groupId);
 }

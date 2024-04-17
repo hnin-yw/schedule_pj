@@ -66,4 +66,10 @@ public class ScheduleController {
 		scheduleBusiness.deleteSchedule(id);
 		return "redirect:/schedules";
 	}
+
+	@RequestMapping("/download")
+	public String download(Model model) {
+		scheduleBusiness.exportUsersToExcel();
+		return "redirect:/schedules";
+	}
 }

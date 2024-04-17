@@ -51,4 +51,12 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		q.setParameter("scheduleId", id);
 		q.executeUpdate();
 	}
+
+	@Override
+	public List<Schedule> findScheduleListByUserCode(String userCode) {
+		Query query = (Query) entityManager.createQuery("from Schedule WHERE userCode =: userCode and delFlg = false");
+		query.setParameter("userCode", userCode);
+		List<Schedule> schedules = query.getResultList();
+		return schedules;
+	}
 }

@@ -49,10 +49,15 @@ public class UserServiceImpl implements UserService {
 	public User findUserCodeByDesc() {
 		return userDao.findUserCodeByDesc();
 	}
-	
-    @Override
-    public User findUserByUsername(String username){
-        User user = userDao.findUserByUsername(username);
-        return user;
-    }
+
+	@Override
+	public User findUserByLoginData(String userName, String password) {
+		User user = userDao.findUserByLoginData(userName, password);
+		return user;
+	}
+
+	@Override
+	public List<User> findUserListByGroupId(int groupId) {
+		return userDao.findUserListByGroupId(groupId);
+	}
 }

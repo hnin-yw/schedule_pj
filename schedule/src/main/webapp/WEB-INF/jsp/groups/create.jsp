@@ -1,41 +1,41 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
 <title>Create Group</title>
 </head>
 <body>
-	<div align="center">
-		<h1>Create Group</h1>
-		<br />
-		<form action='/schedule/groups/save' method='post'>
-
-			<table class='table table-hover table-responsive table-bordered'>
-				<tr>
-					<td>Group Name:</td>
-					<td>
-					<input type="text" id="groupName" name="groupName"
-						placeholder="Group Name" class="form-control "> <span
-						style="color: red;"><c:out
-								value="${result.hasFieldErrors('groupName') == true ? result.getFieldError('groupName').getDefaultMessage() : ''}" /></span>
-
-					</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td>
-						<button type="submit" class="btn btn-primary">Save Group</button>
-						<a href="/schedule/groups">
-							<button type="button" class="btn btn-primary">Cancel</button>
-					</a>
-					</td>
-				</tr>
-
-			</table>
-		</form>
+<div class="container pt-5">
+		<h1 class="text-center">グループの登録</h1>
+		<div class="container mt-5">
+			<div class="row justify-content-center">
+				<div class="col-md-6">
+					<div class="card">
+						<c:if test="${not empty error}">
+							<div class="alert alert-danger" role="alert">
+								<strong>${error}</strong>
+							</div>
+						</c:if>
+						<div class="card-body">
+							<form action='/schedule/groups/save' method='post'>
+								<div class="form-group">
+									<label for="email"> グループ名 :</label> 
+									<input type="text" class="form-control" id="groupName" name="groupName" placeholder="Group Name" />
+								</div>
+								<button type="submit" class="btn btn-primary">登録</button>
+								<a href="/schedule/groups">
+									<button type="button" class="btn btn-Light">キャンセル</button>
+								</a>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 </html>

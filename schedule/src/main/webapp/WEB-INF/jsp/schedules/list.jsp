@@ -6,12 +6,11 @@
 <head>
 <meta charset="utf-8" />
 <title>List</title>
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
 </head>
 <body>
 	<div class="container">
@@ -52,6 +51,9 @@
 		<div>
 			<a href="/schedule/schedules/create">
 				<button type="button" class="btn btn-primary">Create Schedule</button>
+			</a>
+			<a href="/schedule/main_menu">
+				<button type="button" class="btn btn-primary">Back</button>
 			</a>
 		</div>
 	</div>

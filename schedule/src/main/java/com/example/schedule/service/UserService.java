@@ -1,5 +1,7 @@
 package com.example.schedule.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,5 +19,7 @@ public interface UserService {
 
 	public User findUserCodeByDesc();
 
-	User findUserByUsername(String username);
+	User findUserByLoginData(String userName,String password);
+
+	public List<User> findUserListByGroupId(int groupId);
 }

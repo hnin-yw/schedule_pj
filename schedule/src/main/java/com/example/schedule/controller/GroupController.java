@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
@@ -45,13 +47,15 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result, Model model) {
-//		if (result.hasErrors()) {
-//			System.out.println(result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage() : "test");
-//			return "groups/create";
-//		}
-		groupBusiness.saveGroup(group);
-		return "redirect:/groups";
+	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,RedirectAttributes redirectAttributes) {
+		if (result.hasErrors()) {
+			System.out.println(result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage() : "test");
+			return "groups/create";
+		}else {
+			groupBusiness.saveGroup(group);
+			redirectAttributes.addFlashAttribute("message", "Group has been created successfully!.");
+			return "redirect:/groups";
+		}
 	}
 	
 

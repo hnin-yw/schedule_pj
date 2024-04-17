@@ -12,4 +12,6 @@ public interface ScheduleDao {
 	Schedule save(Schedule schedule);
 
 	void deleteById(int id);
+
+	List<Schedule> findScheduleListByUserCode(String userCode);
 }

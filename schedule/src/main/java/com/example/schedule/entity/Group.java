@@ -2,6 +2,7 @@ package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "user_groups")
@@ -13,6 +14,7 @@ public class Group {
 	@Column(name = "group_code")
 	private String groupCode;
 
+	@NotEmpty
 	@Column(name = "group_name")
 	private String groupName;
 

@@ -1,8 +1,6 @@
 package com.example.schedule.business;
 
-import java.io.IOException;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
@@ -34,9 +33,9 @@ public class ScheduleBusiness {
 	public Schedule saveSchedule(Schedule schedule) {
 		Schedule scheduleDb = scheduleService.save(schedule);
 
-		ScheduleReminder reminder = schedule.getScheduleReminder();
-		reminder.setScheduleId(scheduleDb.getId());
-		scheduleReminderService.save(reminder);
+		//List<ScheduleReminder> reminder = schedule.getScheduleReminders();
+		//reminder.setScheduleId(scheduleDb.getId());
+		//scheduleReminderService.save(reminder);
 
 		return scheduleDb;
 	}
@@ -60,12 +59,7 @@ public class ScheduleBusiness {
 		if (schedule == null) {
 			throw new RuntimeException("Schedule Id not found.");
 		}
-		ScheduleReminder reminder = scheduleReminderService
-				.findScheduleReminderById(schedule.getScheduleReminder().getId());
-		if (reminder != null) {
-			throw new RuntimeException("Cannot delete Schedule because other table use.");
-		}
-		scheduleReminderService.deleteById(schedule.getScheduleReminder().getId());
+		//scheduleReminderService.deleteById(schedule.getScheduleReminders().getId());
 		scheduleService.deleteById(id);
 		return "redirect:/schedules";
 	}

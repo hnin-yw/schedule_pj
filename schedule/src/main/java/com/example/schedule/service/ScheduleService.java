@@ -14,4 +14,6 @@ public interface ScheduleService {
 	public Schedule save(Schedule schedule);
 
 	public int deleteById(int id);
+
+	public List<Schedule> findScheduleListByUserCode(String userCode);
 }

@@ -1,7 +1,6 @@
 package com.example.schedule.business;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -9,16 +8,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
-import com.example.schedule.service.GroupService;
+import com.example.schedule.service.*;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class GroupBusiness {
 	private final GroupService groupService;
+	private final UserService userService;
 
 	@Autowired
-	public GroupBusiness(GroupService groupService) {
+	public GroupBusiness(GroupService groupService,UserService userService) {
 		this.groupService = groupService;
+		this.userService = userService;
 	}
 
 	public List<Group> getGroupLists() {
@@ -54,7 +55,12 @@ public class GroupBusiness {
 	public String deleteGroup(@PathVariable int id) {
 		Group gp = groupService.findGroupById(id);
 		if (gp == null) {
-			throw new RuntimeException("Group Id not found");
+			throw new RuntimeException("Group Id not found.");
+		}else {
+			List<User> users = userService.findUserListByGroupId(id);
+			if(users.size()>0) {
+				throw new RuntimeException("Cannot delete group.");
+			}
 		}
 		groupService.deleteById(id);
 		return "redirect:/groups";

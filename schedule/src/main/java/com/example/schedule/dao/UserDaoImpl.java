@@ -28,16 +28,16 @@ public class UserDaoImpl implements UserDao {
 	// get all the transactions from the database
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Page<User> getAlls(Pageable pageable) {
-        Query query = entityManager.createQuery("SELECT COUNT(u) FROM User u WHERE u.delFlg = false");
-        long total = (long) query.getSingleResult();
-        
-        query = entityManager.createQuery("FROM User WHERE delFlg = false");
-        int start = (int) pageable.getOffset();
-        List<User> users = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
-        
-        return new PageImpl<>(users, pageable, total);
+		Query query = entityManager.createQuery("SELECT COUNT(u) FROM User u WHERE u.delFlg = false");
+		long total = (long) query.getSingleResult();
+
+		query = entityManager.createQuery("FROM User WHERE delFlg = false");
+		int start = (int) pageable.getOffset();
+		List<User> users = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
+
+		return new PageImpl<>(users, pageable, total);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public void deleteById(int id) {
-		Query q = (Query) entityManager.createQuery("delete from User where id=:userId");
+		Query q = (Query) entityManager.createQuery("delete from User WHERE id=:userId");
 		q.setParameter("userId", id);
 		q.executeUpdate();
 	}
@@ -67,21 +67,31 @@ public class UserDaoImpl implements UserDao {
 		Query query = (Query) entityManager.createQuery("from User ORDER BY userCode DESC LIMIT 1");
 		List<User> users = query.getResultList();
 		if (users.isEmpty()) {
-	        return null;
-	    } else {
-	        return users.get(0);
-	    }
+			return null;
+		} else {
+			return users.get(0);
+		}
 	}
 
 	@Override
-	public User findUserByUsername(String username) {
-		Query query = (Query) entityManager.createQuery("from User where userName=:userName");
+	public User findUserByLoginData(String username, String password) {
+		Query query = (Query) entityManager
+				.createQuery("from User WHERE userName=:userName and password =: password and delFlg = false");
 		query.setParameter("userName", username);
+		query.setParameter("password", password);
 		List<User> users = query.getResultList();
 		if (users.isEmpty()) {
-	        return null;
-	    } else {
-	        return users.get(0);
-	    }
+			return null;
+		} else {
+			return users.get(0);
+		}
+	}
+
+	@Override
+	public List<User> findUserListByGroupId(int groupId) {
+		Query query = (Query) entityManager.createQuery("from User WHERE groupId =: groupId and delFlg = false");
+		query.setParameter("groupId", groupId);
+		List<User> users = query.getResultList();
+		return users;
 	}
 }

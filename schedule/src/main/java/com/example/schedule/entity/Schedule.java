@@ -1,14 +1,21 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "schedules")
 public class Schedule {
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "id", referencedColumnName = "schedule_id")
-	private ScheduleReminder scheduleReminder;
+//	@OneToOne(cascade = CascadeType.ALL)
+//	@JoinColumn(name = "id", referencedColumnName = "schedule_id")
+//	private ScheduleReminder scheduleReminder;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private List<ScheduleReminder> scheduleReminders = new ArrayList<>();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,6 +47,9 @@ public class Schedule {
 
 	@Column(name = "repeat_interval")
 	private int repeatInterval;
+
+	@Column(name = "repeat_interval_type")
+	private String repeatIntervalType;
 
 	@Column(name = "repeat_day_of_week")
 	private int repeatDayOfWeek;
@@ -94,10 +104,10 @@ public class Schedule {
 
 	public Schedule(int id, String groupCode, String userCode, String userName, String scheduleTitle,
 			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg, String repeatType,
-			int repeatUntil, int repeatInterval, int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth,
+			int repeatUntil, int repeatInterval, String repeatIntervalType,int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth,
 			Boolean scheduleDisplayFlg, String location, String meetLink, String scheduleDescription, String scheduleThemeColor,
 			Boolean otherVisibilityFlg, Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
-			LocalDateTime updatedAt, ScheduleReminder scheduleReminder) {
+			LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -108,6 +118,7 @@ public class Schedule {
 		this.repeatType = repeatType;
 		this.repeatUntil = repeatUntil;
 		this.repeatInterval = repeatInterval;
+		this.repeatIntervalType = repeatIntervalType;
 		this.repeatDayOfWeek = repeatDayOfWeek;
 		this.repeatDayOfMonth = repeatDayOfMonth;
 		this.repeatMonth = repeatMonth;
@@ -124,7 +135,7 @@ public class Schedule {
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
-		this.scheduleReminder = scheduleReminder;
+		this.scheduleReminders = scheduleReminders;
 	}
 
 	/*
@@ -208,6 +219,14 @@ public class Schedule {
 
 	public void setRepeatInterval(int repeatInterval) {
 		this.repeatInterval = repeatInterval;
+	}
+
+	public String getRepeatIntervalType() {
+		return repeatIntervalType;
+	}
+
+	public void setRepeatIntervalType(String repeatIntervalType) {
+		this.repeatIntervalType = repeatIntervalType;
 	}
 
 	public int getRepeatDayOfWeek() {
@@ -338,16 +357,18 @@ public class Schedule {
 		this.updatedAt = updatedAt;
 	}
 
-	public ScheduleReminder getScheduleReminder() {
-		return scheduleReminder;
+	public List<ScheduleReminder> getScheduleReminders() {
+		return scheduleReminders;
 	}
 
-	public void setScheduleReminder(ScheduleReminder scheduleReminder) {
-		this.scheduleReminder = scheduleReminder;
+	public void setScheduleReminders(List<ScheduleReminder> scheduleReminders) {
+		this.scheduleReminders = scheduleReminders;
 	}
 	
 	@PrePersist
     protected void onCreate() {
+		this.userCode = "U000001";
+		this.groupCode = "G000001";
 		this.allDayFlg = false;
 		this.repeatType = "01";
 		this.scheduleDisplayFlg = true;

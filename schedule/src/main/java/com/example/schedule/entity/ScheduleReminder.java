@@ -1,7 +1,6 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import jakarta.persistence.*;
 
@@ -16,7 +15,10 @@ public class ScheduleReminder {
 	private int scheduleId;
 
 	@Column(name = "schedule_reminder_time")
-	private LocalTime scheduleReminderTime;
+	private int scheduleReminderTime;
+
+	@Column(name = "schedule_reminder_type")
+	private String scheduleReminderType;
 
 	@Column(name = "noti_method_flg")
 	private Boolean notiMethodFlg;
@@ -39,11 +41,12 @@ public class ScheduleReminder {
 	public ScheduleReminder() {
 	}
 
-	public ScheduleReminder(int id, int scheduleId, LocalTime scheduleReminderTime, Boolean notiMethodFlg, Boolean delFlg,
+	public ScheduleReminder(int id, int scheduleId, int scheduleReminderTime, String scheduleReminderType, Boolean notiMethodFlg, Boolean delFlg,
 			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt) {
 		this.id = id;
 		this.scheduleId = scheduleId;
 		this.scheduleReminderTime = scheduleReminderTime;
+		this.scheduleReminderType = scheduleReminderType;
 		this.notiMethodFlg = notiMethodFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
@@ -71,12 +74,20 @@ public class ScheduleReminder {
 		this.scheduleId = scheduleId;
 	}
 
-	public LocalTime getScheduleReminderTime() {
+	public int getScheduleReminderTime() {
 		return scheduleReminderTime;
 	}
 
-	public void setScheduleReminderTime(LocalTime scheduleReminderTime) {
+	public void setScheduleReminderTime(int scheduleReminderTime) {
 		this.scheduleReminderTime = scheduleReminderTime;
+	}
+
+	public String getscheduleReminderType() {
+		return scheduleReminderType;
+	}
+
+	public void setScheduleReminderType(String scheduleReminderType) {
+		this.scheduleReminderType = scheduleReminderType;
 	}
 
 	public Boolean getNotiMethodFlg() {

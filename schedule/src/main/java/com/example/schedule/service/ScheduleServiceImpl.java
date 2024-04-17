@@ -47,4 +47,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<Schedule> findScheduleListByUserCode(String userCode) {
+		return scheduleDao.findScheduleListByUserCode(userCode);
+	}
 }

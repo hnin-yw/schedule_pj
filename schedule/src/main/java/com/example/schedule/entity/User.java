@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User {
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "group_id", referencedColumnName = "id")
-	private Group group;
+	@JoinColumn(name = "group_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Group group;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

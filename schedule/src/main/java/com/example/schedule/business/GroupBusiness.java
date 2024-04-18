@@ -1,6 +1,10 @@
 package com.example.schedule.business;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,8 +20,12 @@ public class GroupBusiness {
 	private final GroupService groupService;
 	private final UserService userService;
 
+	private Map<String, ArrayList> msgLists = new HashMap<>();
+	private ArrayList<String> errMsgLists = new ArrayList<>();
+	private ArrayList<String> sucMsgLists = new ArrayList<>();
+
 	@Autowired
-	public GroupBusiness(GroupService groupService,UserService userService) {
+	public GroupBusiness(GroupService groupService, UserService userService) {
 		this.groupService = groupService;
 		this.userService = userService;
 	}
@@ -52,18 +60,31 @@ public class GroupBusiness {
 		return "redirect:/groups";
 	}
 
-	public String deleteGroup(@PathVariable int id) {
+	public Map<String, ArrayList> deleteGroup(@PathVariable int id) {
+		msgLists = new HashMap<>();
+		errMsgLists = new ArrayList<>();
+		sucMsgLists = new ArrayList<>();
+		
+		Boolean isError = false;
 		Group gp = groupService.findGroupById(id);
 		if (gp == null) {
-			throw new RuntimeException("Group Id not found.");
-		}else {
+			isError = true;
+			errMsgLists.add("グループが見つかりません。");
+		} else {
 			List<User> users = userService.findUserListByGroupId(id);
-			if(users.size()>0) {
-				throw new RuntimeException("Cannot delete group.");
+			if (users.size() > 0) {
+				isError = true;
+				errMsgLists.add("このグループは削除できません。");
 			}
 		}
-		groupService.deleteById(id);
-		return "redirect:/groups";
+		if (!isError) {
+			groupService.deleteById(id);
+			sucMsgLists.add("グループは正常に削除されました。");
+			msgLists.put("messages", sucMsgLists);
+		} else {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
 	}
 
 	public String getGroupCode() {

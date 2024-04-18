@@ -1,5 +1,9 @@
 package com.example.schedule.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,9 +36,9 @@ public class GroupController {
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
 		Page<Group> listGroups = groupBusiness.list(PageRequest.of(page, 10));
-        model.addAttribute("listGroups", listGroups);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", listGroups.getTotalPages());
+		model.addAttribute("listGroups", listGroups);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", listGroups.getTotalPages());
 		return "groups/list";
 	}
 
@@ -47,17 +51,19 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,RedirectAttributes redirectAttributes) {
+	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,
+			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
-			System.out.println(result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage() : "test");
+			System.out.println(
+					result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage()
+							: "test");
 			return "groups/create";
-		}else {
+		} else {
 			groupBusiness.saveGroup(group);
 			redirectAttributes.addFlashAttribute("message", "Group has been created successfully!.");
 			return "redirect:/groups";
 		}
 	}
-	
 
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
@@ -75,8 +81,9 @@ public class GroupController {
 	}
 
 	@RequestMapping("/delete/{id}")
-	public String delete(@PathVariable int id) {
-		groupBusiness.deleteGroup(id);
+	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes) {
+		Map<String, ArrayList> msgLists = groupBusiness.deleteGroup(id);
+		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}
 }

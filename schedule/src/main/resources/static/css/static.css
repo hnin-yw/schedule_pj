@@ -1,15 +1,7 @@
-.container {
-  margin-bottom:500px;
+.content_body {
+	background-color: #ff0000;
 }
-.content {
-  margin-bottom:80px;
-}
-.content {
-  padding-bottom:80px;
-}
-.main-wrapper {
-  margin-bottom:80px;
-}
-.main-wrapper {
-  padding-bottom:80px;
+
+.btn_gp_up {
+	margin-right: 10px !important;
 }

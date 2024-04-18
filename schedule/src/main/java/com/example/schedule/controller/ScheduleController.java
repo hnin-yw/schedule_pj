@@ -1,5 +1,6 @@
 package com.example.schedule.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.schedule.business.ScheduleBusiness;
 import com.example.schedule.entity.*;
@@ -41,7 +43,8 @@ public class ScheduleController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("schedule") @Validated Schedule schedule, BindingResult result, Model model) {
+	public String save(@ModelAttribute("schedule") Schedule schedule,
+			BindingResult result, Model model) {
 		scheduleBusiness.saveSchedule(schedule);
 		return "redirect:/schedules";
 	}
@@ -57,6 +60,12 @@ public class ScheduleController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public String update(Schedule Schedule) {
+		scheduleBusiness.updateSchedule(Schedule);
+		return "redirect:/schedules";
+	}
+
+	@RequestMapping(value = "status/update", method = RequestMethod.POST)
+	public String updateScheduleStatus(Schedule Schedule) {
 		scheduleBusiness.updateSchedule(Schedule);
 		return "redirect:/schedules";
 	}

@@ -13,9 +13,9 @@ public class Schedule {
 //	@JoinColumn(name = "id", referencedColumnName = "schedule_id")
 //	private ScheduleReminder scheduleReminder;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id")
-    private List<ScheduleReminder> scheduleReminders = new ArrayList<>();
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "id")
+	private List<ScheduleReminder> scheduleReminders = new ArrayList<>();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -99,15 +99,20 @@ public class Schedule {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
+	private String startDateTimeString;
+	private String endDateTimeString;
+	private String repeatUntilDateTimeString;
+
 	public Schedule() {
 	}
 
 	public Schedule(int id, String groupCode, String userCode, String userName, String scheduleTitle,
-			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg, String repeatType,
-			int repeatUntil, int repeatInterval, String repeatIntervalType,int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth,
-			Boolean scheduleDisplayFlg, String location, String meetLink, String scheduleDescription, String scheduleThemeColor,
-			Boolean otherVisibilityFlg, Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
-			LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders) {
+			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg,
+			String repeatType, int repeatUntil, int repeatInterval, String repeatIntervalType, int repeatDayOfWeek,
+			int repeatDayOfMonth, int repeatMonth, Boolean scheduleDisplayFlg, String location, String meetLink,
+			String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg, Boolean eventFlg,
+			Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
+			LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,String startDateTimeString,String endDateTimeString,String repeatUntilDateTimeString) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -136,6 +141,9 @@ public class Schedule {
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
 		this.scheduleReminders = scheduleReminders;
+		this.startDateTimeString = startDateTimeString;
+		this.endDateTimeString = endDateTimeString;
+		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
 	}
 
 	/*
@@ -364,9 +372,9 @@ public class Schedule {
 	public void setScheduleReminders(List<ScheduleReminder> scheduleReminders) {
 		this.scheduleReminders = scheduleReminders;
 	}
-	
+
 	@PrePersist
-    protected void onCreate() {
+	protected void onCreate() {
 		this.userCode = "U000001";
 		this.groupCode = "G000001";
 		this.allDayFlg = false;
@@ -379,11 +387,37 @@ public class Schedule {
 		this.createdBy = "U000001";
 		this.updatedAt = LocalDateTime.now();
 		this.updatedBy = "U000001";
-    }
-	
+	}
+
 	@PreUpdate
-    protected void onUpdate() {
+	protected void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
 		this.updatedBy = "U000011";
-    }
+	}
+	
+
+
+	public String getStartDateTimeString() {
+		return startDateTimeString;
+	}
+
+	public void setStartDateTime(String startDateTimeString) {
+		this.startDateTimeString = startDateTimeString;
+	}
+
+	public String getEndDateTimeString() {
+		return endDateTimeString;
+	}
+
+	public void setEndDateTimeString(String endDateTimeString) {
+		this.endDateTimeString = endDateTimeString;
+	}
+
+	public String getRepeatUntilDateTimeString() {
+		return repeatUntilDateTimeString;
+	}
+
+	public void setRepeatUntilDateTimeString(String repeatUntilDateTimeString) {
+		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+	}
 }

@@ -27,12 +27,12 @@
 								<div class="form-group">
 									<label for="email"> ユーザ名 :</label> <input type="text"
 										class="form-control" id="userName" name="userName"
-										placeholder="User Name" />
+										placeholder="ユーザ名" />
 								</div>
 								<div class="form-group">
 									<label for="password"> パスワード :</label> <input type="password"
 										class="form-control" id="password" name="password"
-										placeholder="Password" />
+										placeholder="パスワード" />
 								</div>
 								<button type="submit" class="btn btn-primary">ログイン</button>
 							</form>

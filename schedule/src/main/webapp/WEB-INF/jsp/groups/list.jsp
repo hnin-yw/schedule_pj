@@ -1,70 +1,100 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+request.setAttribute("title", "List Group");
+%>
+<%@ include file="/WEB-INF/jsp/content.jsp"%>
+<div class="container-fluid">
+	<div class="row content">
+		<%@ include file="/WEB-INF/jsp/header_menu.jsp"%>
+		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
+		<div class="col-sm-10 content_body">
+			<h2 class="text-center">グループ一覧</h2>
+			<%@ include file="/WEB-INF/jsp/message.jsp"%>
+			<div class="col-sm-12">
+				<div class="up-btn-gp">
+					<a href="/schedule/groups/create">
+						<button type="button" class="btn btn-primary">グループを登録</button>
+					</a>
+				</div>
 
-<!DOCTYPE>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<title>List</title>
-<link rel="stylesheet" href="../static/css/static.css">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script
-	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-</head>
-<body>
-	<div class="container pt-5">
-		<div class="content">
-			<h3>グループ一覧</h3>
-			<br>
-			<div>
-				<a href="/schedule/groups/create">
-					<button type="button" class="btn btn-primary">グループを登録</button>
-				</a> <a href="/schedule/main_menu">
-					<button type="button" class="btn btn-primary">戻す</button>
-				</a>
-			</div>
-			<c:if test="${not empty message}">
-				<div class="alert alert-success">${message}</div>
-			</c:if>
-			<c:choose>
-				<c:when test="${listGroups.getTotalElements() > 0}">
-					<table class="table table-bordered">
-						<thead>
-							<tr>
-								<th><b> グループ名 </b></th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach items="${listGroups.content}" var="group">
+				<table class="table table-bordered" style="maring-top: 10px;">
+					<thead>
+						<tr>
+							<th><b> グループ名 </b></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:choose>
+							<c:when test="${listGroups.getTotalElements() > 0}">
+								<c:forEach items="${listGroups.content}" var="group">
+									<tr>
+										<td>${group.getGroupName()}</td>
+
+										<td style="width: 20%;"><a
+											href="/schedule/groups/edit/${group.getId()}">
+												<button type="submit" class="btn btn-primary">編集</button>
+										</a>
+											<button type="button" data-gpid="${group.getId()}"
+												id="btnGroupDelete" class="btn btn-danger"
+												data-toggle="modal" data-target="#deleteConfirmModel">削除</button></td>
+									</tr>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
 								<tr>
-									<td>${group.getGroupName()}</td>
-
-									<td><a href="/schedule/groups/edit/${group.getId()}">
-											<button type="submit" class="btn btn-primary">編集</button>
-									</a> <a href="/schedule/groups/delete/${group.getId()}">
-											<button type="submit" class="btn btn-danger">削除</button>
-									</a></td>
+									<td colspan="2">グループはありません.</td>
 								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
+
+							</c:otherwise>
+						</c:choose>
+					</tbody>
+				</table>
+				<c:if test="${listGroups.getTotalElements() > 0}">
 					<%@ include file="/WEB-INF/jsp/pagination.jsp"%>
-				</c:when>
-				<c:otherwise>
-					<div>
-						<p>グループはありません。</p>
+				</c:if>
+			</div>
+		</div>
+		<!-- Delete Confirm Modal -->
+		<div class="modal fade" id="deleteConfirmModel" tabindex="-1"
+			role="dialog" aria-labelledby="deleteConfirmModelLabel"
+			aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">情報削除の確認</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
-				</c:otherwise>
-			</c:choose>
+					<div class="modal-body">ユーザ情報を削除してもよろしいですか?</div>
+					<div class="modal-footer">
+						<a href="" id="deleteUrl">
+							<button type="submit" class="btn btn-danger">削除</button>
+						</a>
+						<button type="button" class="btn btn-secondary"
+							id="btnDeleteCancel" data-dismiss="modal">キャンセル</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
+</div>
 </body>
+<script>
+	$(document).ready(function() {
+		$('body').on('click', '#btnGroupDelete', function() {
+			var groupId = $(this).data('gpid');
+			var url = '/schedule/groups/delete/' + groupId;
+			document.getElementById('deleteUrl').setAttribute('href', url);
+		});
+
+		$("#btnDeleteCancel").click(function(e) {
+			document.getElementById('deleteUrl').setAttribute('href', "");
+		});
+	});
+</script>
 </html>

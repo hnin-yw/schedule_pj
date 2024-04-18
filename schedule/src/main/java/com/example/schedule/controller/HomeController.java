@@ -33,7 +33,7 @@ public class HomeController {
 			redirectAttributes.addFlashAttribute("error", "Invalid username or password!");
 			return "redirect:/";
 		} else {
-			return "redirect:/main_menu";
+			return "redirect:/groups";
 		}
 	}
 

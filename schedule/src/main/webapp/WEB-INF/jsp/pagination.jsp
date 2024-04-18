@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 
 <!-- Pagination controls -->
-<nav aria-label="Page navigation example">
+<nav aria-label="Page navigation example" class="cus-pagination">
 	<ul class="pagination justify-content-center">
 		<li class="page-item">
 			<c:choose>

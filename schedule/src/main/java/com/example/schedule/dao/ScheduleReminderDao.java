@@ -7,5 +7,5 @@ public interface ScheduleReminderDao {
 
 	ScheduleReminder findScheduleReminderById(int id);
 	
-	void deleteById(int id);
+	void deleteBySchedulId(int scheduleId);
 }

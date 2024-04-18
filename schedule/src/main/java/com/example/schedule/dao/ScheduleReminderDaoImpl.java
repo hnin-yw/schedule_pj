@@ -34,9 +34,9 @@ public class ScheduleReminderDaoImpl implements ScheduleReminderDao {
 	}
 
 	@Override
-	public void deleteById(int id) {
-		Query q = (Query) entityManager.createQuery("delete from ScheduleReminder where id=:ScheduleReminderId");
-		q.setParameter("ScheduleReminderId", id);
+	public void deleteBySchedulId(int scheduleId) {
+		Query q = (Query) entityManager.createQuery("delete from ScheduleReminder where scheduleId=:scheduleId");
+		q.setParameter("scheduleId", scheduleId);
 		q.executeUpdate();
 	}
 }

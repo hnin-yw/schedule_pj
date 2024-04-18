@@ -29,8 +29,8 @@ public class ScheduleReminderServiceImpl implements ScheduleReminderService {
 
 	@Override
 	@Transactional
-	public int deleteById(int id) {
-		ScheduleReminderDao.deleteById(id);
-		return id;
+	public int deleteBySchedulId(int scheduleId) {
+		ScheduleReminderDao.deleteBySchedulId(scheduleId);
+		return scheduleId;
 	}
 }

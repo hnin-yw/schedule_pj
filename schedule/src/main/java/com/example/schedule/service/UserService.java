@@ -21,5 +21,5 @@ public interface UserService {
 
 	User findUserByLoginData(String userName,String password);
 
-	public List<User> findUserListByGroupId(int groupId);
+	public List<User> findUserListByGroupCode(String groupCode);
 }

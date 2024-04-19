@@ -5,7 +5,7 @@
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="#"><span class="glyphicon glyphicon-user"></span>
-						My Account</a></li>
+						<%= session.getAttribute("user_code") %></a></li>
 				<li><a href="#"><span class="glyphicon glyphicon-log-in"></span>
 						ログアウト</a></li>
 			</ul>

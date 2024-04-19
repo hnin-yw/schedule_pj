@@ -4,7 +4,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +19,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class UserBusiness {
 	private final UserService userService;
 	private final ScheduleService scheduleService;
 
+	private Map<String, ArrayList> msgLists = new HashMap<>();
+	private ArrayList<String> errMsgLists = new ArrayList<>();
+	private ArrayList<String> sucMsgLists = new ArrayList<>();
+
 	@Autowired
-	public UserBusiness(UserService userService,ScheduleService scheduleService) {
+	public UserBusiness(UserService userService, ScheduleService scheduleService) {
 		this.userService = userService;
 		this.scheduleService = scheduleService;
 	}
-
-//	public User login(User user) {
-//		if (user.getUserName() == null || user.getPassword() == null) {
-//			return user;
-//		} else {
-//			user = userService.findUserByUsername(user.getUserName());
-//		}
-//		return user;
-//	}
 
 	public Page<User> list(Pageable pageable) {
 		Page<User> listUsers = userService.findAlls(pageable);
@@ -58,7 +60,7 @@ public class UserBusiness {
 		if (updUser == null) {
 			throw new RuntimeException("User to update doesn't exist");
 		}
-		updUser.setGroupId(user.getGroupId());
+		updUser.setGroupCode(user.getGroupCode());
 		updUser.setUserName(user.getUserName());
 		updUser.setUserFirstName(user.getUserFirstName());
 		updUser.setUserLastName(user.getUserLastName());
@@ -70,18 +72,32 @@ public class UserBusiness {
 		return "redirect:/users";
 	}
 
-	public String deleteUser(@PathVariable int id) {
+	public Map<String, ArrayList> deleteUser(@PathVariable int id) {
+		msgLists = new HashMap<>();
+		errMsgLists = new ArrayList<>();
+		sucMsgLists = new ArrayList<>();
+
+		Boolean isError = false;
 		User user = userService.findUserById(id);
 		if (user == null) {
-			throw new RuntimeException("User Id not found.");
-		}else {
+			isError = true;
+			errMsgLists.add("ユーザが見つかりません。");
+		} else {
 			List<Schedule> schedules = scheduleService.findScheduleListByUserCode(user.getUserCode());
-			if(schedules.size()>0) {
-				throw new RuntimeException("Cannot delete User.");
+			if (schedules.size() > 0) {
+				isError = true;
+				errMsgLists.add("このユーザは削除できません。");
 			}
 		}
-		userService.deleteById(id);
-		return "redirect:/users";
+		if (!isError) {
+			user.setDelFlg(true);
+			userService.save(user);
+			sucMsgLists.add("ユーザは正常に削除されました。");
+			msgLists.put("messages", sucMsgLists);
+		} else {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
 	}
 
 	public String getUserCode() {
@@ -123,15 +139,22 @@ public class UserBusiness {
 		return hexString.toString();
 	}
 
-	public Boolean login(User user) {
+	public Boolean login(User user, HttpServletResponse response) {
 		boolean isLoginFail = false;
 		if (user.getUserName() == null || user.getPassword() == null) {
 			isLoginFail = true;
-		}else {
+		} else {
 			String password = DigestUtils.sha256Hex(user.getPassword());
 			User userdb = userService.findUserByLoginData(user.getUserName(), password);
 			if (userdb == null) {
 				isLoginFail = true;
+			} else {
+//				Cookie c1 = new Cookie("user_code", user.getUserCode());				
+//				Cookie c2 = new Cookie("user_name", user.getUserName());			
+//				Cookie c3 = new Cookie("group_code", user.getGroupCode());
+//				response.addCookie(c1);
+//				response.addCookie(c2);
+//				response.addCookie(c3);
 			}
 		}
 		return isLoginFail;

@@ -1,7 +1,6 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -9,13 +8,8 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "schedules")
 public class Schedule {
-//	@OneToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name = "id", referencedColumnName = "schedule_id")
-//	private ScheduleReminder scheduleReminder;
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "id")
-	private List<ScheduleReminder> scheduleReminders = new ArrayList<>();
+	@OneToMany(mappedBy = "schedule")
+	protected List<ScheduleReminder> scheduleReminders;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,7 +37,7 @@ public class Schedule {
 	private String repeatType;
 
 	@Column(name = "repeat_until")
-	private int repeatUntil;
+	private LocalDateTime repeatUntil;
 
 	@Column(name = "repeat_interval")
 	private int repeatInterval;
@@ -108,11 +102,12 @@ public class Schedule {
 
 	public Schedule(int id, String groupCode, String userCode, String userName, String scheduleTitle,
 			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg,
-			String repeatType, int repeatUntil, int repeatInterval, String repeatIntervalType, int repeatDayOfWeek,
-			int repeatDayOfMonth, int repeatMonth, Boolean scheduleDisplayFlg, String location, String meetLink,
-			String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg, Boolean eventFlg,
-			Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
-			LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,String startDateTimeString,String endDateTimeString,String repeatUntilDateTimeString) {
+			String repeatType, LocalDateTime repeatUntil, int repeatInterval, String repeatIntervalType,
+			int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth, Boolean scheduleDisplayFlg, String location,
+			String meetLink, String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg,
+			Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt,
+			String updatedBy, LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,
+			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -213,11 +208,11 @@ public class Schedule {
 		this.repeatType = repeatType;
 	}
 
-	public int getRepeatUntil() {
+	public LocalDateTime getRepeatUntil() {
 		return repeatUntil;
 	}
 
-	public void setRepeatUntil(int repeatUntil) {
+	public void setRepeatUntil(LocalDateTime repeatUntil) {
 		this.repeatUntil = repeatUntil;
 	}
 
@@ -309,11 +304,11 @@ public class Schedule {
 		this.otherVisibilityFlg = otherVisibilityFlg;
 	}
 
-	public Boolean geteventFlg() {
+	public Boolean getEventFlg() {
 		return eventFlg;
 	}
 
-	public void seteventFlg(Boolean eventFlg) {
+	public void setEventFlg(Boolean eventFlg) {
 		this.eventFlg = eventFlg;
 	}
 
@@ -377,10 +372,6 @@ public class Schedule {
 	protected void onCreate() {
 		this.userCode = "U000001";
 		this.groupCode = "G000001";
-		this.allDayFlg = false;
-		this.repeatType = "01";
-		this.scheduleDisplayFlg = true;
-		this.otherVisibilityFlg = false;
 		this.scheduleStatusFlg = false;
 		this.delFlg = false;
 		this.createdAt = LocalDateTime.now();
@@ -394,14 +385,12 @@ public class Schedule {
 		this.updatedAt = LocalDateTime.now();
 		this.updatedBy = "U000011";
 	}
-	
-
 
 	public String getStartDateTimeString() {
 		return startDateTimeString;
 	}
 
-	public void setStartDateTime(String startDateTimeString) {
+	public void setStartDateTimeString(String startDateTimeString) {
 		this.startDateTimeString = startDateTimeString;
 	}
 

@@ -1,7 +1,6 @@
 package com.example.schedule.controller;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 
 @Controller
 @RequestMapping("/groups")
@@ -51,18 +48,23 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,
-			RedirectAttributes redirectAttributes) {
-		if (result.hasErrors()) {
-			System.out.println(
-					result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage()
-							: "test");
-			return "groups/create";
-		} else {
-			groupBusiness.saveGroup(group);
-			redirectAttributes.addFlashAttribute("message", "Group has been created successfully!.");
-			return "redirect:/groups";
-		}
+//	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,
+//			RedirectAttributes redirectAttributes) {
+//		if (result.hasErrors()) {
+//			System.out.println(
+//					result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage()
+//							: "test");
+//			return "groups/create";
+//		} else {
+//			groupBusiness.saveGroup(group);
+//			redirectAttributes.addFlashAttribute("message", "グループが正常に登録されました。");
+//			return "redirect:/groups";
+//		}
+//	}
+	public String save(@ModelAttribute("group") Group group, RedirectAttributes redirectAttributes) {
+		Map<String, ArrayList> msgLists = groupBusiness.saveGroup(group);
+		redirectAttributes.addFlashAttribute("msgLists", msgLists);
+		return "redirect:/groups";
 	}
 
 	@RequestMapping("/edit/{id}")
@@ -75,8 +77,9 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Group group) {
-		groupBusiness.updateGroup(group);
+	public String update(Group group, RedirectAttributes redirectAttributes) {
+		Map<String, ArrayList> msgLists = groupBusiness.updateGroup(group);
+		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}
 

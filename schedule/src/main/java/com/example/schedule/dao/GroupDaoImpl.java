@@ -27,25 +27,25 @@ public class GroupDaoImpl implements GroupDao {
 
 	// get all the transactions from the database
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public List<Group> getGroupLists() {
-        Query query = entityManager.createQuery("from Group WHERE delFlg = false");
-        return query.getResultList();
+		Query query = entityManager.createQuery("from Group WHERE delFlg = false");
+		return query.getResultList();
 	}
 
 	// get all the transactions from the database
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Page<Group> getAlls(Pageable pageable) {
-        Query query = entityManager.createQuery("SELECT COUNT(g) FROM Group g");
-        long total = (long) query.getSingleResult();
-        
-        query = entityManager.createQuery("FROM Group");
-        int start = (int) pageable.getOffset();
-        List<Group> groups = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
-        
-        return new PageImpl<>(groups, pageable, total);
+		Query query = entityManager.createQuery("SELECT COUNT(g) FROM Group g WHERE delFlg=false");
+		long total = (long) query.getSingleResult();
+
+		query = entityManager.createQuery("FROM Group WHERE delFlg=false");
+		int start = (int) pageable.getOffset();
+		List<Group> groups = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
+
+		return new PageImpl<>(groups, pageable, total);
 	}
 
 	@Override
@@ -75,9 +75,9 @@ public class GroupDaoImpl implements GroupDao {
 		Query query = (Query) entityManager.createQuery("from Group ORDER BY groupCode DESC LIMIT 1");
 		List<Group> groups = query.getResultList();
 		if (groups.isEmpty()) {
-	        return null;
-	    } else {
-	        return groups.get(0);
-	    }
+			return null;
+		} else {
+			return groups.get(0);
+		}
 	}
 }

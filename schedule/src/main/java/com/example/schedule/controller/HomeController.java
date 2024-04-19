@@ -10,6 +10,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.schedule.business.UserBusiness;
 import com.example.schedule.entity.*;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Controller
 public class HomeController {
 	private final UserBusiness userBusiness;
@@ -25,9 +27,9 @@ public class HomeController {
 	}
 
 	@RequestMapping(value = "schedule/login", method = RequestMethod.POST)
-	public String showWelcomePage(User user, RedirectAttributes redirectAttributes) {
+	public String showWelcomePage(User user, RedirectAttributes redirectAttributes, HttpServletResponse response) {
 
-		Boolean isLoginFail = userBusiness.login(user);
+		Boolean isLoginFail = userBusiness.login(user, response);
 
 		if (isLoginFail) {
 			redirectAttributes.addFlashAttribute("error", "Invalid username or password!");

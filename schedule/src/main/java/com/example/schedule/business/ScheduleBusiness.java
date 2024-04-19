@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
@@ -38,17 +37,16 @@ public class ScheduleBusiness {
 
 		schedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
 		schedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
-		schedule.setScheduleEndDateTime(toDateTime(schedule.getRepeatUntilDateTimeString()));
+		schedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
 
 		Schedule scheduleDb = scheduleService.save(schedule);
-
 		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
 		if (reminders.size() > 0) {
-			for (int j = 0; j < reminders.size(); j++) {
-				ScheduleReminder reminder = reminders.get(j);
-				reminder.setScheduleId(scheduleDb.getId());
-				scheduleReminderService.save(reminder);
-			}
+		    for (int j = 0; j < reminders.size(); j++) {
+		        ScheduleReminder reminder = reminders.get(j);
+		        reminder.setScheduleId(scheduleDb.getId());
+		        scheduleReminderService.save(reminder);
+		    }
 		}
 
 		return scheduleDb;
@@ -64,6 +62,24 @@ public class ScheduleBusiness {
 		if (updSchedule == null) {
 			throw new RuntimeException("Schedule to update doesn't exist");
 		}
+		updSchedule.setScheduleTitle(schedule.getScheduleTitle());
+		updSchedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
+		updSchedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
+		updSchedule.setAllDayFlg(schedule.getAllDayFlg());
+		updSchedule.setRepeatType(schedule.getRepeatType());
+		updSchedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
+		updSchedule.setRepeatInterval(schedule.getRepeatInterval());
+		updSchedule.setRepeatIntervalType(schedule.getRepeatIntervalType());
+		updSchedule.setRepeatDayOfWeek(schedule.getRepeatDayOfWeek());
+		updSchedule.setRepeatDayOfMonth(schedule.getRepeatDayOfMonth());
+		updSchedule.setRepeatMonth(schedule.getRepeatMonth());
+		updSchedule.setScheduleDisplayFlg(schedule.getScheduleDisplayFlg());
+		updSchedule.setLocation(schedule.getLocation());
+		updSchedule.setMeetLink(schedule.getMeetLink());
+		updSchedule.setScheduleDescription(schedule.getScheduleDescription());
+		updSchedule.setScheduleThemeColor(schedule.getScheduleThemeColor());
+		updSchedule.setOtherVisibilityFlg(schedule.getOtherVisibilityFlg());
+		updSchedule.setEventFlg(schedule.getEventFlg());
 		scheduleService.save(updSchedule);
 
 		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
@@ -93,8 +109,16 @@ public class ScheduleBusiness {
 		if (schedule == null) {
 			throw new RuntimeException("Schedule Id not found.");
 		}
-		scheduleReminderService.deleteBySchedulId(schedule.getId());
-		scheduleService.deleteById(id);
+		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+		if (reminders.size() > 0) {
+			for (int j = 0; j < reminders.size(); j++) {
+				ScheduleReminder reminder = reminders.get(j);
+				reminder.setDelFlg(true);
+				scheduleReminderService.save(reminder);
+			}
+		}
+		schedule.setDelFlg(true);
+		scheduleService.save(schedule);
 		return "redirect:/schedules";
 	}
 

@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> findUserListByGroupId(int groupId) {
-		return userDao.findUserListByGroupId(groupId);
+	public List<User> findUserListByGroupCode(String groupCode) {
+		return userDao.findUserListByGroupCode(groupCode);
 	}
 }

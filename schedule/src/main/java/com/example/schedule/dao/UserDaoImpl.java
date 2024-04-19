@@ -88,9 +88,9 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public List<User> findUserListByGroupId(int groupId) {
-		Query query = (Query) entityManager.createQuery("from User WHERE groupId =: groupId and delFlg = false");
-		query.setParameter("groupId", groupId);
+	public List<User> findUserListByGroupCode(String groupCode) {
+		Query query = (Query) entityManager.createQuery("from User WHERE groupCode =: groupCode and delFlg = false");
+		query.setParameter("groupCode", groupCode);
 		List<User> users = query.getResultList();
 		return users;
 	}

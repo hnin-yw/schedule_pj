@@ -21,5 +21,5 @@ public interface UserDao {
 
 	User findUserByLoginData(String userName,String password);
 
-	List<User> findUserListByGroupId(int groupId);
+	List<User> findUserListByGroupCode(String groupCode);
 }

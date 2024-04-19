@@ -4,16 +4,6 @@
 <%
 request.setAttribute("title", "List User");
 %>
-<script>
-	$(document).ready(function() {
-		$("#btnUserDelete").click(function(e) {
-			e.preventDefault();
-			var groupId = $(this).data('id');
-			window.alert(groupId);
-			$("#deleteGroupId").val(groupId);
-		});
-	});
-</script>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -21,12 +11,7 @@ request.setAttribute("title", "List User");
 		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">ユーザ一覧</h2>
-			<c:if test="${not empty message}">
-				<div class="alert alert-success" role="alert">
-					<strong>${message}</strong>
-				</div>
-			</c:if>
-
+			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="col-sm-12">
 				<div class="up-btn-gp">
 					<a href="/schedule/users/create">
@@ -57,12 +42,9 @@ request.setAttribute("title", "List User");
 										<td><a href="/schedule/users/edit/${user.getId()}">
 												<button type="submit" class="btn btn-primary">編集</button>
 										</a>
-											<button type="button" data-id="${user.getId()}"
+											<button type="button" data-userid="${user.getId()}"
 												id="btnUserDelete" class="btn btn-danger"
-												data-toggle="modal" data-target="#deleteConfirmModel">
-												削除</button> <%-- <a href="/schedule/users/delete/${user.getId()}">
-											<button type="submit" class="btn btn-danger">削除</button>
-										</a> --%></td>
+												data-toggle="modal" data-target="#deleteConfirmModel">削除</button></td>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -80,6 +62,7 @@ request.setAttribute("title", "List User");
 				</c:if>
 			</div>
 		</div>
+
 		<!-- Delete Confirm Modal -->
 		<div class="modal fade" id="deleteConfirmModel" tabindex="-1"
 			role="dialog" aria-labelledby="deleteConfirmModelLabel"
@@ -93,13 +76,13 @@ request.setAttribute("title", "List User");
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="modal-body">ユーザ情報を削除してもよろしいですか?</div>
+					<div class="modal-body">ユーザの情報を削除してもよろしいですか?</div>
 					<div class="modal-footer">
-						<input type="text" class="form-control" id="deleteGroupId"
-							name="deleteGroupId" />
-						<button type="button" class="btn btn-primary">削除</button>
+						<a href="" id="deleteUrl">
+							<button type="submit" class="btn btn-danger">削除</button>
+						</a>
 						<button type="button" class="btn btn-secondary"
-							data-dismiss="modal">キャンセル</button>
+							id="btnDeleteCancel" data-dismiss="modal">キャンセル</button>
 					</div>
 				</div>
 			</div>
@@ -107,4 +90,17 @@ request.setAttribute("title", "List User");
 	</div>
 </div>
 </body>
+<script>
+	$(document).ready(function() {
+		$('body').on('click', '#btnUserDelete', function() {
+			var groupId = $(this).data('userid');
+			var url = '/schedule/users/delete/' + groupId;
+			document.getElementById('deleteUrl').setAttribute('href', url);
+		});
+
+		$("#btnDeleteCancel").click(function(e) {
+			document.getElementById('deleteUrl').setAttribute('href', "");
+		});
+	});
+</script>
 </html>

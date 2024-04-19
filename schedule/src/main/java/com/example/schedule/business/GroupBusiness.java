@@ -40,9 +40,17 @@ public class GroupBusiness {
 		return listGroups;
 	}
 
-	public Group saveGroup(Group group) {
+	public Map<String, ArrayList> saveGroup(Group group) {
+		msgLists = new HashMap<>();
+		sucMsgLists = new ArrayList<>();
+		
 		group.setGroupCode(this.getGroupCode());
-		return groupService.save(group);
+		Group gpDb = groupService.save(group);
+		if(gpDb != null) {
+			sucMsgLists.add("グループは正常に更新されました。");
+			msgLists.put("messages", sucMsgLists);
+		}
+		return msgLists;
 	}
 
 	public Group findGroupById(int id) {
@@ -50,35 +58,47 @@ public class GroupBusiness {
 		return group;
 	}
 
-	public String updateGroup(Group group) {
+	public Map<String, ArrayList> updateGroup(Group group) {
+		msgLists = new HashMap<>();
+		errMsgLists = new ArrayList<>();
+		sucMsgLists = new ArrayList<>();
+		Boolean isError = false;
 		Group updGroup = groupService.findGroupById(group.getId());
 		if (updGroup == null) {
-			throw new RuntimeException("Group to update doesn't exist");
+			isError = true;
+			errMsgLists.add("更新するグループが存在しません。");
 		}
-		updGroup.setGroupName(group.getGroupName());
-		groupService.save(updGroup);
-		return "redirect:/groups";
+		if (!isError) {
+			updGroup.setGroupName(group.getGroupName());
+			groupService.save(updGroup);
+			sucMsgLists.add("グループは正常に更新されました。");
+			msgLists.put("messages", sucMsgLists);
+		} else {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
 	}
 
 	public Map<String, ArrayList> deleteGroup(@PathVariable int id) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
-		
+
 		Boolean isError = false;
 		Group gp = groupService.findGroupById(id);
 		if (gp == null) {
 			isError = true;
 			errMsgLists.add("グループが見つかりません。");
 		} else {
-			List<User> users = userService.findUserListByGroupId(id);
+			List<User> users = userService.findUserListByGroupCode(gp.getGroupCode());
 			if (users.size() > 0) {
 				isError = true;
 				errMsgLists.add("このグループは削除できません。");
 			}
 		}
 		if (!isError) {
-			groupService.deleteById(id);
+			gp.setDelFlg(true);
+			groupService.save(gp);
 			sucMsgLists.add("グループは正常に削除されました。");
 			msgLists.put("messages", sucMsgLists);
 		} else {

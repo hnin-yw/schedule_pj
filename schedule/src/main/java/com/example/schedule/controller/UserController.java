@@ -1,6 +1,9 @@
 package com.example.schedule.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import org.springframework.ui.Model;
@@ -25,7 +30,7 @@ public class UserController {
 	private final GroupBusiness groupBusiness;
 
 	@Autowired
-	public UserController(UserBusiness userBusiness,GroupBusiness groupBusiness) {
+	public UserController(UserBusiness userBusiness, GroupBusiness groupBusiness) {
 		this.userBusiness = userBusiness;
 		this.groupBusiness = groupBusiness;
 	}
@@ -33,9 +38,9 @@ public class UserController {
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
 		Page<User> listUsers = userBusiness.list(PageRequest.of(page, 10));
-        model.addAttribute("listUsers", listUsers);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", listUsers.getTotalPages());
+		model.addAttribute("listUsers", listUsers);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", listUsers.getTotalPages());
 		return "users/list";
 	}
 
@@ -73,8 +78,9 @@ public class UserController {
 	}
 
 	@RequestMapping("/delete/{id}")
-	public String delete(@PathVariable int id) {
-		userBusiness.deleteUser(id);
+	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes) {
+		Map<String, ArrayList> msgLists = userBusiness.deleteUser(id);
+		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/users";
 	}
 }

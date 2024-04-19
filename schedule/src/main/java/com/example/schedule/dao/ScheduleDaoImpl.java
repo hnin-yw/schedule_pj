@@ -25,7 +25,7 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Schedule> getAlls() {
-		Query q = (Query) entityManager.createQuery("from Schedule");
+		Query q = (Query) entityManager.createQuery("from Schedule WHERE delFlg=false");
 		List<Schedule> transactions = q.getResultList();
 
 		return transactions;
@@ -47,7 +47,7 @@ public class ScheduleDaoImpl implements ScheduleDao {
 
 	@Override
 	public void deleteById(int id) {
-		Query q = (Query) entityManager.createQuery("delete from Schedule where id=:scheduleId");
+		Query q = (Query) entityManager.createQuery("delete from Schedule WHERE id=:scheduleId");
 		q.setParameter("scheduleId", id);
 		q.executeUpdate();
 	}

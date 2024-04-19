@@ -29,13 +29,13 @@
 <style>
 .row.content {
 	margin: 10px;
-	min-height: 730px;
+	height: 1005px;
 	box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 
 .sidenav {
 	background-color: #f1f1f1;
-	min-height: 730px;
+	height: 955px;
 	padding-top: 20px;
 }
 
@@ -47,9 +47,34 @@
 	text-align: right;
 }
 
+.mrg_form {
+	margin-bottom: 10px;
+}
+
 .table {
 	margin-top: 20px;
 	margin-bottom: 10px !important;
+}
+
+.custom-label {
+	display: block;
+	margin-bottom: 15px;
+}
+
+.custom-checkbox {
+	width: 20px;
+	height: 20px;
+	margin-right: 5px;
+}
+
+.custom-color_box {
+	width: 30px;
+	height: 30px;
+}
+
+.cus_left-panel {
+	border: 1px solid #000;
+	padding: 10px;
 }
 </style>
 <title><%=request.getAttribute("title")%></title>

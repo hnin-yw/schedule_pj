@@ -20,14 +20,14 @@ request.setAttribute("title", "Edit User");
 				<div class="card-body">
 					<form action='/schedule/users/update' method='post'>
 						<div class="form-group col-sm-12">
-							<label for="groupName"> グループ :</label> <select name="groupId"
+							<label for="groupName"> グループ :</label> <select name="groupCode"
 								class="form-control">
 								<c:choose>
 									<c:when test="${gpLists.size() > 0}">
 										<option value="">-- グループを選択してください --</option>
 										<c:forEach items="${gpLists}" var="group">
 											<option value="${group.getId()}"
-												<c:if test="${group.getId() == user.getGroupId()}">selected</c:if>>${group.getGroupName()}</option>
+												<c:if test="${group.getGroupCode() == user.getGroupCode()}">selected</c:if>>${group.getGroupName()}</option>
 										</c:forEach>
 									</c:when>
 									<c:otherwise>
@@ -74,11 +74,13 @@ request.setAttribute("title", "Edit User");
 								name="email" placeholder="メール" value="${user.getEmail()}"
 								class="form-control ">
 						</div>
+						<input type='hidden' id='id' class='form-control' name='id'
+							value="${user.getId()}" />
 						<div class="up-btn-gp col-sm-12">
+							<button type="submit" class="btn btn-primary">編集</button>
 							<a href="/schedule/users">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
-							<button type="submit" class="btn btn-primary">編集</button>
 						</div>
 					</form>
 				</div>

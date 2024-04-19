@@ -20,16 +20,17 @@ request.setAttribute("title", "Create User");
 				<div class="card-body">
 					<form action='/schedule/users/save' method='post'>
 						<div class="form-group col-sm-12">
-							<label for="groupName"> グループ :</label> <select name="groupId"
+							<label for="groupName"> グループ :</label> <select name="groupCode"
 								class="form-control">
 								<c:choose>
 									<c:when test="${gpLists.size() > 0}">
 										<option value="">-- グループを選択してください --</option>
 										<c:forEach items="${gpLists}" var="group">
-											<option value="${group.getId()}">${group.getGroupName()}</option>
+											<option value="${group.getGroupCode()}">${group.getGroupName()}</option>
 										</c:forEach>
 									</c:when>
 									<c:otherwise>
+										<option value="">-- グループを選択してください --</option>
 									</c:otherwise>
 								</c:choose>
 							</select>

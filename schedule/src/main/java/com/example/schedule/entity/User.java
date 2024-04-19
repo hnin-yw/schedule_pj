@@ -7,15 +7,15 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User {
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "group_id", referencedColumnName = "id", insertable = false, updatable = false)
+	@JoinColumn(name = "group_code", referencedColumnName = "group_code", insertable = false, updatable = false)
     private Group group;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@Column(name = "group_id")
-	private int groupId;
+	@Column(name = "group_code")
+	private String groupCode;
 
 	@Column(name = "user_code")
 	private String userCode;
@@ -62,11 +62,11 @@ public class User {
 	public User() {
 	}
 
-	public User(int id, int groupId, String userCode, String userName, String userFirstName, String userLastName,
+	public User(int id, String groupCode, String userCode, String userName, String userFirstName, String userLastName,
 			String postCode, String address, String telNumber, String email, String password, Boolean delFlg,
 			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, Group group) {
 		this.id = id;
-		this.groupId = groupId;
+		this.groupCode = groupCode;
 		this.userCode = userCode;
 		this.userName = userName;
 		this.userFirstName = userFirstName;
@@ -94,12 +94,12 @@ public class User {
 		this.id = id;
 	}
 
-	public int getGroupId() {
-		return groupId;
+	public String getGroupCode() {
+		return groupCode;
 	}
 
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
+	public void setGroupCode(String groupCode) {
+		this.groupCode = groupCode;
 	}
 
 	public String getUserCode() {

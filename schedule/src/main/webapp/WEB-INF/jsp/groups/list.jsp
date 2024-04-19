@@ -70,7 +70,7 @@ request.setAttribute("title", "List Group");
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="modal-body">ユーザ情報を削除してもよろしいですか?</div>
+					<div class="modal-body">グループの情報を削除してもよろしいですか?</div>
 					<div class="modal-footer">
 						<a href="" id="deleteUrl">
 							<button type="submit" class="btn btn-danger">削除</button>

@@ -119,14 +119,11 @@ public class Group {
     protected void onCreate() {
 		this.delFlg = false;
 		this.createdAt = LocalDateTime.now();
-		this.createdBy = "U000001";
 		this.updatedAt = LocalDateTime.now();
-		this.updatedBy = "U000001";
     }
 	
 	@PreUpdate
     protected void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
-		this.updatedBy = "U000011";
     }
 }

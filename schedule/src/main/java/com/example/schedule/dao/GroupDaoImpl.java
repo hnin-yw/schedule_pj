@@ -26,6 +26,7 @@ public class GroupDaoImpl implements GroupDao {
 	}
 
 	// get all the transactions from the database
+	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
 	public List<Group> getGroupLists() {

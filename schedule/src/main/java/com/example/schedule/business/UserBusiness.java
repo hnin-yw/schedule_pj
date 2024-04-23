@@ -28,15 +28,17 @@ import jakarta.servlet.http.HttpServletResponse;
 public class UserBusiness {
 	private final UserService userService;
 	private final ScheduleService scheduleService;
+	private final ScheduleBusiness scheduleBusiness;
 
 	private Map<String, ArrayList> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public UserBusiness(UserService userService, ScheduleService scheduleService) {
+	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness) {
 		this.userService = userService;
 		this.scheduleService = scheduleService;
+		this.scheduleBusiness = scheduleBusiness;
 	}
 
 	public Page<User> list(Pageable pageable) {
@@ -44,9 +46,12 @@ public class UserBusiness {
 		return listUsers;
 	}
 
-	public User saveUser(User user) {
+	public User saveUser(User user, HttpServletRequest request) {
 		user.setPassword(toHexString(encodePassword(user.getPassword())));
 		user.setUserCode(this.getUserCode());
+		String userCode = scheduleBusiness.getUserUserCode(request);
+		user.setCreatedBy(userCode);
+		user.setUpdatedBy(userCode);
 		return userService.save(user);
 	}
 
@@ -55,7 +60,7 @@ public class UserBusiness {
 		return User;
 	}
 
-	public String updateUser(User user) {
+	public String updateUser(User user, HttpServletRequest request) {
 		User updUser = userService.findUserById(user.getId());
 		if (updUser == null) {
 			throw new RuntimeException("User to update doesn't exist");
@@ -68,11 +73,13 @@ public class UserBusiness {
 		updUser.setAddress(user.getAddress());
 		updUser.setTelNumber(user.getTelNumber());
 		updUser.setEmail(user.getEmail());
+		String userCode = scheduleBusiness.getUserUserCode(request);
+		updUser.setUpdatedBy(userCode);
 		userService.save(updUser);
 		return "redirect:/users";
 	}
 
-	public Map<String, ArrayList> deleteUser(@PathVariable int id) {
+	public Map<String, ArrayList> deleteUser(@PathVariable int id, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -91,6 +98,8 @@ public class UserBusiness {
 		}
 		if (!isError) {
 			user.setDelFlg(true);
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			user.setUpdatedBy(userCode);
 			userService.save(user);
 			sucMsgLists.add("ユーザは正常に削除されました。");
 			msgLists.put("messages", sucMsgLists);
@@ -149,14 +158,38 @@ public class UserBusiness {
 			if (userdb == null) {
 				isLoginFail = true;
 			} else {
-//				Cookie c1 = new Cookie("user_code", user.getUserCode());				
-//				Cookie c2 = new Cookie("user_name", user.getUserName());			
-//				Cookie c3 = new Cookie("group_code", user.getGroupCode());
-//				response.addCookie(c1);
-//				response.addCookie(c2);
-//				response.addCookie(c3);
+				Cookie c1 = new Cookie("userCode", userdb.getUserCode());
+				c1.setDomain("localhost");
+				c1.setPath("/schedule");
+				c1.setHttpOnly(true);
+				response.addCookie(c1);
+				Cookie c2 = new Cookie("userName", userdb.getUserFirstName() + "_" + userdb.getUserLastName());
+				c2.setDomain("localhost");
+				c2.setPath("/schedule");
+				c2.setHttpOnly(true);
+				response.addCookie(c2);
+				Cookie c3 = new Cookie("groupCode", userdb.getGroupCode());
+				c3.setDomain("localhost");
+				c3.setPath("/schedule");
+				c3.setHttpOnly(true);
+				response.addCookie(c3);
 			}
 		}
 		return isLoginFail;
+	}
+
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
+		// ユーザーに関連付けられたすべての Cookie を削除します。
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (!cookie.getName().equals("JSESSIONID")) {
+					cookie.setValue("");
+					cookie.setPath("/");
+					cookie.setMaxAge(0);
+					response.addCookie(cookie);
+				}
+			}
+		}
 	}
 }

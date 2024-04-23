@@ -73,6 +73,7 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public User findUserByLoginData(String username, String password) {
 		Query query = (Query) entityManager
@@ -87,6 +88,7 @@ public class UserDaoImpl implements UserDao {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> findUserListByGroupCode(String groupCode) {
 		Query query = (Query) entityManager.createQuery("from User WHERE groupCode =: groupCode and delFlg = false");

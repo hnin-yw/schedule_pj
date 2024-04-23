@@ -3,6 +3,8 @@ package com.example.schedule.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.lang.Nullable;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +12,9 @@ import jakarta.persistence.*;
 public class Schedule {
 	@OneToMany(mappedBy = "schedule")
 	protected List<ScheduleReminder> scheduleReminders;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_code", referencedColumnName = "user_code", insertable = false, updatable = false)
+	private User user;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,7 +68,7 @@ public class Schedule {
 	@Column(name = "meet_link")
 	private String meetLink;
 
-	@Column(name = "scheduleDescription")
+	@Column(name = "schedule_description")
 	private String scheduleDescription;
 
 	@Column(name = "schedule_theme_color")
@@ -95,7 +100,7 @@ public class Schedule {
 
 	private String startDateTimeString;
 	private String endDateTimeString;
-	private String repeatUntilDateTimeString;
+	private @Nullable String repeatUntilDateTimeString;
 
 	public Schedule() {
 	}
@@ -107,7 +112,7 @@ public class Schedule {
 			String meetLink, String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg,
 			Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt,
 			String updatedBy, LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,
-			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString) {
+			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString, User user) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -139,6 +144,7 @@ public class Schedule {
 		this.startDateTimeString = startDateTimeString;
 		this.endDateTimeString = endDateTimeString;
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+		this.user = user;
 	}
 
 	/*
@@ -368,22 +374,25 @@ public class Schedule {
 		this.scheduleReminders = scheduleReminders;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@PrePersist
 	protected void onCreate() {
-		this.userCode = "U000001";
-		this.groupCode = "G000001";
 		this.scheduleStatusFlg = false;
 		this.delFlg = false;
 		this.createdAt = LocalDateTime.now();
-		this.createdBy = "U000001";
 		this.updatedAt = LocalDateTime.now();
-		this.updatedBy = "U000001";
 	}
 
 	@PreUpdate
 	protected void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
-		this.updatedBy = "U000011";
 	}
 
 	public String getStartDateTimeString() {

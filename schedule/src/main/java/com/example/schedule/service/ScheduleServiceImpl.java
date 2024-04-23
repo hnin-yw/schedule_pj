@@ -1,7 +1,7 @@
 package com.example.schedule.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.schedule.dao.*;
@@ -20,8 +20,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 	}
 
 	@Override
-	public List<Schedule> findAlls() {
-		return scheduleDao.getAlls();
+	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
+			LocalDateTime endDateTime) {
+		return scheduleDao.findAlls(userCode, groupCode, startDateTime, endDateTime);
+	}
+
+	@Override
+	public List<Schedule> findSelectedAlls(Integer[] selectedIds) {
+		return scheduleDao.findSelectedAlls(selectedIds);
 	}
 
 	@Override

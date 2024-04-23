@@ -24,18 +24,18 @@
 <!-- Bootstrap DateTimePicker JavaScript -->
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/static.css">
 <style>
 .row.content {
 	margin: 10px;
-	height: 1005px;
+	height: 855px;
 	box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 
 .sidenav {
 	background-color: #f1f1f1;
-	height: 955px;
+	height: 805px;
 	padding-top: 20px;
 }
 
@@ -75,6 +75,16 @@
 .cus_left-panel {
 	border: 1px solid #000;
 	padding: 10px;
+}
+
+.cus_modal-footer {
+	padding: 15px;
+	text-align: right;
+	border: none;
+}
+
+.mt-link {
+	margin-top: 20px;
 }
 </style>
 <title><%=request.getAttribute("title")%></title>

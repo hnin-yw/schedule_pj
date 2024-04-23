@@ -21,7 +21,7 @@ request.setAttribute("title", "Edit User");
 					<form action='/schedule/users/update' method='post'>
 						<div class="form-group col-sm-12">
 							<label for="groupName"> グループ :</label> <select name="groupCode"
-								class="form-control">
+								class="form-control" disabled="disabled">
 								<c:choose>
 									<c:when test="${gpLists.size() > 0}">
 										<option value="">-- グループを選択してください --</option>
@@ -33,7 +33,8 @@ request.setAttribute("title", "Edit User");
 									<c:otherwise>
 									</c:otherwise>
 								</c:choose>
-							</select>
+							</select> <input type="hidden" id="groupCode" name="groupCode"
+								value="${user.getGroupCode()}" class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="userName"> ユーザー名・ログイン名 :</label> <input type="text"

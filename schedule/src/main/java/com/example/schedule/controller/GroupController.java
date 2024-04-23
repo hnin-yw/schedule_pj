@@ -18,6 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.ui.Model;
 
 @Controller
@@ -48,21 +51,9 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-//	public String save(@ModelAttribute("group") @Validated Group group, BindingResult result,
-//			RedirectAttributes redirectAttributes) {
-//		if (result.hasErrors()) {
-//			System.out.println(
-//					result.hasFieldErrors("groupName") == true ? result.getFieldError("groupName").getDefaultMessage()
-//							: "test");
-//			return "groups/create";
-//		} else {
-//			groupBusiness.saveGroup(group);
-//			redirectAttributes.addFlashAttribute("message", "グループが正常に登録されました。");
-//			return "redirect:/groups";
-//		}
-//	}
-	public String save(@ModelAttribute("group") Group group, RedirectAttributes redirectAttributes) {
-		Map<String, ArrayList> msgLists = groupBusiness.saveGroup(group);
+	public String save(@ModelAttribute("group") Group group, RedirectAttributes redirectAttributes,
+			HttpServletRequest request) {
+		Map<String, ArrayList> msgLists = groupBusiness.saveGroup(group, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}
@@ -77,15 +68,15 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Group group, RedirectAttributes redirectAttributes) {
-		Map<String, ArrayList> msgLists = groupBusiness.updateGroup(group);
+	public String update(Group group, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		Map<String, ArrayList> msgLists = groupBusiness.updateGroup(group, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}
 
 	@RequestMapping("/delete/{id}")
-	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes) {
-		Map<String, ArrayList> msgLists = groupBusiness.deleteGroup(id);
+	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		Map<String, ArrayList> msgLists = groupBusiness.deleteGroup(id, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}

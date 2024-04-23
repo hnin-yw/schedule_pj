@@ -14,20 +14,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class GroupBusiness {
 	private final GroupService groupService;
 	private final UserService userService;
+	private final ScheduleBusiness scheduleBusiness;
 
 	private Map<String, ArrayList> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public GroupBusiness(GroupService groupService, UserService userService) {
+	public GroupBusiness(GroupService groupService, UserService userService, ScheduleBusiness scheduleBusiness) {
 		this.groupService = groupService;
 		this.userService = userService;
+		this.scheduleBusiness = scheduleBusiness;
 	}
 
 	public List<Group> getGroupLists() {
@@ -40,13 +44,16 @@ public class GroupBusiness {
 		return listGroups;
 	}
 
-	public Map<String, ArrayList> saveGroup(Group group) {
+	public Map<String, ArrayList> saveGroup(Group group, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		sucMsgLists = new ArrayList<>();
-		
+
 		group.setGroupCode(this.getGroupCode());
+		String userCode = scheduleBusiness.getUserUserCode(request);
+		group.setCreatedBy(userCode);
+		group.setUpdatedBy(userCode);
 		Group gpDb = groupService.save(group);
-		if(gpDb != null) {
+		if (gpDb != null) {
 			sucMsgLists.add("グループは正常に更新されました。");
 			msgLists.put("messages", sucMsgLists);
 		}
@@ -58,7 +65,7 @@ public class GroupBusiness {
 		return group;
 	}
 
-	public Map<String, ArrayList> updateGroup(Group group) {
+	public Map<String, ArrayList> updateGroup(Group group, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -70,6 +77,8 @@ public class GroupBusiness {
 		}
 		if (!isError) {
 			updGroup.setGroupName(group.getGroupName());
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			updGroup.setUpdatedBy(userCode);
 			groupService.save(updGroup);
 			sucMsgLists.add("グループは正常に更新されました。");
 			msgLists.put("messages", sucMsgLists);
@@ -79,7 +88,7 @@ public class GroupBusiness {
 		return msgLists;
 	}
 
-	public Map<String, ArrayList> deleteGroup(@PathVariable int id) {
+	public Map<String, ArrayList> deleteGroup(@PathVariable int id, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -98,6 +107,8 @@ public class GroupBusiness {
 		}
 		if (!isError) {
 			gp.setDelFlg(true);
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			gp.setUpdatedBy(userCode);
 			groupService.save(gp);
 			sucMsgLists.add("グループは正常に削除されました。");
 			msgLists.put("messages", sucMsgLists);

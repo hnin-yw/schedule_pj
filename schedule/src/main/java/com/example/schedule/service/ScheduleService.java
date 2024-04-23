@@ -1,11 +1,11 @@
 package com.example.schedule.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
 import com.example.schedule.entity.*;
 
 public interface ScheduleService {
-	public List<Schedule> findAlls();
+	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
 
 	public String findById(int id);
 
@@ -16,4 +16,6 @@ public interface ScheduleService {
 	public int deleteById(int id);
 
 	public List<Schedule> findScheduleListByUserCode(String userCode);
+
+	List<Schedule> findSelectedAlls(Integer[] selectedIds);
 }

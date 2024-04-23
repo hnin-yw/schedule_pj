@@ -1,26 +1,44 @@
 package com.example.schedule.business;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class ScheduleBusiness {
 	private final ScheduleService scheduleService;
 	private final ScheduleReminderService scheduleReminderService;
+	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	static String[] HEADERs = { "Id", "Title", "Description" };
+	static String SHEET = "schedules";
 
 	@Autowired
 	public ScheduleBusiness(ScheduleService scheduleService, ScheduleReminderService scheduleReminderService) {
@@ -28,25 +46,38 @@ public class ScheduleBusiness {
 		this.scheduleReminderService = scheduleReminderService;
 	}
 
-	public List<Schedule> list() {
-		List<Schedule> listSchedules = scheduleService.findAlls();
+	public List<Schedule> list(HttpServletRequest request) {
+		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+				LocalTime.MAX);
+
+		String userCode = getUserUserCode(request);
+		String groupCode = getUserGroupCode(request);
+		List<Schedule> listSchedules = scheduleService.findAlls(userCode, groupCode, startDateTime, endDateTime);
 		return listSchedules;
 	}
 
-	public Schedule saveSchedule(Schedule schedule) {
-
+	public Schedule saveSchedule(Schedule schedule, HttpServletRequest request) {
 		schedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
 		schedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
 		schedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
-
+		String userCode = getUserUserCode(request);
+		schedule.setUserCode(userCode);
+		schedule.setCreatedBy(userCode);
+		schedule.setUpdatedBy(userCode);
+		String groupCode = getUserGroupCode(request);
+		schedule.setGroupCode(groupCode);
 		Schedule scheduleDb = scheduleService.save(schedule);
 		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
 		if (reminders.size() > 0) {
-		    for (int j = 0; j < reminders.size(); j++) {
-		        ScheduleReminder reminder = reminders.get(j);
-		        reminder.setScheduleId(scheduleDb.getId());
-		        scheduleReminderService.save(reminder);
-		    }
+			for (int j = 0; j < reminders.size(); j++) {
+				ScheduleReminder reminder = reminders.get(j);
+				reminder.setScheduleId(scheduleDb.getId());
+				userCode = getUserUserCode(request);
+				reminder.setCreatedBy(userCode);
+				reminder.setUpdatedBy(userCode);
+				scheduleReminderService.save(reminder);
+			}
 		}
 
 		return scheduleDb;
@@ -57,7 +88,7 @@ public class ScheduleBusiness {
 		return schedule;
 	}
 
-	public String updateSchedule(Schedule schedule) {
+	public String updateSchedule(Schedule schedule, HttpServletRequest request) {
 		Schedule updSchedule = scheduleService.findScheduleById(schedule.getId());
 		if (updSchedule == null) {
 			throw new RuntimeException("Schedule to update doesn't exist");
@@ -80,31 +111,40 @@ public class ScheduleBusiness {
 		updSchedule.setScheduleThemeColor(schedule.getScheduleThemeColor());
 		updSchedule.setOtherVisibilityFlg(schedule.getOtherVisibilityFlg());
 		updSchedule.setEventFlg(schedule.getEventFlg());
+		String userCode = getUserUserCode(request);
+		updSchedule.setUpdatedBy(userCode);
 		scheduleService.save(updSchedule);
 
 		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
 		if (reminders.size() > 0) {
-			scheduleReminderService.deleteBySchedulId(updSchedule.getId());
 			for (int j = 0; j < reminders.size(); j++) {
 				ScheduleReminder reminder = reminders.get(j);
-				reminder.setScheduleId(updSchedule.getId());
-				scheduleReminderService.save(reminder);
+				ScheduleReminder updReminder = scheduleReminderService.findScheduleReminderById(reminder.getId());
+
+				updReminder.setScheduleReminderTime(reminder.getScheduleReminderTime());
+				updReminder.setScheduleReminderType(reminder.getScheduleReminderType());
+				updReminder.setNotiMethodFlg(reminder.getNotiMethodFlg());
+				userCode = getUserUserCode(request);
+				updReminder.setUpdatedBy(userCode);
+				scheduleReminderService.save(updReminder);
 			}
 		}
 		return "redirect:/schedules";
 	}
 
-	public String updateScheduleStatus(Schedule schedule) {
+	public String updateScheduleStatus(Schedule schedule, HttpServletRequest request) {
 		Schedule updSchedule = scheduleService.findScheduleById(schedule.getId());
 		if (updSchedule == null) {
 			throw new RuntimeException("Schedule to update doesn't exist");
 		}
 		updSchedule.setScheduleStatusFlg(true);
+		String userCode = getUserUserCode(request);
+		updSchedule.setUpdatedBy(userCode);
 		scheduleService.save(updSchedule);
 		return "redirect:/schedules";
 	}
 
-	public String deleteSchedule(@PathVariable int id) {
+	public String deleteSchedule(@PathVariable int id, HttpServletRequest request) {
 		Schedule schedule = scheduleService.findScheduleById(id);
 		if (schedule == null) {
 			throw new RuntimeException("Schedule Id not found.");
@@ -114,47 +154,111 @@ public class ScheduleBusiness {
 			for (int j = 0; j < reminders.size(); j++) {
 				ScheduleReminder reminder = reminders.get(j);
 				reminder.setDelFlg(true);
+				String userCode = getUserUserCode(request);
+				reminder.setUpdatedBy(userCode);
 				scheduleReminderService.save(reminder);
 			}
 		}
 		schedule.setDelFlg(true);
+		String userCode = getUserUserCode(request);
+		schedule.setUpdatedBy(userCode);
 		scheduleService.save(schedule);
 		return "redirect:/schedules";
 	}
 
-	public void exportUsersToExcel() {
-		List<Schedule> schedules = scheduleService.findAlls();
+	public byte[] generateExcelBytes(String[] selectedIds) throws IOException {
+		Integer[] selectedIdsInt = Arrays.stream(selectedIds).map(Integer::parseInt).toArray(Integer[]::new);
+		List<Schedule> schedules = scheduleService.findSelectedAlls(selectedIdsInt);
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("schedules");
+		// ヘッダー行を作成。
+		Row headerRow = sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("Schedule Title");
+		headerRow.createCell(1).setCellValue("Schedule Start Date Time");
+		headerRow.createCell(2).setCellValue("Schedule End Date Time");
+		headerRow.createCell(3).setCellValue("AllDay Flg");
+		headerRow.createCell(4).setCellValue("Repeat Type");
+		headerRow.createCell(5).setCellValue("Repeat Until");
+		headerRow.createCell(6).setCellValue("Schedule Display Flg");
+		headerRow.createCell(7).setCellValue("Location");
+		headerRow.createCell(8).setCellValue("Meeting Link");
+		headerRow.createCell(9).setCellValue("Schedule Description");
+		headerRow.createCell(10).setCellValue("Schedule Theme Color");
+		headerRow.createCell(11).setCellValue("Other Visibility Flg");
+		headerRow.createCell(12).setCellValue("Event Flag");
+		headerRow.createCell(13).setCellValue("Schedule Status Flag");
+		headerRow.createCell(14).setCellValue("Delete Flag");
+		headerRow.createCell(15).setCellValue("Created By");
+		headerRow.createCell(16).setCellValue("Created At");
+		headerRow.createCell(17).setCellValue("Updated By");
+		headerRow.createCell(18).setCellValue("Updated At");
 
-		try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-			Sheet sheet = workbook.createSheet("schedules");
-
-			// Create a header row
-			Row headerRow = sheet.createRow(0);
-			headerRow.createCell(0).setCellValue("ID");
-			headerRow.createCell(1).setCellValue("Name");
-
-			// Create data rows
-			int rowNum = 1;
-			for (Schedule schedule : schedules) {
-				Row row = sheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(schedule.getId());
-				row.createCell(1).setCellValue(schedule.getScheduleTitle());
-			}
-
-			// Write the workbook to a file
-			try (FileOutputStream fileOut = new FileOutputStream("schedules.xlsx")) {
-				workbook.write(fileOut);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		// データ行の作成。
+		int rowNum = 1;
+		for (Schedule schedule : schedules) {
+			Row row = sheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(schedule.getScheduleTitle());
+			row.createCell(1).setCellValue(schedule.getScheduleStartDateTime().format(dateTimeFormatter));
+			row.createCell(2).setCellValue(schedule.getScheduleEndDateTime().format(dateTimeFormatter));
+			row.createCell(3).setCellValue(schedule.getAllDayFlg());
+			row.createCell(4).setCellValue(schedule.getRepeatType());
+			row.createCell(5).setCellValue(schedule.getRepeatUntil());
+			row.createCell(6).setCellValue(schedule.getScheduleDisplayFlg());
+			row.createCell(7).setCellValue(schedule.getLocation());
+			row.createCell(8).setCellValue(schedule.getMeetLink());
+			row.createCell(9).setCellValue(schedule.getScheduleDescription());
+			row.createCell(10).setCellValue(schedule.getScheduleThemeColor());
+			row.createCell(11).setCellValue(schedule.getOtherVisibilityFlg());
+			row.createCell(12).setCellValue(schedule.getEventFlg());
+			row.createCell(13).setCellValue(schedule.getScheduleStatusFlg());
+			row.createCell(14).setCellValue(schedule.getDelFlg());
+			row.createCell(15).setCellValue(schedule.getCreatedBy());
+			row.createCell(1).setCellValue(schedule.getCreatedAt().format(dateTimeFormatter));
+			row.createCell(17).setCellValue(schedule.getUpdatedBy());
+			row.createCell(2).setCellValue(schedule.getUpdatedAt().format(dateTimeFormatter));
 		}
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		workbook.write(outputStream);
+		workbook.close();
+
+		return outputStream.toByteArray();
 	}
 
 	private LocalDateTime toDateTime(String strDateTime) {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		if (strDateTime == null || strDateTime.isBlank() || strDateTime.isEmpty()) {
+			return null;
+		} else {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(strDateTime, formatter);
+			return dateTime;
+		}
+	}
 
-		LocalDateTime dateTime = LocalDateTime.parse(strDateTime, formatter);
+	public String getUserGroupCode(HttpServletRequest request) {
+		String dataValue = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("groupCode")) {
+					dataValue = cookie.getValue();
+				}
+			}
+		}
+		return dataValue;
+	}
 
-		return dateTime;
+	public String getUserUserCode(HttpServletRequest request) {
+		String dataValue = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("userCode")) {
+					dataValue = cookie.getValue();
+				}
+			}
+		}
+		return dataValue;
 	}
 }

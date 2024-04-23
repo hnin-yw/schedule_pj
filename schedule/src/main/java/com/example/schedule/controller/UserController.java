@@ -19,6 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -55,8 +58,9 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("user") @Validated User user, BindingResult result, Model model) {
-		userBusiness.saveUser(user);
+	public String save(@ModelAttribute("user") @Validated User user, BindingResult result, Model model,
+			HttpServletRequest request) {
+		userBusiness.saveUser(user, request);
 		return "redirect:/users";
 	}
 
@@ -72,14 +76,14 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(User user) {
-		userBusiness.updateUser(user);
+	public String update(User user, HttpServletRequest request) {
+		userBusiness.updateUser(user, request);
 		return "redirect:/users";
 	}
 
 	@RequestMapping("/delete/{id}")
-	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes) {
-		Map<String, ArrayList> msgLists = userBusiness.deleteUser(id);
+	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		Map<String, ArrayList> msgLists = userBusiness.deleteUser(id, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/users";
 	}

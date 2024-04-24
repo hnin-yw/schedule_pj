@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
@@ -13,23 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
@@ -46,16 +36,26 @@ public class ScheduleBusiness {
 		this.scheduleReminderService = scheduleReminderService;
 	}
 
-	public List<Schedule> list(HttpServletRequest request) {
-		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
-		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
-				LocalTime.MAX);
-
+	public Page<Schedule> list(Pageable pageable, HttpServletRequest request) {
+//		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+//		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+//				LocalTime.MAX);
 		String userCode = getUserUserCode(request);
 		String groupCode = getUserGroupCode(request);
-		List<Schedule> listSchedules = scheduleService.findAlls(userCode, groupCode, startDateTime, endDateTime);
+		Page<Schedule> listSchedules = scheduleService.findAlls(pageable, userCode, groupCode);
 		return listSchedules;
 	}
+
+//	public List<Schedule> list(HttpServletRequest request) {
+//		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+//		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
+//				LocalTime.MAX);
+//
+//		String userCode = getUserUserCode(request);
+//		String groupCode = getUserGroupCode(request);
+//		List<Schedule> listSchedules = scheduleService.findAlls(userCode, groupCode, startDateTime, endDateTime);
+//		return listSchedules;
+//	}
 
 	public Schedule saveSchedule(Schedule schedule, HttpServletRequest request) {
 		schedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
@@ -203,7 +203,9 @@ public class ScheduleBusiness {
 			row.createCell(2).setCellValue(schedule.getScheduleEndDateTime().format(dateTimeFormatter));
 			row.createCell(3).setCellValue(schedule.getAllDayFlg());
 			row.createCell(4).setCellValue(schedule.getRepeatType());
-			row.createCell(5).setCellValue(schedule.getRepeatUntil());
+			if (schedule.getRepeatUntil() != null) {
+				row.createCell(5).setCellValue(schedule.getRepeatUntil().format(dateTimeFormatter));
+			}
 			row.createCell(6).setCellValue(schedule.getScheduleDisplayFlg());
 			row.createCell(7).setCellValue(schedule.getLocation());
 			row.createCell(8).setCellValue(schedule.getMeetLink());
@@ -214,9 +216,9 @@ public class ScheduleBusiness {
 			row.createCell(13).setCellValue(schedule.getScheduleStatusFlg());
 			row.createCell(14).setCellValue(schedule.getDelFlg());
 			row.createCell(15).setCellValue(schedule.getCreatedBy());
-			row.createCell(1).setCellValue(schedule.getCreatedAt().format(dateTimeFormatter));
+			row.createCell(16).setCellValue(schedule.getCreatedAt().format(dateTimeFormatter));
 			row.createCell(17).setCellValue(schedule.getUpdatedBy());
-			row.createCell(2).setCellValue(schedule.getUpdatedAt().format(dateTimeFormatter));
+			row.createCell(18).setCellValue(schedule.getUpdatedAt().format(dateTimeFormatter));
 		}
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

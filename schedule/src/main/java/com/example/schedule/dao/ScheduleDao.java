@@ -1,12 +1,15 @@
 package com.example.schedule.dao;
 
-import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.schedule.entity.*;
 
 public interface ScheduleDao {
-	List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
+	// List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime
+	// startDateTime, LocalDateTime endDateTime);
 
 	Schedule findScheduleById(int id);
 
@@ -17,4 +20,6 @@ public interface ScheduleDao {
 	List<Schedule> findScheduleListByUserCode(String userCode);
 
 	List<Schedule> findSelectedAlls(Integer[] selectedIds);
+
+	Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode);
 }

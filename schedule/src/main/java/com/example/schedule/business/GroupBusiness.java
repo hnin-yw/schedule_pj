@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.example.schedule.*;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 @SpringBootApplication
@@ -22,16 +21,19 @@ public class GroupBusiness {
 	private final GroupService groupService;
 	private final UserService userService;
 	private final ScheduleBusiness scheduleBusiness;
+	private final Consts con;
 
-	private Map<String, ArrayList> msgLists = new HashMap<>();
+	private Map<String, ArrayList<String>> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public GroupBusiness(GroupService groupService, UserService userService, ScheduleBusiness scheduleBusiness) {
+	public GroupBusiness(GroupService groupService, UserService userService, ScheduleBusiness scheduleBusiness,
+			Consts con) {
 		this.groupService = groupService;
 		this.userService = userService;
 		this.scheduleBusiness = scheduleBusiness;
+		this.con = con;
 	}
 
 	public List<Group> getGroupLists() {
@@ -44,19 +46,32 @@ public class GroupBusiness {
 		return listGroups;
 	}
 
-	public Map<String, ArrayList> saveGroup(Group group, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> validate(Group group) {
+		msgLists = new HashMap<>();
+		errMsgLists = new ArrayList<>();
+		if (group.getGroupName() == null || group.getGroupName().isBlank()) {
+			errMsgLists.add("グループ名は必須です。");
+		} else {
+			if (group.getGroupName().length() > con.MAX_NAME_LENGTH) {
+				errMsgLists.add("グループ名は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
+			}
+		}
+		msgLists.put("errors", errMsgLists);
+		return msgLists;
+	}
+
+	public Map<String, ArrayList<String>> saveGroup(Group group, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		sucMsgLists = new ArrayList<>();
-
 		group.setGroupCode(this.getGroupCode());
 		String userCode = scheduleBusiness.getUserUserCode(request);
 		group.setCreatedBy(userCode);
 		group.setUpdatedBy(userCode);
-		Group gpDb = groupService.save(group);
-		if (gpDb != null) {
+		Group dbGroup = groupService.save(group);
+		if (dbGroup != null) {
 			sucMsgLists.add("グループは正常に更新されました。");
-			msgLists.put("messages", sucMsgLists);
 		}
+		msgLists.put("messages", sucMsgLists);
 		return msgLists;
 	}
 
@@ -65,7 +80,7 @@ public class GroupBusiness {
 		return group;
 	}
 
-	public Map<String, ArrayList> updateGroup(Group group, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> updateGroup(Group group, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -88,7 +103,7 @@ public class GroupBusiness {
 		return msgLists;
 	}
 
-	public Map<String, ArrayList> deleteGroup(@PathVariable int id, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> deleteGroup(@PathVariable int id, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();

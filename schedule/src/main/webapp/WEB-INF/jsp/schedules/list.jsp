@@ -1,10 +1,10 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page import="java.time.LocalDateTime"%>
 <%@ page import="java.time.format.DateTimeFormatter"%>
 
 <%
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 request.setAttribute("title", "List Schedule");
 String userCode = "";
 Cookie[] c = request.getCookies();
@@ -16,8 +16,6 @@ if (c != null) {
 		}
 	}
 }
-
-DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 %>
 
 <c:set var="userCode" value="<%=userCode%>" />
@@ -57,8 +55,8 @@ DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 						</thead>
 						<tbody>
 							<c:choose>
-								<c:when test="${listSchedules.size() > 0}">
-									<c:forEach items="${listSchedules}" var="schedule">
+								<c:when test="${listSchedules.getTotalElements() > 0}">
+									<c:forEach items="${listSchedules.content}" var="schedule">
 										<tr
 											<c:choose>
 											    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
@@ -137,6 +135,9 @@ DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 							</c:choose>
 						</tbody>
 					</table>
+					<c:if test="${listSchedules.getTotalElements() > 0}">
+						<%@ include file="/WEB-INF/jsp/pagination.jsp"%>
+					</c:if>
 					<button type="submit" class="btn btn-primary"
 						id="btnDownloadSchedule" disabled>
 						<i class="bi bi-download"></i> ダウンロード
@@ -184,8 +185,8 @@ DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 						</div>
 						<div class="modal-body">完了としてもよろしいですか。</div>
 						<div class="modal-footer">
+							<input type="hidden" id="scheduleId" name="id" />
 							<button type="submit" class="btn btn-danger">完了</button>
-							</a> <input type="hidden" id="scheduleId" name="id" />
 							<button type="button" class="btn btn-secondary"
 								id="btnScheduleUpdate" data-dismiss="modal">キャンセル</button>
 						</div>

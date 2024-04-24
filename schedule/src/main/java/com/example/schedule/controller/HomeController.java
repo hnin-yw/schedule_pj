@@ -32,7 +32,7 @@ public class HomeController {
 		Boolean isLoginFail = userBusiness.login(user, response);
 
 		if (isLoginFail) {
-			redirectAttributes.addFlashAttribute("error", "Invalid username or password!");
+			redirectAttributes.addFlashAttribute("error", "ユーザー名またはパスワードが正しくありません！");
 			return "redirect:/";
 		} else {
 			return "redirect:/schedules";

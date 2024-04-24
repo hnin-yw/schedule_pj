@@ -1,8 +1,9 @@
 package com.example.schedule.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.schedule.dao.*;
 import com.example.schedule.entity.*;
@@ -19,10 +20,15 @@ public class ScheduleServiceImpl implements ScheduleService {
 		this.scheduleDao = scheduleDao;
 	}
 
+//	@Override
+//	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
+//			LocalDateTime endDateTime) {
+//		return scheduleDao.findAlls(userCode, groupCode, startDateTime, endDateTime);
+//	}
+
 	@Override
-	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
-			LocalDateTime endDateTime) {
-		return scheduleDao.findAlls(userCode, groupCode, startDateTime, endDateTime);
+	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
+		return scheduleDao.findAlls(pageable, userCode, groupCode);
 	}
 
 	@Override

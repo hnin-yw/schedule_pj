@@ -51,11 +51,19 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("group") Group group, RedirectAttributes redirectAttributes,
+	public String save(Model model, @ModelAttribute("group") Group group, RedirectAttributes redirectAttributes,
 			HttpServletRequest request) {
-		Map<String, ArrayList> msgLists = groupBusiness.saveGroup(group, request);
-		redirectAttributes.addFlashAttribute("msgLists", msgLists);
-		return "redirect:/groups";
+		Map<String, ArrayList<String>> errLists = groupBusiness.validate(group);
+		if (errLists.isEmpty()) {
+			Map<String, ArrayList<String>> msgLists = groupBusiness.saveGroup(group, request);
+			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+			return "redirect:/groups";
+		} else {
+			redirectAttributes.addFlashAttribute("msgLists", errLists);
+			model.addAttribute("cusGroup", group);
+			return "redirect:/groups/create";
+		}
+
 	}
 
 	@RequestMapping("/edit/{id}")
@@ -68,15 +76,22 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Group group, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList> msgLists = groupBusiness.updateGroup(group, request);
-		redirectAttributes.addFlashAttribute("msgLists", msgLists);
-		return "redirect:/groups";
+	public String update(Model model, Group group, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		Map<String, ArrayList<String>> errLists = groupBusiness.validate(group);
+		if (errLists.isEmpty()) {
+			Map<String, ArrayList<String>> msgLists = groupBusiness.updateGroup(group, request);
+			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+			return "redirect:/groups";
+		} else {
+			redirectAttributes.addFlashAttribute("msgLists", errLists);
+			model.addAttribute("cusGroup", group);
+			return "redirect:/groups/edit/" + group.getId();
+		}
 	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList> msgLists = groupBusiness.deleteGroup(id, request);
+		Map<String, ArrayList<String>> msgLists = groupBusiness.deleteGroup(id, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/groups";
 	}

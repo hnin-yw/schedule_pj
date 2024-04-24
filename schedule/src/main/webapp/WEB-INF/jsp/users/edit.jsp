@@ -11,12 +11,8 @@ request.setAttribute("title", "Edit User");
 		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">ユーザの編集</h2>
+			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="card">
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger" role="alert">
-						<strong>${error}</strong>
-					</div>
-				</c:if>
 				<div class="card-body">
 					<form action='/schedule/users/update' method='post'>
 						<div class="form-group col-sm-12">
@@ -37,9 +33,9 @@ request.setAttribute("title", "Edit User");
 								value="${user.getGroupCode()}" class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
-							<label for="userName"> ユーザー名・ログイン名 :</label> <input type="text"
+							<label for="userName"> ユーザ名・ログイン名 :</label> <input type="text"
 								id="userName" name="userName" value="${user.getUserName()}"
-								placeholder="ユーザー名・ログイン名" class="form-control ">
+								placeholder="ユーザ名・ログイン名" class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="userFirstName"> ユーザの名 :</label> <input type="text"
@@ -48,9 +44,9 @@ request.setAttribute("title", "Edit User");
 								class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
-							<label for="userLastName"> ユーザーの姓 :</label> <input type="text"
+							<label for="userLastName"> ユーザの姓 :</label> <input type="text"
 								id="userLastName" name="userLastName"
-								value="${user.getUserLastName()}" placeholder="ユーザーの姓"
+								value="${user.getUserLastName()}" placeholder="ユーザの姓"
 								class="form-control ">
 						</div>
 						<div class="form-group">
@@ -61,7 +57,7 @@ request.setAttribute("title", "Edit User");
 							</div>
 							<div class="col-sm-8">
 								<label for="address"> 住所 :</label>
-								<textarea id="address" name="address" placeholder="ユーザーの住所"
+								<textarea id="address" name="address" placeholder="ユーザの住所"
 									class="form-control">${user.getAddress()}</textarea>
 							</div>
 						</div>
@@ -78,10 +74,10 @@ request.setAttribute("title", "Edit User");
 						<input type='hidden' id='id' class='form-control' name='id'
 							value="${user.getId()}" />
 						<div class="up-btn-gp col-sm-12">
-							<button type="submit" class="btn btn-primary">編集</button>
 							<a href="/schedule/users">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
+							<button type="submit" class="btn btn-primary">編集</button>
 						</div>
 					</form>
 				</div>

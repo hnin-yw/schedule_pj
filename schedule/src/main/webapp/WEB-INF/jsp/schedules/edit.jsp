@@ -250,9 +250,7 @@ request.setAttribute("title", "Edit schedule");
 						<div class="form-group col-sm-12">
 							<label for="scheduleDescription"> スケジュールの説明 :</label>
 							<textarea id="scheduleDescription" name="scheduleDescription"
-								placeholder="ケジュールの説明"
-								value="${schedule.getScheduleDescription()}"
-								class="form-control"></textarea>
+								placeholder="ケジュールの説明" class="form-control">${schedule.getScheduleDescription()}</textarea>
 						</div>
 						<div class="up-btn-gp col-sm-12">
 							<input type='hidden' id='id' class='form-control' name='id'

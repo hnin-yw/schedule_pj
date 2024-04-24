@@ -1,11 +1,17 @@
 package com.example.schedule.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.example.schedule.entity.*;
 
 public interface ScheduleService {
-	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime, LocalDateTime endDateTime);
+	// public List<Schedule> findAlls(String userCode, String groupCode,
+	// LocalDateTime startDateTime, LocalDateTime endDateTime);
+
+	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode);
 
 	public String findById(int id);
 

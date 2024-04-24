@@ -11,12 +11,8 @@ request.setAttribute("title", "Create User");
 		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">ユーザの登録</h2>
+			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="card">
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger" role="alert">
-						<strong>${error}</strong>
-					</div>
-				</c:if>
 				<div class="card-body">
 					<form action='/schedule/users/save' method='post'>
 						<div class="form-group col-sm-12">
@@ -36,8 +32,8 @@ request.setAttribute("title", "Create User");
 							</select>
 						</div>
 						<div class="form-group col-sm-12">
-							<label for="userName"> ユーザー名・ログイン名 :</label> <input type="text"
-								id="userName" name="userName" placeholder="ユーザー名・ログイン名"
+							<label for="userName"> ユーザ名・ログイン名 :</label> <input type="text"
+								id="userName" name="userName" placeholder="ユーザ名・ログイン名"
 								class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
@@ -51,25 +47,25 @@ request.setAttribute("title", "Create User");
 								class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">
-							<label for="userLastName"> ユーザーの姓 :</label> <input type="text"
-								id="userLastName" name="userLastName" placeholder="ユーザーの姓"
+							<label for="userLastName"> ユーザの姓 :</label> <input type="text"
+								id="userLastName" name="userLastName" placeholder="ユーザの姓"
 								class="form-control ">
 						</div>
 						<div class="form-group">
 							<div class="col-sm-4">
 								<label for="postCode"> 郵便番号 :</label> <input type="text"
-									id="postCode" name="postCode" placeholder="郵便番号"
+									id="postCode" name="postCode" placeholder="000-0000"
 									class="form-control ">
 							</div>
 							<div class="col-sm-8">
 								<label for="address"> 住所 :</label>
-								<textarea id="address" name="address" placeholder="ユーザーの住所"
+								<textarea id="address" name="address" placeholder="ユーザの住所"
 									class="form-control"></textarea>
 							</div>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="telNumber"> 電話番号 :</label> <input type="text"
-								id="telNumber" name="telNumber" placeholder="電話番号"
+								id="telNumber" name="telNumber" placeholder="000-0000-0000"
 								class="form-control ">
 						</div>
 						<div class="form-group col-sm-12">

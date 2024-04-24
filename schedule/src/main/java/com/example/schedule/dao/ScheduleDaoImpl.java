@@ -1,11 +1,15 @@
 package com.example.schedule.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.schedule.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,20 +24,39 @@ public class ScheduleDaoImpl implements ScheduleDao {
 
 	}
 
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
+//			LocalDateTime endDateTime) {
+//		Query query = (Query) entityManager.createQuery(
+//				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND scheduleStartDateTime BETWEEN :startDateTime AND :endDateTime and delFlg = false ORDER BY scheduleStartDateTime ASC");
+//		query.setParameter("userCode", userCode);
+//		query.setParameter("groupCode", groupCode);
+//		query.setParameter("startDateTime", startDateTime);
+//		query.setParameter("endDateTime", endDateTime);
+//
+//		List<Schedule> transactions = query.getResultList();
+//
+//		return transactions;
+//	}
+
+	// get all the transactions from the database
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
-			LocalDateTime endDateTime) {
-		Query query = (Query) entityManager.createQuery(
-				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND scheduleStartDateTime BETWEEN :startDateTime AND :endDateTime and delFlg = false ORDER BY scheduleStartDateTime ASC");
+	@Transactional(readOnly = true)
+	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
+		Query query = entityManager.createQuery("SELECT COUNT(s) FROM Schedule s WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
-		query.setParameter("startDateTime", startDateTime);
-		query.setParameter("endDateTime", endDateTime);
+		long total = (long) query.getSingleResult();
 
-		List<Schedule> transactions = query.getResultList();
+		query = entityManager.createQuery("FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
+		query.setParameter("userCode", userCode);
+		query.setParameter("groupCode", groupCode);
+		int start = (int) pageable.getOffset();
+		List<Schedule> schedules = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
 
-		return transactions;
+		return new PageImpl<>(schedules, pageable, total);
 	}
 
 	@SuppressWarnings("unchecked")

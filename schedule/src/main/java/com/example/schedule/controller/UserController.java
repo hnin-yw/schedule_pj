@@ -3,7 +3,6 @@ package com.example.schedule.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,15 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
-
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 
 @Controller
 @RequestMapping("/users")
@@ -58,10 +52,18 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("user") @Validated User user, BindingResult result, Model model,
+	public String save(Model model, @ModelAttribute("user") User user, RedirectAttributes redirectAttributes,
 			HttpServletRequest request) {
-		userBusiness.saveUser(user, request);
-		return "redirect:/users";
+		Map<String, ArrayList<String>> errLists = userBusiness.validateCreate(user);
+		if (errLists.isEmpty()) {
+			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user, request);
+			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+			return "redirect:/users";
+		} else {
+			redirectAttributes.addFlashAttribute("msgLists", errLists);
+			model.addAttribute("cusUser", user);
+			return "redirect:/users/create";
+		}
 	}
 
 	@RequestMapping("/edit/{id}")
@@ -76,14 +78,22 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(User user, HttpServletRequest request) {
-		userBusiness.updateUser(user, request);
-		return "redirect:/users";
+	public String update(Model model, User user, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		Map<String, ArrayList<String>> errLists = userBusiness.validateUpdate(user);
+		if (errLists.isEmpty()) {
+			Map<String, ArrayList<String>> msgLists = userBusiness.updateUser(user, request);
+			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+			return "redirect:/users";
+		} else {
+			redirectAttributes.addFlashAttribute("msgLists", errLists);
+			model.addAttribute("cusUser", user);
+			return "redirect:/users/edit/" + user.getId();
+		}
 	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList> msgLists = userBusiness.deleteUser(id, request);
+		Map<String, ArrayList<String>> msgLists = userBusiness.deleteUser(id, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
 		return "redirect:/users";
 	}

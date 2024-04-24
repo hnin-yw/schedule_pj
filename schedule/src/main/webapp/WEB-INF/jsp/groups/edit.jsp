@@ -12,11 +12,7 @@ request.setAttribute("title", "Edit Group");
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">グループの編集</h2>
 			<div class="card">
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger" role="alert">
-						<strong>${error}</strong>
-					</div>
-				</c:if>
+				<%@ include file="/WEB-INF/jsp/message.jsp"%>
 				<div class="card-body">
 					<form action='/schedule/groups/update' method='post'>
 						<div class="form-group col-sm-12">
@@ -30,8 +26,7 @@ request.setAttribute("title", "Edit Group");
 							<a href="/schedule/groups">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
-							<button type="submit"
-								class="btn btn-primary">編集</button>
+							<button type="submit" class="btn btn-primary">編集</button>
 						</div>
 					</form>
 				</div>

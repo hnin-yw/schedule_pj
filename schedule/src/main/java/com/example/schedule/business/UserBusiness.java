@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import com.example.schedule.Consts;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 
@@ -29,16 +32,19 @@ public class UserBusiness {
 	private final UserService userService;
 	private final ScheduleService scheduleService;
 	private final ScheduleBusiness scheduleBusiness;
+	private final Consts con;
 
-	private Map<String, ArrayList> msgLists = new HashMap<>();
+	private Map<String, ArrayList<String>> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness) {
+	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness,
+			Consts con) {
 		this.userService = userService;
 		this.scheduleService = scheduleService;
 		this.scheduleBusiness = scheduleBusiness;
+		this.con = con;
 	}
 
 	public Page<User> list(Pageable pageable) {
@@ -46,13 +52,97 @@ public class UserBusiness {
 		return listUsers;
 	}
 
-	public User saveUser(User user, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> validateCreate(User user) {
+		msgLists = new HashMap<>();
+		errMsgLists = this.validate(user);
+		if (user.getPassword() == null || user.getPassword().isBlank()) {
+			errMsgLists.add("パスワードは必須です。");
+		}
+		if (!errMsgLists.isEmpty()) {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
+	}
+
+	private ArrayList<String> validate(User user) {
+        ArrayList<String> errMsgLists = new ArrayList<>();
+        if (user.getUserName() == null || user.getUserName().isBlank()) {
+            errMsgLists.add("ユーザ名またはログイン名は必須です。");
+        } else if (user.getUserName().length() > con.MAX_CODE_LENGTH) {
+            errMsgLists.add("ユーザ名またはログイン名は最大 " + con.MAX_CODE_LENGTH + " 文字までです。");
+        }
+
+        if (user.getUserFirstName() == null || user.getUserFirstName().isBlank()) {
+            errMsgLists.add("ユーザの名は必須です。");
+        } else if (user.getUserFirstName().length() > con.MAX_NAME_LENGTH) {
+            errMsgLists.add("ユーザの名は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
+        }
+
+        if (user.getUserLastName() == null || user.getUserLastName().isBlank()) {
+            errMsgLists.add("ユーザの姓は必須です。");
+        } else if (user.getUserLastName().length() > con.MAX_NAME_LENGTH) {
+            errMsgLists.add("ユーザの姓は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
+        }
+
+        if (user.getPostCode() == null || user.getPostCode().isBlank()) {
+            errMsgLists.add("郵便番号は必須です。");
+        } else if (user.getPostCode().length() > con.MAX_CODE_CONT_LENGTH) {
+            errMsgLists.add("郵便番号は最大 " + con.MAX_CODE_CONT_LENGTH + " 文字までです。");
+        } else if (!user.getPostCode().matches("[0-9\\-]+")) {
+            errMsgLists.add("郵便番号が無効です。");
+        }
+
+        if (user.getAddress() == null || user.getAddress().isBlank()) {
+            errMsgLists.add("住所は必須です。");
+        } else if (user.getAddress().length() > con.MAX_NAME_AREA_LENGTH) {
+            errMsgLists.add("住所は最大 " + con.MAX_NAME_AREA_LENGTH + " 文字までです。");
+        }
+
+        if (user.getTelNumber() == null || user.getTelNumber().isBlank()) {
+            errMsgLists.add("電話番号は必須です。");
+        } else if (user.getTelNumber().length() > con.MAX_CODE_CONT_LENGTH) {
+            errMsgLists.add("電話番号は最大 " + con.MAX_CODE_CONT_LENGTH + " 文字までです。");
+        } else if (!user.getTelNumber().matches("[0-9\\-]+")) {
+            errMsgLists.add("電話番号が無効です。");
+        }
+
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            errMsgLists.add("メールは必須です。");
+        } else if (user.getEmail().length() > con.MAX_NAME_LENGTH) {
+            errMsgLists.add("メールは最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
+        } else {
+            String EMAIL_PATTERN = "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$";
+            Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+            if (!pattern.matcher(user.getEmail()).matches()) {
+                errMsgLists.add("メールアドレスが無効です。「例) @ を含める必要があります」");
+            }
+        }
+        return errMsgLists;
+    }
+
+	public Map<String, ArrayList<String>> validateUpdate(User user) {
+		msgLists = new HashMap<>();
+		errMsgLists = this.validate(user);
+		if (!errMsgLists.isEmpty()) {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
+	}
+
+	public Map<String, ArrayList<String>> saveUser(User user, HttpServletRequest request) {
+		msgLists = new HashMap<>();
+		sucMsgLists = new ArrayList<>();
 		user.setPassword(toHexString(encodePassword(user.getPassword())));
 		user.setUserCode(this.getUserCode());
 		String userCode = scheduleBusiness.getUserUserCode(request);
 		user.setCreatedBy(userCode);
 		user.setUpdatedBy(userCode);
-		return userService.save(user);
+		User dbUser = userService.save(user);
+		if (dbUser != null) {
+			sucMsgLists.add("グループは正常に更新されました。");
+		}
+		msgLists.put("messages", sucMsgLists);
+		return msgLists;
 	}
 
 	public User findUserById(int id) {
@@ -60,26 +150,37 @@ public class UserBusiness {
 		return User;
 	}
 
-	public String updateUser(User user, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> updateUser(User user, HttpServletRequest request) {
+		msgLists = new HashMap<>();
+		errMsgLists = new ArrayList<>();
+		sucMsgLists = new ArrayList<>();
+		Boolean isError = false;
 		User updUser = userService.findUserById(user.getId());
 		if (updUser == null) {
-			throw new RuntimeException("User to update doesn't exist");
+			isError = true;
+			errMsgLists.add("更新するユーザが存在しません。");
 		}
-		updUser.setGroupCode(user.getGroupCode());
-		updUser.setUserName(user.getUserName());
-		updUser.setUserFirstName(user.getUserFirstName());
-		updUser.setUserLastName(user.getUserLastName());
-		updUser.setPostCode(user.getPostCode());
-		updUser.setAddress(user.getAddress());
-		updUser.setTelNumber(user.getTelNumber());
-		updUser.setEmail(user.getEmail());
-		String userCode = scheduleBusiness.getUserUserCode(request);
-		updUser.setUpdatedBy(userCode);
-		userService.save(updUser);
-		return "redirect:/users";
+		if (!isError) {
+			updUser.setGroupCode(user.getGroupCode());
+			updUser.setUserName(user.getUserName());
+			updUser.setUserFirstName(user.getUserFirstName());
+			updUser.setUserLastName(user.getUserLastName());
+			updUser.setPostCode(user.getPostCode());
+			updUser.setAddress(user.getAddress());
+			updUser.setTelNumber(user.getTelNumber());
+			updUser.setEmail(user.getEmail());
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			updUser.setUpdatedBy(userCode);
+			userService.save(updUser);
+			sucMsgLists.add("ユーザは正常に更新されました。");
+			msgLists.put("messages", sucMsgLists);
+		} else {
+			msgLists.put("errors", errMsgLists);
+		}
+		return msgLists;
 	}
 
-	public Map<String, ArrayList> deleteUser(@PathVariable int id, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> deleteUser(@PathVariable int id, HttpServletRequest request) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -179,7 +280,7 @@ public class UserBusiness {
 	}
 
 	public void logout(HttpServletRequest request, HttpServletResponse response) {
-		// ユーザーに関連付けられたすべての Cookie を削除します。
+		// ユーザに関連付けられたすべての Cookie を削除します。
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {

@@ -1,3 +1,4 @@
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -12,35 +13,34 @@ request.setAttribute("title", "Edit schedule");
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">スケジュールの編集</h2>
 			<div class="card">
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger" role="alert">
-						<strong>${error}</strong>
-					</div>
-				</c:if>
-				<form action='/schedule/schedules/update' method='post'>
+				<form:form action='/schedule/schedules/update' method='post'
+					modelAttribute="schedule">
 					<div class="card-body">
 						<div class="row">
 							<div class="col-sm-9">
 								<div class="form-group col-sm-12">
 									<label for="scheduleTitle"> スケジュールタイトル :</label> <input
 										type="text" id="scheduleTitle" name="scheduleTitle"
-										placeholder="Schedule Title"
-										value="${schedule.getScheduleTitle()}" class="form-control ">
+										placeholder="スケジュールタイトル"
+										value="${schedule.getScheduleTitle()}" class="form-control "><span><form:errors
+											path="scheduleTitle" style="color:red" /></span>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-4">
 										<label for="startDateTimeString"> スケジュールの開始日時 :</label> <input
 											type="text" class="form-control" id="startDateTimeString"
 											name="startDateTimeString"
-											value="${schedule.getScheduleStartDateTime()}"
-											placeholder="YYYY-MM-DD HH:mm:ss" />
+											value="${schedule.getStartDateTimeString()}"
+											placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
+												path="startDateTimeString" style="color:red" /></span>
 									</div>
 									<div class="col-sm-4">
 										<label for="endDateTimeString"> スケジュールの終了日時 :</label> <input
 											type="text" class="form-control" id="endDateTimeString"
 											name="endDateTimeString"
-											value="${schedule.getScheduleEndDateTime()}"
-											placeholder="YYYY-MM-DD HH:mm:ss" />
+											value="${schedule.getEndDateTimeString()}"
+											placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
+												path="endDateTimeString" style="color:red" /></span>
 									</div>
 									<div class="col-sm-12"></div>
 								</div>
@@ -201,12 +201,14 @@ request.setAttribute("title", "Edit schedule");
 						<div class="form-group col-sm-12 mt-link">
 							<label for="meetLink"> ミーティングのリンク :</label> <input type="text"
 								id="meetLink" name="meetLink" placeholder="ミーティングのリンク"
-								value="${schedule.getMeetLink()}" class="form-control ">
+								value="${schedule.getMeetLink()}" class="form-control "><span><form:errors
+									path="meetLink" style="color:red" /></span>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="location"> ロケーション :</label> <input type="text"
 								id="location" name="location" value="${schedule.getLocation()}"
-								placeholder="ロケーション" class="form-control ">
+								placeholder="ロケーション" class="form-control "><span><form:errors
+									path="location" style="color:red" /></span>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-12">
@@ -251,6 +253,9 @@ request.setAttribute("title", "Edit schedule");
 							<label for="scheduleDescription"> スケジュールの説明 :</label>
 							<textarea id="scheduleDescription" name="scheduleDescription"
 								placeholder="ケジュールの説明" class="form-control">${schedule.getScheduleDescription()}</textarea>
+							<span><form:errors path="scheduleDescription"
+									style="color:red" /></span>
+
 						</div>
 						<div class="up-btn-gp col-sm-12">
 							<input type='hidden' id='id' class='form-control' name='id'
@@ -260,17 +265,13 @@ request.setAttribute("title", "Edit schedule");
 							<button type="submit" class="btn btn-primary">編集</button>
 						</div>
 					</div>
-				</form>
+				</form:form>
 			</div>
 		</div>
 	</div>
 </div>
 </body>
 <script>
-	document.addEventListener("DOMContentLoaded", function(event) {
-		//document.getElementById("scheduleThemeColor").value = "#FF4013";
-	});
-
 	$(document).ready(function() {
 		$('#endDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'

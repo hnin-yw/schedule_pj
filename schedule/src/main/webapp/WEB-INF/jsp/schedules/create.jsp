@@ -1,3 +1,4 @@
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -12,44 +13,50 @@ request.setAttribute("title", "Create schedule");
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">スケジュールの登録</h2>
 			<div class="card">
-				<c:if test="${not empty error}">
-					<div class="alert alert-danger" role="alert">
-						<strong>${error}</strong>
-					</div>
-				</c:if>
-				<form action='/schedule/schedules/save' method='post'>
+				<form:form action='/schedule/schedules/save' method='post'
+					modelAttribute="schedule">
 					<div class="card-body">
 						<div class="row">
 							<div class="col-sm-9">
 								<div class="form-group col-sm-12">
 									<label for="scheduleTitle"> スケジュールタイトル :</label> <input
 										type="text" id="scheduleTitle" name="scheduleTitle"
-										placeholder="スケジュールタイトル" class="form-control ">
+										placeholder="スケジュールタイトル"
+										value="${schedule.getScheduleTitle()}" class="form-control "><span><form:errors
+											path="scheduleTitle" style="color:red" /></span>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-4">
 										<label for="startDateTimeString"> スケジュールの開始日時 :</label> <input
-											type="text" class="form-control" id="startDateTimeString"
-											name="startDateTimeString" placeholder="YYYY-MM-DD HH:mm:ss" />
+											type="text" id="startDateTimeString"
+											name="startDateTimeString"
+											value="${schedule.getStartDateTimeString()}"
+											class="form-control" placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
+												path="startDateTimeString" style="color:red" /></span>
 									</div>
 									<div class="col-sm-4">
 										<label for="endDateTimeString"> スケジュールの終了日時 :</label> <input
-											type="text" class="form-control" id="endDateTimeString"
-											name="endDateTimeString" placeholder="YYYY-MM-DD HH:mm:ss" />
+											type="text" id="endDateTimeString" name="endDateTimeString"
+											value="${schedule.getEndDateTimeString()}"
+											class="form-control" placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
+												path="endDateTimeString" style="color:red" /></span>
 									</div>
 									<div class="col-sm-12"></div>
 								</div>
 								<div class="form-group col-sm-12" style="margin-top: 10px;">
 									<label for="scheduleThemeColor">スケジュールテーマカラー </label><input
 										type="color" class="custom-color_box" id="scheduleThemeColor"
-										name="scheduleThemeColor" class="form-control ">
+										name="scheduleThemeColor"
+										value="${schedule.getScheduleThemeColor()}"
+										class="form-control ">
 								</div>
 
 								<div class="form-group">
 									<div class="col-sm-2" style="margin-top: 20px;">
 										<input type="hidden" id="allDayFlg" name="allDayFlg" value="0">
 										<input type="checkbox" class="custom-checkbox"
-											id="allDayFlgChk" onchange="onAllDayFlgChange(this)">
+											id="allDayFlgChk" onchange="onAllDayFlgChange(this)"
+											<c:if test="${schedule.getAllDayFlg()}">checked</c:if>>
 										<label for="male">一日中</label>
 									</div>
 									<div class="col-sm-3" style="margin-top: 5px;">
@@ -57,8 +64,10 @@ request.setAttribute("title", "Create schedule");
 											name="repeatType" onchange="onRepeatTypeChange(this)"
 											data-toggle="modal" data-target="#repeatConfirmModel"
 											class="form-control">
-											<option value="01">リピートなし</option>
-											<option value="02">カスタム</option>
+											<option value="01"
+												<c:if test="${schedule.getRepeatType() == '01'}">selected</c:if>>リピートなし</option>
+											<option value="02"
+												<c:if test="${schedule.getRepeatType() == '02'}">selected</c:if>>カスタム</option>
 										</select>
 									</div>
 
@@ -70,29 +79,39 @@ request.setAttribute("title", "Create schedule");
 									<label for="otherVisibilityFlg"> スケジュールタイプ</label> <select
 										name="eventFlg" class="form-control"
 										onchange="onEventChange(this)">
-										<option value="1" selected>イベント</option>
-										<option value="0">タスク</option>
+										<option value="1"
+											<c:if test="${schedule.getEventFlg() == '1'}">selected</c:if>>イベント</option>
+										<option value="0"
+											<c:if test="${schedule.getEventFlg() == '0'}">selected</c:if>>タスク</option>
 									</select> <br> <label for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">
-										<option value="0">公開</option>
-										<option value="1" selected>非公開</option>
+										<option value="0"
+											<c:if test="${!schedule.getOtherVisibilityFlg()}">selected</c:if>>公開</option>
+										<option value="1"
+											<c:if test="${schedule.getOtherVisibilityFlg()}">selected</c:if>>非公開</option>
 									</select> <br> <label for="scheduleDisplayFlg"> スケジュール表示 </label> <select
 										name="scheduleDisplayFlg" class="form-control">
-										<option value="0">無料</option>
-										<option value="1" selected>忙しい</option>
+										<option value="0"
+											<c:if test="${!schedule.getScheduleDisplayFlg()}">selected</c:if>>無料</option>
+										<option value="1"
+											<c:if test="${schedule.getScheduleDisplayFlg()}">selected</c:if>>忙しい</option>
 									</select>
 								</div>
 							</div>
 						</div>
 
 						<input type="hidden" id="repeatInterval" name="repeatInterval"
-							value="0" /> <input type="hidden" id="repeatIntervalType"
-							name="repeatIntervalType" value="0" /> <input type="hidden"
-							id="repeatDayOfWeek" name="repeatDayOfWeek" value="0" /> <input
-							type="hidden" id="repeatDayOfMonth" name="repeatDayOfMonth"
-							value="0" /> <input type="hidden" id="repeatMonth"
-							name="repeatMonth" value="0" /> <input type="hidden"
-							id="repeatUntilDateTimeString" name="repeatUntilDateTimeString" />
+							value="${schedule.getRepeatInterval()}" /> <input type="hidden"
+							id="repeatIntervalType" name="repeatIntervalType"
+							value="${schedule.getRepeatIntervalType()}" /> <input
+							type="hidden" id="repeatDayOfWeek" name="repeatDayOfWeek"
+							value="${schedule.getRepeatDayOfWeek()}" /> <input type="hidden"
+							id="repeatDayOfMonth" name="repeatDayOfMonth"
+							value="${schedule.getRepeatDayOfMonth()}" /> <input
+							type="hidden" id="repeatMonth" name="repeatMonth"
+							value="${schedule.getRepeatMonth()}" /> <input type="hidden"
+							id="repeatUntilDateTimeString" name="repeatUntilDateTimeString"
+							value="${schedule.getRepeatUntilDateTimeString()}" />
 
 						<!-- Repeat Confirm Modal -->
 						<div class="modal fade" id="repeatConfirmModel" tabindex="-1"
@@ -180,46 +199,91 @@ request.setAttribute("title", "Create schedule");
 
 						<div class="form-group col-sm-12 mt-link">
 							<label for="meetLink"> ミーティングのリンク :</label> <input type="text"
-								id="meetLink" name="meetLink" placeholder="ミーティングのリンク"
-								class="form-control ">
+								id="meetLink" name="meetLink" value="${schedule.getMeetLink()}"
+								placeholder="ミーティングのリンク" class="form-control "><span><form:errors
+									path="meetLink" style="color:red" /></span>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="location"> ロケーション :</label> <input type="text"
-								id="location" name="location" placeholder="ロケーション"
-								class="form-control ">
+								id="location" name="location" value="${schedule.getLocation()}"
+								placeholder="ロケーション" class="form-control "><span><form:errors
+									path="location" style="color:red" /></span>
 						</div>
 						<div class="form-group">
 							<div class="col-sm-12">
 								<label for="scheduleDescription"> 通知の種類:</label>
 							</div>
-							<c:forEach var="i" begin="0" end="2">
-								<div class="col-sm-12"></div>
-								<div class="col-sm-2">
-									<select name="scheduleReminders[${i}].notiMethodFlg"
-										class="form-control">
-										<option value="0">メール</option>
-										<option value="1">通知</option>
-									</select>
-								</div>
-								<div class="col-sm-2">
-									<input type="number" id="scheduleReminderTime${i}"
-										name="scheduleReminders[${i}].scheduleReminderTime" min="1"
-										value="1" class="form-control">
-								</div>
-								<div class="col-sm-2">
-									<select name="scheduleReminders[${i}].scheduleReminderType"
-										class="form-control">
-										<option value="01">分間</option>
-										<option value="02">時間</option>
-									</select>
-								</div>
-								<div class="col-sm-12 mrg_form"></div>
-							</c:forEach>
+							<c:choose>
+								<c:when test="${not empty schedule.getScheduleReminders()}">
+									<c:forEach var="reminder"
+										items="${schedule.getScheduleReminders()}" varStatus="loop">
+										<div class="col-sm-12">
+											<input type="hidden" id="id${loop.index}"
+												name="scheduleReminders[${loop.index}].id"
+												value="${reminder.getId()}" class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${loop.index}].notiMethodFlg"
+												class="form-control">
+												<option value="0"
+													<c:if test="${reminder.getNotiMethodFlg() == '0'}">selected</c:if>>メール</option>
+												<option value="1"
+													<c:if test="${reminder.getNotiMethodFlg() == '1'}">selected</c:if>>通知</option>
+											</select>
+										</div>
+										<div class="col-sm-2">
+											<input type="number" id="scheduleReminderTime${loop.index}"
+												name="scheduleReminders[${loop.index}].scheduleReminderTime"
+												value="${reminder.getScheduleReminderTime()}"
+												class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select
+												name="scheduleReminders[${loop.index}].scheduleReminderType"
+												class="form-control">
+												<option value="01"
+													<c:if test="${reminder.getScheduleReminderType() == '01'}">selected</c:if>>分間</option>
+												<option value="02"
+													<c:if test="${reminder.getScheduleReminderType() == '02'}">selected</c:if>>時間</option>
+											</select>
+										</div>
+										<div class="col-sm-12 mrg_form"></div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="i" begin="0" end="2">
+										<div class="col-sm-12"></div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${i}].notiMethodFlg"
+												class="form-control">
+												<option value="0">メール</option>
+												<option value="1">通知</option>
+											</select>
+										</div>
+										<div class="col-sm-2">
+											<input type="number" id="scheduleReminderTime${i}"
+												name="scheduleReminders[${i}].scheduleReminderTime" min="1"
+												value="1" class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${i}].scheduleReminderType"
+												class="form-control">
+												<option value="01">分間</option>
+												<option value="02">時間</option>
+											</select>
+										</div>
+										<div class="col-sm-12 mrg_form"></div>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
 						</div>
 						<div class="form-group col-sm-12">
-							<label for="scheduleDescription"> スケジュールの説明 :</label>
+							<label for="scheduleDescription"> スケジュールの説明 :</label> 
 							<textarea id="scheduleDescription" name="scheduleDescription"
-								placeholder="ケジュールの説明" class="form-control"></textarea>
+								placeholder="ケジュールの説明" class="form-control">${schedule.getScheduleDescription()}</textarea>
+							<span><form:errors path="scheduleDescription"
+									style="color:red" /></span>
+
 						</div>
 						<div class="up-btn-gp col-sm-12">
 							<a href="/schedule/schedules">
@@ -228,7 +292,7 @@ request.setAttribute("title", "Create schedule");
 							<button type="submit" class="btn btn-primary">登録</button>
 						</div>
 					</div>
-				</form>
+				</form:form>
 			</div>
 		</div>
 	</div>
@@ -236,7 +300,7 @@ request.setAttribute("title", "Create schedule");
 </body>
 <script>
 	document.addEventListener("DOMContentLoaded", function(event) {
-		$('#scheduleThemeColor').val("#FF4013");
+		//$('#scheduleThemeColor').val("#FF4013");
 	});
 
 	$(document).ready(function() {

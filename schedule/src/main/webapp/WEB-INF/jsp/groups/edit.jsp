@@ -1,3 +1,4 @@
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -14,11 +15,13 @@ request.setAttribute("title", "Edit Group");
 			<div class="card">
 				<%@ include file="/WEB-INF/jsp/message.jsp"%>
 				<div class="card-body">
-					<form action='/schedule/groups/update' method='post'>
+					<form:form action='/schedule/groups/update' method='post'
+						modelAttribute="group">
 						<div class="form-group col-sm-12">
 							<label for="groupName"> グループ名 :</label> <input type='text'
 								name='groupName' id='groupName' class='form-control'
-								value="${group.getGroupName()}" />
+								placeholder="グループ名" value="${group.getGroupName()}" /> <span><form:errors
+									path="groupName" cssStyle="color:red" /></span>
 						</div>
 						<input type='hidden' id='id' class='form-control' name='id'
 							value="${group.getId()}" />
@@ -28,7 +31,7 @@ request.setAttribute("title", "Edit Group");
 							</a>
 							<button type="submit" class="btn btn-primary">編集</button>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>

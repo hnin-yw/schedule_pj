@@ -40,7 +40,7 @@ request.setAttribute("title", "List User");
 										<td>${user.getGroup().getGroupName()}</td>
 
 										<td><a href="/schedule/users/edit/${user.getId()}">
-												<button type="submit" class="btn btn-primary">編集</button>
+												<button type="button" class="btn btn-primary">編集</button>
 										</a>
 											<button type="button" data-userid="${user.getId()}"
 												id="btnUserDelete" class="btn btn-danger"

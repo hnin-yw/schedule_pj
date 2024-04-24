@@ -34,31 +34,30 @@ if (c != null) {
 						<button type="button" class="btn btn-primary">スケジュールを登録</button>
 					</a>
 				</div>
-				<form action='/schedule/schedules/download' method='post'>
-					<table class="table table-bordered" style="maring-top: 10px;">
-						<thead>
-							<tr>
-								<th rowspan="2" style="width: 5px;"></th>
-								<th rowspan="2"></th>
-								<th rowspan="2"></th>
-								<th colspan="2"><b>イベント開始日時 ~ 終了日時</b></th>
-								<th><b>繰り返しタイプ</b></th>
-								<th rowspan="2"><b>ステータス</b></th>
-								<th rowspan="2"><b>オーナー</b></th>
-								<th rowspan="2" style="width: 20px;"></th>
-							</tr>
-							<tr>
-								<th><b>スケジュールタイトル</b></th>
-								<th><b>説明</b></th>
-								<th><b>繰り返す終了日付</b></th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:choose>
-								<c:when test="${listSchedules.getTotalElements() > 0}">
-									<c:forEach items="${listSchedules.content}" var="schedule">
-										<tr
-											<c:choose>
+				<table class="table table-bordered" style="maring-top: 10px;">
+					<thead>
+						<tr>
+							<th rowspan="2" style="width: 5px;"></th>
+							<th rowspan="2"></th>
+							<th rowspan="2"></th>
+							<th colspan="2"><b>イベント開始日時 ~ 終了日時</b></th>
+							<th><b>繰り返しタイプ</b></th>
+							<th rowspan="2"><b>ステータス</b></th>
+							<th rowspan="2"><b>オーナー</b></th>
+							<th rowspan="2" style="width: 20px;"></th>
+						</tr>
+						<tr>
+							<th><b>スケジュールタイトル</b></th>
+							<th><b>説明</b></th>
+							<th><b>繰り返す終了日付</b></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:choose>
+							<c:when test="${listSchedules.getTotalElements() > 0}">
+								<c:forEach items="${listSchedules.content}" var="schedule">
+									<tr
+										<c:choose>
 											    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
 											        style="background-color:#919191;"
 											    </c:when>
@@ -67,52 +66,51 @@ if (c != null) {
 											    </c:otherwise>
 											</c:choose>>
 
-											<td rowspan="2"><c:if
-													test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
-													<input type="checkbox" name="selectedIds"
-														class="custom-checkbox" onChange="updateButtonState()"
-														value="${schedule.getId()}" />
-												</c:if></td>
-											<td rowspan="2"><c:if test="${schedule.getAllDayFlg()}">
+										<td rowspan="2"><c:if
+												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
+												<input type="checkbox" id="chkSelectedIds"
+													name="chkSelectedIds" class="custom-checkbox"
+													onChange="updateButtonState()" value="${schedule.getId()}" />
+											</c:if></td>
+										<td rowspan="2"><c:if test="${schedule.getAllDayFlg()}">
 													一日中
 												</c:if></td>
-											<td rowspan="2"><c:choose>
-													<c:when
-														test="${!schedule.getUserCode().equals(userCode) && schedule.getScheduleDisplayFlg()}">
-														<i class="bi bi-circle" style="color: red;"></i> Busy
+										<td rowspan="2"><c:choose>
+												<c:when
+													test="${!schedule.getUserCode().equals(userCode) && schedule.getScheduleDisplayFlg()}">
+													<i class="bi bi-circle" style="color: red;"></i> Busy
 													</c:when>
-													<c:when
-														test="${!schedule.getUserCode().equals(userCode) && !schedule.getScheduleDisplayFlg()}">
-														<i class="bi bi-circle" style="color: green;"></i> Free
+												<c:when
+													test="${!schedule.getUserCode().equals(userCode) && !schedule.getScheduleDisplayFlg()}">
+													<i class="bi bi-circle" style="color: green;"></i> Free
 													</c:when>
-													<c:otherwise></c:otherwise>
-												</c:choose></td>
-											<td colspan="2">${schedule.getScheduleStartDateTime().format(formatter)}
-												~ ${schedule.getScheduleEndDateTime().format(formatter)}</td>
+												<c:otherwise></c:otherwise>
+											</c:choose></td>
+										<td colspan="2">${schedule.getScheduleStartDateTime().format(formatter)}
+											~ ${schedule.getScheduleEndDateTime().format(formatter)}</td>
 
-											<td>${schedule.getRepeatType() == '01'? "リピートなし" : "カスタム"}</td>
-											<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
-											<td rowspan="2">${schedule.getUser().getUserFirstName()}
-												${schedule.getUser().getUserLastName()}</td>
-											<td rowspan="2" style="width: 20%;"><c:if
-													test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
-													<a href="/schedule/schedules/edit/${schedule.getId()}">
-														<button type="button" class="btn btn-primary">編集</button>
-													</a>
+										<td>${schedule.getRepeatType() == '01'? "リピートなし" : "カスタム"}</td>
+										<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
+										<td rowspan="2">${schedule.getUser().getUserFirstName()}
+											${schedule.getUser().getUserLastName()}</td>
+										<td rowspan="2" style="width: 20%;"><c:if
+												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
+												<a href="/schedule/schedules/edit/${schedule.getId()}">
+													<button type="button" class="btn btn-primary">編集</button>
+												</a>
+												<button type="button" data-scheduleid="${schedule.getId()}"
+													id="btnScheduleDelete" class="btn btn-danger"
+													data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
+												<c:if
+													test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
 													<button type="button" data-scheduleid="${schedule.getId()}"
-														id="btnScheduleDelete" class="btn btn-danger"
-														data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
-													<c:if
-														test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
-														<button type="button"
-															data-scheduleid="${schedule.getId()}"
-															id="btnScheduleUpdate" class="btn btn-light"
-															data-toggle="modal" data-target="#completeConfirmModel">完了</button>
-													</c:if>
-												</c:if></td>
-										</tr>
-										<tr
-											<c:choose>
+														id="btnScheduleUpdate" class="btn btn-light"
+														data-toggle="modal" data-target="#completeConfirmModel">完了</button>
+												</c:if>
+											</c:if></td>
+									</tr>
+									<tr
+										<c:choose>
 											    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
 											        style="background-color:#919191;"
 											    </c:when>
@@ -120,29 +118,29 @@ if (c != null) {
 											        style="background-color:${schedule.getScheduleThemeColor()};"
 											    </c:otherwise>
 											</c:choose>>
-											<td>${schedule.getScheduleTitle()}</td>
-											<td>${schedule.getScheduleDescription()}</td>
-											<td>${schedule.getRepeatUntil().format(formatter)}</td>
-										</tr>
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-									<tr>
-										<td colspan="3">スケジュールはありません.</td>
+										<td>${schedule.getScheduleTitle()}</td>
+										<td>${schedule.getScheduleDescription()}</td>
+										<td>${schedule.getRepeatUntil().format(formatter)}</td>
 									</tr>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<tr>
+									<td colspan="9">スケジュールはありません.</td>
+								</tr>
 
-								</c:otherwise>
-							</c:choose>
-						</tbody>
-					</table>
-					<c:if test="${listSchedules.getTotalElements() > 0}">
-						<%@ include file="/WEB-INF/jsp/pagination.jsp"%>
-					</c:if>
-					<button type="submit" class="btn btn-primary"
-						id="btnDownloadSchedule" disabled>
-						<i class="bi bi-download"></i> ダウンロード
-					</button>
-				</form>
+							</c:otherwise>
+						</c:choose>
+					</tbody>
+				</table>
+				<c:if test="${listSchedules.getTotalElements() > 0}">
+					<%@ include file="/WEB-INF/jsp/pagination.jsp"%>
+				</c:if>
+				<button type="button" class="btn btn-primary"
+					id="btnDownloadSchedule" data-toggle="modal"
+					data-target="#downloadConfirmModel" disabled>
+					<i class="bi bi-download"></i> ダウンロード
+				</button>
 			</div>
 		</div>
 		<!-- Delete Confirm Modal -->
@@ -194,46 +192,99 @@ if (c != null) {
 				</div>
 			</form>
 		</div>
+		<!-- Download Confirm Modal -->
+		<div class="modal fade" id="downloadConfirmModel" tabindex="-1"
+			role="dialog" aria-labelledby="downloadConfirmModelLabel"
+			aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<form action='/schedule/schedules/download' method='post'>
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">CSVダウンロードの確認</h5>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">スケジュールCSVをダウンロードしてもよろしいですか?</div>
+						<div class="modal-footer">
+							<input type="hidden" name="selectedIds" id="selectedIds" />
+							<button type="submit" class="btn btn-danger" id="btnDownloadOK">OK</button>
+							<button type="button" class="btn btn-secondary"
+								id="btnDownloadCancel" data-dismiss="modal">キャンセル</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 </body>
 <script>
-	$(document).ready(
-			function() {
-				$('body').on(
-						'click',
-						'#btnScheduleDelete',
-						function() {
-							var scheduleId = $(this).data('scheduleid');
-							var url = '/schedule/schedules/delete/'
-									+ scheduleId;
-							document.getElementById('deleteUrl').setAttribute(
-									'href', url);
-						});
-				$('body').on(
-						'click',
-						'#btnScheduleUpdate',
-						function() {
-							var scheduleId = $(this).data('scheduleid');
-							var url = '/schedule/schedules/status/update';
-							$('#scheduleId').val(scheduleId);
-							document.getElementById('completeConfirmAction')
-									.setAttribute('action', url);
-						});
+	$(document)
+			.ready(
+					function() {
+						$('body')
+								.on(
+										'click',
+										'#btnScheduleDelete',
+										function() {
+											var scheduleId = $(this).data(
+													'scheduleid');
+											var url = '/schedule/schedules/delete/'
+													+ scheduleId;
+											document
+													.getElementById('deleteUrl')
+													.setAttribute('href', url);
+										});
+						$('body')
+								.on(
+										'click',
+										'#btnScheduleUpdate',
+										function() {
+											var scheduleId = $(this).data(
+													'scheduleid');
+											var url = '/schedule/schedules/status/update';
+											$('#scheduleId').val(scheduleId);
+											document
+													.getElementById(
+															'completeConfirmAction')
+													.setAttribute('action', url);
+										});
+						$("#btnDeleteCancel").click(
+								function(e) {
+									document.getElementById('deleteUrl')
+											.setAttribute('href', "");
+								});
+						$("#btnDownloadSchedule")
+								.click(
+										function(e) {
+											var checkboxes = document
+													.querySelectorAll('input[name="chkSelectedIds"]:checked');
+											var values = [];
+											checkboxes.forEach(function(
+													checkbox) {
+												values.push(checkbox.value);
+											});
+											document
+													.getElementById('selectedIds').value = values
+													.join(',');
+											$("#selectedIds").val(
+													values.join(','));
+										});
+						$("#btnDownloadOK")
+								.click(
+										function(e) {
+											$("#downloadConfirmModel").modal(
+													"hide");
+											var checkboxes = document
+													.querySelectorAll('input[name="chkSelectedIds"]:checked');
+											for (var i = 0; i < checkboxes.length; i++) {
+												checkboxes[i].checked = false;
+											}
+										});
+					});
 
-				$("#btnDeleteCancel").click(
-						function(e) {
-							document.getElementById('deleteUrl').setAttribute(
-									'href', "");
-						});
-			});
-
-	/* $("#btnDownloadSchedule").click(function(e) {
-		var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-		checkboxes.forEach(function(checkbox) {
-			checkbox.checked = false;
-		});
-	}); */
 	function updateButtonState() {
 		var checkboxes = document.querySelectorAll('input[type="checkbox"]');
 		var checked = false;

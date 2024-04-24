@@ -15,6 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.schedule.business.ScheduleBusiness;
 import com.example.schedule.entity.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.http.HttpHeaders;
@@ -31,16 +33,9 @@ public class ScheduleController {
 		this.scheduleBusiness = scheduleBusiness;
 	}
 
-//	@GetMapping()
-//	public String list(HttpServletRequest request, Model model) {
-//		List<Schedule> listSchedules = scheduleBusiness.list(request);
-//		model.addAttribute("listSchedules", listSchedules);
-//		return "schedules/list";
-//	}
-
 	@GetMapping()
-	public String list(@RequestParam(defaultValue = "0") int page, HttpServletRequest request,Model model) {
-		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 6),request);
+	public String list(@RequestParam(defaultValue = "0") int page, HttpServletRequest request, Model model) {
+		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 6), request);
 		model.addAttribute("listSchedules", listSchedules);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", listSchedules.getTotalPages());
@@ -50,16 +45,21 @@ public class ScheduleController {
 	@RequestMapping("/create")
 	public String create(Model model) {
 		Schedule schedule = new Schedule();
+		schedule.setScheduleThemeColor("#FF4013");
 		model.addAttribute("schedule", schedule);
 
 		return "schedules/create";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("schedule") Schedule schedule, BindingResult result, Model model,
+	public String save(Model model, @ModelAttribute("schedule") @Valid Schedule schedule, BindingResult result,
 			HttpServletRequest request) {
-		scheduleBusiness.saveSchedule(schedule, request);
-		return "redirect:/schedules";
+		if (result.hasErrors()) {
+			return "schedules/create";
+		} else {
+			scheduleBusiness.saveSchedule(schedule, request);
+			return "redirect:/schedules";
+		}
 	}
 
 	@RequestMapping("/edit/{id}")
@@ -72,9 +72,14 @@ public class ScheduleController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Schedule Schedule, HttpServletRequest request) {
-		scheduleBusiness.updateSchedule(Schedule, request);
-		return "redirect:/schedules";
+	public String update(Model model, @ModelAttribute("schedule") @Valid Schedule schedule, BindingResult result,
+			HttpServletRequest request) {
+		if (result.hasErrors()) {
+			return "schedules/edit";
+		} else {
+			scheduleBusiness.updateSchedule(schedule, request);
+			return "redirect:/schedules";
+		}
 	}
 
 	@RequestMapping(value = "status/update", method = RequestMethod.POST)

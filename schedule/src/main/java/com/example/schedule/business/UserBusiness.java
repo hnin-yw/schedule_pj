@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,11 +15,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import com.example.schedule.Consts;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,101 +27,21 @@ public class UserBusiness {
 	private final UserService userService;
 	private final ScheduleService scheduleService;
 	private final ScheduleBusiness scheduleBusiness;
-	private final Consts con;
 
 	private Map<String, ArrayList<String>> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness,
-			Consts con) {
+	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness) {
 		this.userService = userService;
 		this.scheduleService = scheduleService;
 		this.scheduleBusiness = scheduleBusiness;
-		this.con = con;
 	}
 
 	public Page<User> list(Pageable pageable) {
 		Page<User> listUsers = userService.findAlls(pageable);
 		return listUsers;
-	}
-
-	public Map<String, ArrayList<String>> validateCreate(User user) {
-		msgLists = new HashMap<>();
-		errMsgLists = this.validate(user);
-		if (user.getPassword() == null || user.getPassword().isBlank()) {
-			errMsgLists.add("パスワードは必須です。");
-		}
-		if (!errMsgLists.isEmpty()) {
-			msgLists.put("errors", errMsgLists);
-		}
-		return msgLists;
-	}
-
-	private ArrayList<String> validate(User user) {
-        ArrayList<String> errMsgLists = new ArrayList<>();
-        if (user.getUserName() == null || user.getUserName().isBlank()) {
-            errMsgLists.add("ユーザ名またはログイン名は必須です。");
-        } else if (user.getUserName().length() > con.MAX_CODE_LENGTH) {
-            errMsgLists.add("ユーザ名またはログイン名は最大 " + con.MAX_CODE_LENGTH + " 文字までです。");
-        }
-
-        if (user.getUserFirstName() == null || user.getUserFirstName().isBlank()) {
-            errMsgLists.add("ユーザの名は必須です。");
-        } else if (user.getUserFirstName().length() > con.MAX_NAME_LENGTH) {
-            errMsgLists.add("ユーザの名は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
-        }
-
-        if (user.getUserLastName() == null || user.getUserLastName().isBlank()) {
-            errMsgLists.add("ユーザの姓は必須です。");
-        } else if (user.getUserLastName().length() > con.MAX_NAME_LENGTH) {
-            errMsgLists.add("ユーザの姓は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
-        }
-
-        if (user.getPostCode() == null || user.getPostCode().isBlank()) {
-            errMsgLists.add("郵便番号は必須です。");
-        } else if (user.getPostCode().length() > con.MAX_CODE_CONT_LENGTH) {
-            errMsgLists.add("郵便番号は最大 " + con.MAX_CODE_CONT_LENGTH + " 文字までです。");
-        } else if (!user.getPostCode().matches("[0-9\\-]+")) {
-            errMsgLists.add("郵便番号が無効です。");
-        }
-
-        if (user.getAddress() == null || user.getAddress().isBlank()) {
-            errMsgLists.add("住所は必須です。");
-        } else if (user.getAddress().length() > con.MAX_NAME_AREA_LENGTH) {
-            errMsgLists.add("住所は最大 " + con.MAX_NAME_AREA_LENGTH + " 文字までです。");
-        }
-
-        if (user.getTelNumber() == null || user.getTelNumber().isBlank()) {
-            errMsgLists.add("電話番号は必須です。");
-        } else if (user.getTelNumber().length() > con.MAX_CODE_CONT_LENGTH) {
-            errMsgLists.add("電話番号は最大 " + con.MAX_CODE_CONT_LENGTH + " 文字までです。");
-        } else if (!user.getTelNumber().matches("[0-9\\-]+")) {
-            errMsgLists.add("電話番号が無効です。");
-        }
-
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            errMsgLists.add("メールは必須です。");
-        } else if (user.getEmail().length() > con.MAX_NAME_LENGTH) {
-            errMsgLists.add("メールは最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
-        } else {
-            String EMAIL_PATTERN = "^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,3})+$";
-            Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-            if (!pattern.matcher(user.getEmail()).matches()) {
-                errMsgLists.add("メールアドレスが無効です。「例) @ を含める必要があります」");
-            }
-        }
-        return errMsgLists;
-    }
-
-	public Map<String, ArrayList<String>> validateUpdate(User user) {
-		msgLists = new HashMap<>();
-		errMsgLists = this.validate(user);
-		if (!errMsgLists.isEmpty()) {
-			msgLists.put("errors", errMsgLists);
-		}
-		return msgLists;
 	}
 
 	public Map<String, ArrayList<String>> saveUser(User user, HttpServletRequest request) {
@@ -192,7 +107,8 @@ public class UserBusiness {
 			errMsgLists.add("ユーザが見つかりません。");
 		} else {
 			List<Schedule> schedules = scheduleService.findScheduleListByUserCode(user.getUserCode());
-			if (schedules.size() > 0) {
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			if (schedules.size() > 0 || userCode.equals(user.getUserCode())) {
 				isError = true;
 				errMsgLists.add("このユーザは削除できません。");
 			}
@@ -274,6 +190,11 @@ public class UserBusiness {
 				c3.setPath("/schedule");
 				c3.setHttpOnly(true);
 				response.addCookie(c3);
+				Cookie c4 = new Cookie("userId", String.valueOf(userdb.getId()));
+				c4.setDomain("localhost");
+				c4.setPath("/schedule");
+				c4.setHttpOnly(true);
+				response.addCookie(c4);
 			}
 		}
 		return isLoginFail;
@@ -283,11 +204,12 @@ public class UserBusiness {
 		// ユーザに関連付けられたすべての Cookie を削除します。
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
-			for (Cookie cookie : cookies) {
+			for (Cookie cookie : request.getCookies()) {
 				if (!cookie.getName().equals("JSESSIONID")) {
 					cookie.setValue("");
-					cookie.setPath("/");
 					cookie.setMaxAge(0);
+					cookie.setPath("/"); // Set the path to match where the cookie was originally set
+					cookie.setDomain("");
 					response.addCookie(cookie);
 				}
 			}

@@ -1,12 +1,12 @@
 .row.content {
 	margin: 10px;
-	height: 1005px;
+	height: 905px;
 	box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 
 .sidenav {
 	background-color: #f1f1f1;
-	height: 955px;
+	height: 855px;
 	padding-top: 20px;
 }
 
@@ -56,4 +56,13 @@
 
 .mt-link {
 	margin-top: 20px;
+}
+
+a:focus, a:hover {
+	text-decoration: none !important;
+	/* Remove underline on hover and focus */
+}
+
+a:active {
+	outline: 0; /* Remove outline when link is active (clicked) */
 }

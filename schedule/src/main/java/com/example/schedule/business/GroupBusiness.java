@@ -10,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.example.schedule.*;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,19 +20,16 @@ public class GroupBusiness {
 	private final GroupService groupService;
 	private final UserService userService;
 	private final ScheduleBusiness scheduleBusiness;
-	private final Consts con;
 
 	private Map<String, ArrayList<String>> msgLists = new HashMap<>();
 	private ArrayList<String> errMsgLists = new ArrayList<>();
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public GroupBusiness(GroupService groupService, UserService userService, ScheduleBusiness scheduleBusiness,
-			Consts con) {
+	public GroupBusiness(GroupService groupService, UserService userService, ScheduleBusiness scheduleBusiness) {
 		this.groupService = groupService;
 		this.userService = userService;
 		this.scheduleBusiness = scheduleBusiness;
-		this.con = con;
 	}
 
 	public List<Group> getGroupLists() {
@@ -44,20 +40,6 @@ public class GroupBusiness {
 	public Page<Group> list(Pageable pageable) {
 		Page<Group> listGroups = groupService.findAlls(pageable);
 		return listGroups;
-	}
-
-	public Map<String, ArrayList<String>> validate(Group group) {
-		msgLists = new HashMap<>();
-		errMsgLists = new ArrayList<>();
-		if (group.getGroupName() == null || group.getGroupName().isBlank()) {
-			errMsgLists.add("グループ名は必須です。");
-		} else {
-			if (group.getGroupName().length() > con.MAX_NAME_LENGTH) {
-				errMsgLists.add("グループ名は最大 " + con.MAX_NAME_LENGTH + " 文字までです。");
-			}
-		}
-		msgLists.put("errors", errMsgLists);
-		return msgLists;
 	}
 
 	public Map<String, ArrayList<String>> saveGroup(Group group, HttpServletRequest request) {

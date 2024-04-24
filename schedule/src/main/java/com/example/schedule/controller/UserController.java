@@ -18,7 +18,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 @Controller
 @RequestMapping("/users")
@@ -52,17 +55,16 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(Model model, @ModelAttribute("user") User user, RedirectAttributes redirectAttributes,
-			HttpServletRequest request) {
-		Map<String, ArrayList<String>> errLists = userBusiness.validateCreate(user);
-		if (errLists.isEmpty()) {
+	public String save(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
+			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		if (result.hasErrors()) {
+			List<Group> gpLists = groupBusiness.getGroupLists();
+			model.addAttribute("gpLists", gpLists);
+			return "users/create";
+		} else {
 			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
 			return "redirect:/users";
-		} else {
-			redirectAttributes.addFlashAttribute("msgLists", errLists);
-			model.addAttribute("cusUser", user);
-			return "redirect:/users/create";
 		}
 	}
 
@@ -78,16 +80,16 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Model model, User user, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList<String>> errLists = userBusiness.validateUpdate(user);
-		if (errLists.isEmpty()) {
+	public String update(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
+			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		if (result.hasErrors()) {
+			List<Group> gpLists = groupBusiness.getGroupLists();
+			model.addAttribute("gpLists", gpLists);
+			return "users/edit";
+		} else {
 			Map<String, ArrayList<String>> msgLists = userBusiness.updateUser(user, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
 			return "redirect:/users";
-		} else {
-			redirectAttributes.addFlashAttribute("msgLists", errLists);
-			model.addAttribute("cusUser", user);
-			return "redirect:/users/edit/" + user.getId();
 		}
 	}
 

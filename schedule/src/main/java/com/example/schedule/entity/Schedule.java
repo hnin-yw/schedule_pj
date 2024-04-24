@@ -5,7 +5,11 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 
+import com.example.schedule.Consts;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "schedules")
@@ -25,7 +29,9 @@ public class Schedule {
 
 	@Column(name = "user_code")
 	private String userCode;
-
+	
+	@NotEmpty(message = "スケジュールタイトルは必須です。")
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "スケジュールタイトルは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "schedule_title")
 	private String scheduleTitle;
 
@@ -62,12 +68,15 @@ public class Schedule {
 	@Column(name = "schedule_display_flg")
 	private Boolean scheduleDisplayFlg;
 
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "ロケーションは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "location")
 	private String location;
 
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "ミーティングのリンクは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "meet_link")
 	private String meetLink;
 
+	@Size(max = Consts.MAX_NAME_AREA_LENGTH, message = "スケジュールの説明は最大 " + Consts.MAX_NAME_AREA_LENGTH + " 文字までです。")
 	@Column(name = "schedule_description")
 	private String scheduleDescription;
 
@@ -98,7 +107,9 @@ public class Schedule {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
+	@NotEmpty(message = "スケジュール開始日時は必須です。")
 	private String startDateTimeString;
+	@NotEmpty(message = "スケジュール終了日時は必須です。")
 	private String endDateTimeString;
 	private @Nullable String repeatUntilDateTimeString;
 

@@ -26,9 +26,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class ScheduleBusiness {
 	private final ScheduleService scheduleService;
 	private final ScheduleReminderService scheduleReminderService;
-	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	static String[] HEADERs = { "Id", "Title", "Description" };
-	static String SHEET = "schedules";
 
 	@Autowired
 	public ScheduleBusiness(ScheduleService scheduleService, ScheduleReminderService scheduleReminderService) {
@@ -45,17 +42,6 @@ public class ScheduleBusiness {
 		Page<Schedule> listSchedules = scheduleService.findAlls(pageable, userCode, groupCode);
 		return listSchedules;
 	}
-
-//	public List<Schedule> list(HttpServletRequest request) {
-//		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
-//		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
-//				LocalTime.MAX);
-//
-//		String userCode = getUserUserCode(request);
-//		String groupCode = getUserGroupCode(request);
-//		List<Schedule> listSchedules = scheduleService.findAlls(userCode, groupCode, startDateTime, endDateTime);
-//		return listSchedules;
-//	}
 
 	public Schedule saveSchedule(Schedule schedule, HttpServletRequest request) {
 		schedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));

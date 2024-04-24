@@ -1,3 +1,4 @@
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -14,11 +15,13 @@ request.setAttribute("title", "Create Group");
 			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="card">
 				<div class="card-body">
-					<form action='/schedule/groups/save' method='post'>
+					<form:form action='/schedule/groups/save' method='post'
+						modelAttribute="group">
 						<div class="form-group col-sm-12">
 							<label for="groupName"> グループ名 :</label> <input type="text"
 								class="form-control" id="groupName" name="groupName"
-								placeholder="Group Name" value="${cusGroup.getGroupName()}" />
+								placeholder="グループ名" value="${group.getGroupName()}" /> <span><form:errors
+									path="groupName" style="color:red" /></span>
 						</div>
 						<div class="up-btn-gp col-sm-12">
 							<a href="/schedule/groups">
@@ -26,7 +29,7 @@ request.setAttribute("title", "Create Group");
 							</a>
 							<button type="submit" class="btn btn-primary">登録</button>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>

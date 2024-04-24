@@ -20,8 +20,10 @@ import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 
 @Controller
 @RequestMapping("/groups")
@@ -51,41 +53,35 @@ public class GroupController {
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(Model model, @ModelAttribute("group") Group group, RedirectAttributes redirectAttributes,
-			HttpServletRequest request) {
-		Map<String, ArrayList<String>> errLists = groupBusiness.validate(group);
-		if (errLists.isEmpty()) {
+	public String save(Model model, @ModelAttribute("group") @Valid Group group, BindingResult result,
+			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		if (result.hasErrors()) {
+			return "groups/create";
+		} else {
 			Map<String, ArrayList<String>> msgLists = groupBusiness.saveGroup(group, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
 			return "redirect:/groups";
-		} else {
-			redirectAttributes.addFlashAttribute("msgLists", errLists);
-			model.addAttribute("cusGroup", group);
-			return "redirect:/groups/create";
 		}
-
 	}
 
 	@RequestMapping("/edit/{id}")
-	public ModelAndView edit(@PathVariable(name = "id") int id) {
+	public ModelAndView edit(@PathVariable(name = "id") int id, RedirectAttributes redirectAttributes) {
 		ModelAndView mav = new ModelAndView("groups/edit");
 		Group group = groupBusiness.findGroupById(id);
-		mav.addObject("group", group);
 
+		mav.addObject("group", group);
 		return mav;
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Model model, Group group, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList<String>> errLists = groupBusiness.validate(group);
-		if (errLists.isEmpty()) {
+	public String update(Model model, @ModelAttribute("group") @Valid Group group, BindingResult result,
+			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		if (result.hasErrors()) {
+			return "groups/edit";
+		} else {
 			Map<String, ArrayList<String>> msgLists = groupBusiness.updateGroup(group, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
 			return "redirect:/groups";
-		} else {
-			redirectAttributes.addFlashAttribute("msgLists", errLists);
-			model.addAttribute("cusGroup", group);
-			return "redirect:/groups/edit/" + group.getId();
 		}
 	}
 

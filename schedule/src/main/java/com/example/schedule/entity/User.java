@@ -1,43 +1,68 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
+
+import com.example.schedule.Consts;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
 public class User {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "group_code", referencedColumnName = "group_code", insertable = false, updatable = false)
-    private Group group;
+	private Group group;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
+	@NotEmpty(message = "グループ名は必須です。")
 	@Column(name = "group_code")
 	private String groupCode;
 
 	@Column(name = "user_code")
 	private String userCode;
 
+	@NotEmpty(message = "ユーザ名またはログイン名は必須です。")
+	@Size(max = Consts.MAX_CODE_LENGTH, message = "ユーザ名またはログイン名は最大 " + Consts.MAX_CODE_LENGTH + " 文字までです。")
 	@Column(name = "user_name")
 	private String userName;
 
+	@NotEmpty(message = "ユーザの名は必須です。")
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "ユーザの名は最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "user_first_name")
 	private String userFirstName;
 
+	@NotEmpty(message = "ユーザの姓は必須です。")
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "ユーザの姓は最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "user_last_name")
 	private String userLastName;
 
+	@NotEmpty(message = "郵便番号は必須です。")
+	@Pattern.List({ @Pattern(regexp = "[0-9\\-]+", message = "郵便番号が無効です。") })
+	@Size(max = Consts.MAX_CODE_CONT_LENGTH, message = "郵便番号は最大 " + Consts.MAX_CODE_CONT_LENGTH + " 文字までです。")
 	@Column(name = "post_code")
 	private String postCode;
 
+	@NotEmpty(message = "住所は必須です。")
+	@Size(max = Consts.MAX_NAME_AREA_LENGTH, message = "住所は最大 " + Consts.MAX_NAME_AREA_LENGTH + " 文字までです。")
 	@Column(name = "address")
 	private String address;
 
+	@NotEmpty(message = "電話番号は必須です。")
+	@Pattern.List({ @Pattern(regexp = "[0-9\\-]+", message = "電話番号が無効です。") })
+	@Size(max = Consts.MAX_CODE_CONT_LENGTH, message = "電話番号は最大 " + Consts.MAX_CODE_CONT_LENGTH + " 文字までです。")
 	@Column(name = "tel_number")
 	private String telNumber;
 
+	@NotEmpty(message = "メールは必須です。")
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "メールは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
+	@Email(message = "メールアドレスが無効です。「例) @ を含める必要があります」")
 	@Column(name = "email")
 	private String email;
 

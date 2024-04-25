@@ -43,6 +43,8 @@ request.setAttribute("title", "Edit User");
 							value="${user.getGroupCode()}" class="form-control ">
 						<input type="hidden" id="userName" name="userName"
 							value="${user.getUserName()}" class="form-control ">
+						<input type="hidden" id="password" name="password"
+							value="${user.getPassword()}" class="form-control ">
 						<div class="form-group col-sm-12">
 							<label for="userFirstName"> ユーザの名 :</label> <input type="text"
 								id="userFirstName" name="userFirstName"

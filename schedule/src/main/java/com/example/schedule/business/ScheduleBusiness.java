@@ -8,6 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import com.example.schedule.Consts;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 import jakarta.servlet.http.Cookie;
@@ -34,9 +36,6 @@ public class ScheduleBusiness {
 	}
 
 	public Page<Schedule> list(Pageable pageable, HttpServletRequest request) {
-//		LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
-//		LocalDateTime endDateTime = LocalDateTime.of(LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()),
-//				LocalTime.MAX);
 		String userCode = getUserUserCode(request);
 		String groupCode = getUserGroupCode(request);
 		Page<Schedule> listSchedules = scheduleService.findAlls(pageable, userCode, groupCode);
@@ -44,29 +43,136 @@ public class ScheduleBusiness {
 	}
 
 	public Schedule saveSchedule(Schedule schedule, HttpServletRequest request) {
-		schedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
-		schedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
-		schedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
+		LocalDateTime startDateTime = toDateTime(schedule.getStartDateTimeString());
+		LocalDateTime dbStartDateTime = toDateTime(schedule.getStartDateTimeString());
+		LocalDateTime dbEndDateTime = toDateTime(schedule.getEndDateTimeString());
+		schedule.setScheduleStartDateTime(dbStartDateTime);
+		schedule.setScheduleEndDateTime(dbEndDateTime);
+		String groupCode = getUserGroupCode(request);
 		String userCode = getUserUserCode(request);
+		schedule.setScheduleCode(this.getScheduleCode());
 		schedule.setUserCode(userCode);
 		schedule.setCreatedBy(userCode);
 		schedule.setUpdatedBy(userCode);
-		String groupCode = getUserGroupCode(request);
 		schedule.setGroupCode(groupCode);
-		Schedule scheduleDb = scheduleService.save(schedule);
-		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
-		if (reminders.size() > 0) {
-			for (int j = 0; j < reminders.size(); j++) {
-				ScheduleReminder reminder = reminders.get(j);
-				reminder.setScheduleId(scheduleDb.getId());
-				userCode = getUserUserCode(request);
-				reminder.setCreatedBy(userCode);
-				reminder.setUpdatedBy(userCode);
-				scheduleReminderService.save(reminder);
+		schedule.setDelFlg(false);
+		schedule.setScheduleStatusFlg(false);
+		if (!schedule.getRepeatType().equals(Consts.REPEATE_TYPE_NONE)) {
+			LocalDateTime repeatUntilDateTime = toDateTime(schedule.getRepeatUntilDateTimeString());
+			schedule.setRepeatUntil(repeatUntilDateTime);
+			if (schedule.getRepeatType().equals(Consts.REPEATE_TYPE_DAY)) {
+				for (LocalDateTime dateTime = startDateTime; !dateTime.isAfter(repeatUntilDateTime); dateTime = dateTime
+						.plusDays(1)) {
+					if (!dateTime.isEqual(dbStartDateTime)) {
+						dbStartDateTime = dbStartDateTime.plusDays(1);
+						dbEndDateTime = dbEndDateTime.plusDays(1);
+					}
+					Schedule s = schedule;
+					s.setCreatedAt(LocalDateTime.now());
+					s.setUpdatedAt(LocalDateTime.now());
+					s.setScheduleStartDateTime(dbStartDateTime);
+					s.setScheduleEndDateTime(dbEndDateTime);
+					int id = scheduleService.saveSchedule(s);
+					if (!schedule.getAllDayFlg()) {
+						List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+						if (reminders.size() > 0) {
+							for (int j = 0; j < reminders.size(); j++) {
+								ScheduleReminder reminder = reminders.get(j);
+								reminder.setScheduleId(id);
+								userCode = getUserUserCode(request);
+								reminder.setCreatedBy(userCode);
+								reminder.setUpdatedBy(userCode);
+								reminder.setDelFlg(false);
+								reminder.setCreatedAt(LocalDateTime.now());
+								reminder.setUpdatedAt(LocalDateTime.now());
+								scheduleReminderService.saveScheduleReminder(reminder);
+							}
+						}
+					}
+				}
+			} else if (schedule.getRepeatType().equals(Consts.REPEATE_TYPE_MONTH)) {
+				for (LocalDateTime dateTime = startDateTime; !dateTime.isAfter(repeatUntilDateTime); dateTime = dateTime
+						.plusMonths(1)) {
+					if (!dateTime.isEqual(dbStartDateTime)) {
+						dbStartDateTime = dbStartDateTime.plusMonths(1);
+						dbEndDateTime = dbEndDateTime.plusMonths(1);
+					}
+					Schedule s = schedule;
+					s.setCreatedAt(LocalDateTime.now());
+					s.setUpdatedAt(LocalDateTime.now());
+					s.setScheduleStartDateTime(dbStartDateTime);
+					s.setScheduleEndDateTime(dbEndDateTime);
+					int id = scheduleService.saveSchedule(s);
+					if (!schedule.getAllDayFlg()) {
+						List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+						if (reminders.size() > 0) {
+							for (int j = 0; j < reminders.size(); j++) {
+								ScheduleReminder reminder = reminders.get(j);
+								reminder.setScheduleId(id);
+								userCode = getUserUserCode(request);
+								reminder.setCreatedBy(userCode);
+								reminder.setUpdatedBy(userCode);
+								reminder.setDelFlg(false);
+								reminder.setCreatedAt(LocalDateTime.now());
+								reminder.setUpdatedAt(LocalDateTime.now());
+								scheduleReminderService.saveScheduleReminder(reminder);
+							}
+						}
+					}
+				}
+			} else if (schedule.getRepeatType().equals(Consts.REPEATE_TYPE_YEAR)) {
+				for (LocalDateTime dateTime = startDateTime; !dateTime.isAfter(repeatUntilDateTime); dateTime = dateTime
+						.plusYears(1)) {
+					System.out.println(dateTime);
+					System.out.println(repeatUntilDateTime);
+					System.out.println(!dateTime.isAfter(repeatUntilDateTime));
+					if (!dateTime.isEqual(dbStartDateTime)) {
+						dbStartDateTime = dbStartDateTime.plusYears(1);
+						dbEndDateTime = dbEndDateTime.plusYears(1);
+					}
+					Schedule s = schedule;
+					s.setCreatedAt(LocalDateTime.now());
+					s.setUpdatedAt(LocalDateTime.now());
+					s.setScheduleStartDateTime(dbStartDateTime);
+					s.setScheduleEndDateTime(dbEndDateTime);
+					int id = scheduleService.saveSchedule(s);
+					if (!schedule.getAllDayFlg()) {
+						List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+						if (reminders.size() > 0) {
+							for (int j = 0; j < reminders.size(); j++) {
+								ScheduleReminder reminder = reminders.get(j);
+								reminder.setScheduleId(id);
+								userCode = getUserUserCode(request);
+								reminder.setCreatedBy(userCode);
+								reminder.setUpdatedBy(userCode);
+								reminder.setDelFlg(false);
+								reminder.setCreatedAt(LocalDateTime.now());
+								reminder.setUpdatedAt(LocalDateTime.now());
+								scheduleReminderService.saveScheduleReminder(reminder);
+							}
+						}
+					}
+				}
+			}
+
+		} else {
+			Schedule scheduleDb = scheduleService.save(schedule);
+			if (!schedule.getAllDayFlg()) {
+				List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+				if (reminders.size() > 0) {
+					for (int j = 0; j < reminders.size(); j++) {
+						ScheduleReminder reminder = reminders.get(j);
+						reminder.setScheduleId(scheduleDb.getId());
+						userCode = getUserUserCode(request);
+						reminder.setCreatedBy(userCode);
+						reminder.setUpdatedBy(userCode);
+						scheduleReminderService.save(reminder);
+					}
+				}
 			}
 		}
 
-		return scheduleDb;
+		return schedule;
 	}
 
 	public Schedule findScheduleById(int id) {
@@ -85,11 +191,6 @@ public class ScheduleBusiness {
 		updSchedule.setAllDayFlg(schedule.getAllDayFlg());
 		updSchedule.setRepeatType(schedule.getRepeatType());
 		updSchedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
-		updSchedule.setRepeatInterval(schedule.getRepeatInterval());
-		updSchedule.setRepeatIntervalType(schedule.getRepeatIntervalType());
-		updSchedule.setRepeatDayOfWeek(schedule.getRepeatDayOfWeek());
-		updSchedule.setRepeatDayOfMonth(schedule.getRepeatDayOfMonth());
-		updSchedule.setRepeatMonth(schedule.getRepeatMonth());
 		updSchedule.setScheduleDisplayFlg(schedule.getScheduleDisplayFlg());
 		updSchedule.setLocation(schedule.getLocation());
 		updSchedule.setMeetLink(schedule.getMeetLink());
@@ -101,19 +202,32 @@ public class ScheduleBusiness {
 		updSchedule.setUpdatedBy(userCode);
 		scheduleService.save(updSchedule);
 
-		List<ScheduleReminder> reminders = schedule.getScheduleReminders();
-		if (reminders.size() > 0) {
-			for (int j = 0; j < reminders.size(); j++) {
-				ScheduleReminder reminder = reminders.get(j);
-				ScheduleReminder updReminder = scheduleReminderService.findScheduleReminderById(reminder.getId());
-
-				updReminder.setScheduleReminderTime(reminder.getScheduleReminderTime());
-				updReminder.setScheduleReminderType(reminder.getScheduleReminderType());
-				updReminder.setNotiMethodFlg(reminder.getNotiMethodFlg());
-				userCode = getUserUserCode(request);
-				updReminder.setUpdatedBy(userCode);
-				scheduleReminderService.save(updReminder);
+		if (!schedule.getAllDayFlg()) {
+			List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+			List<ScheduleReminder> updReminders = updSchedule.getScheduleReminders();
+			if (updReminders.size() > 0 && reminders.size() > 0) {
+				for (int j = 0; j < reminders.size(); j++) {
+					ScheduleReminder reminder = reminders.get(j);
+					ScheduleReminder updReminder = scheduleReminderService.findScheduleReminderById(reminder.getId());
+					updReminder.setScheduleReminderTime(reminder.getScheduleReminderTime());
+					updReminder.setScheduleReminderType(reminder.getScheduleReminderType());
+					updReminder.setNotiMethodFlg(reminder.getNotiMethodFlg());
+					userCode = getUserUserCode(request);
+					updReminder.setUpdatedBy(userCode);
+					scheduleReminderService.save(updReminder);
+				}
+			} else if (updReminders.size() == 0 && reminders.size() > 0) {
+				for (int j = 0; j < reminders.size(); j++) {
+					ScheduleReminder reminder = reminders.get(j);
+					reminder.setScheduleId(updSchedule.getId());
+					userCode = getUserUserCode(request);
+					reminder.setCreatedBy(userCode);
+					reminder.setUpdatedBy(userCode);
+					scheduleReminderService.save(reminder);
+				}
 			}
+		} else {
+			scheduleReminderService.deleteBySchedulId(updSchedule.getId());
 		}
 		return "redirect:/schedules";
 	}
@@ -248,5 +362,22 @@ public class ScheduleBusiness {
 			}
 		}
 		return dataValue;
+	}
+
+	public String getScheduleCode() {
+		String scheduleCode = null;
+
+		// 現在の最大グループをデータベースから取得します。
+		Schedule schedule = scheduleService.findScheduleCodeByDesc();
+
+		if (schedule != null) {
+			int nextNumber = Integer.parseInt(schedule.getScheduleCode().substring(1)) + 1;
+			// 「S000001」パターンにフォーマットします
+			scheduleCode = "S" + String.format("%06d", nextNumber);
+		} else {
+			// グループがまだ存在しない場合
+			scheduleCode = "S000001";
+		}
+		return scheduleCode;
 	}
 }

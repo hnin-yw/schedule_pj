@@ -9,4 +9,6 @@ public interface ScheduleReminderService {
 	public int deleteBySchedulId(int scheduleId);
 
 	ScheduleReminder findScheduleReminderById(int id);
+
+	ScheduleReminder saveScheduleReminder(ScheduleReminder scheduleReminder);
 }

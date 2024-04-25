@@ -22,4 +22,8 @@ public interface ScheduleDao {
 	List<Schedule> findSelectedAlls(Integer[] selectedIds);
 
 	Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode);
+
+	Schedule findScheduleCodeByDesc();
+
+	int saveSchedule(Schedule schedule);
 }

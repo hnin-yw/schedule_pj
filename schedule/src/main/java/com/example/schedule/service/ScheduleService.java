@@ -24,4 +24,8 @@ public interface ScheduleService {
 	public List<Schedule> findScheduleListByUserCode(String userCode);
 
 	List<Schedule> findSelectedAlls(Integer[] selectedIds);
+
+	Schedule findScheduleCodeByDesc();
+
+	int saveSchedule(Schedule schedule);
 }

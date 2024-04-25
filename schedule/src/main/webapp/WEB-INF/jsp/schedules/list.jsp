@@ -41,15 +41,15 @@ if (c != null) {
 							<th rowspan="2"></th>
 							<th rowspan="2"></th>
 							<th colspan="2"><b>イベント開始日時 ~ 終了日時</b></th>
-							<th><b>繰り返しタイプ</b></th>
-							<th rowspan="2"><b>ステータス</b></th>
+							<!-- <th rowspan="2"><b>繰り返しタイプ</b></th> -->
 							<th rowspan="2"><b>オーナー</b></th>
+							<th rowspan="2"><b>ステータス</b></th>
 							<th rowspan="2" style="width: 20px;"></th>
 						</tr>
 						<tr>
 							<th><b>スケジュールタイトル</b></th>
 							<th><b>説明</b></th>
-							<th><b>繰り返す終了日付</b></th>
+							<!-- <th><b>繰り返す終了日付</b></th> -->
 						</tr>
 					</thead>
 					<tbody>
@@ -89,10 +89,9 @@ if (c != null) {
 										<td colspan="2">${schedule.getScheduleStartDateTime().format(formatter)}
 											~ ${schedule.getScheduleEndDateTime().format(formatter)}</td>
 
-										<td>${schedule.getRepeatType() == '01'? "リピートなし" : "カスタム"}</td>
+										<%-- <td rowspan="2">${schedule.getRepeatType() == '01'? "無" : "カスタム"}</td> --%>
+										<td rowspan="2">${schedule.getUser().getUserFirstName()} ${schedule.getUser().getUserLastName()}</td>
 										<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
-										<td rowspan="2">${schedule.getUser().getUserFirstName()}
-											${schedule.getUser().getUserLastName()}</td>
 										<td rowspan="2" style="width: 20%;"><c:if
 												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
 												<a href="/schedule/schedules/edit/${schedule.getId()}">
@@ -120,7 +119,7 @@ if (c != null) {
 											</c:choose>>
 										<td>${schedule.getScheduleTitle()}</td>
 										<td>${schedule.getScheduleDescription()}</td>
-										<td>${schedule.getRepeatUntil().format(formatter)}</td>
+										<%-- <td>${schedule.getRepeatUntil().format(formatter)}</td> --%>
 									</tr>
 								</c:forEach>
 							</c:when>

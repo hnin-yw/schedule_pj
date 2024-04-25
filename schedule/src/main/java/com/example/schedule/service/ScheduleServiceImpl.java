@@ -49,6 +49,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 	@Override
 	@Transactional
+	public int saveSchedule(Schedule schedule) {
+		return scheduleDao.saveSchedule(schedule);
+	}
+
+	@Override
+	@Transactional
 	public int deleteById(int id) {
 		scheduleDao.deleteById(id);
 		return id;
@@ -63,5 +69,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Override
 	public List<Schedule> findScheduleListByUserCode(String userCode) {
 		return scheduleDao.findScheduleListByUserCode(userCode);
+	}
+
+	@Override
+	@Transactional
+	public Schedule findScheduleCodeByDesc() {
+		return scheduleDao.findScheduleCodeByDesc();
 	}
 }

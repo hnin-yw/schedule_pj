@@ -8,4 +8,6 @@ public interface ScheduleReminderDao {
 	ScheduleReminder findScheduleReminderById(int id);
 	
 	void deleteBySchedulId(int scheduleId);
+
+	ScheduleReminder saveScheduleReminder(ScheduleReminder scheduleReminder);
 }

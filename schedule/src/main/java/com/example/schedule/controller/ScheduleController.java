@@ -1,6 +1,9 @@
 package com.example.schedule.controller;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,7 +38,7 @@ public class ScheduleController {
 
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, HttpServletRequest request, Model model) {
-		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 6), request);
+		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 7), request);
 		model.addAttribute("listSchedules", listSchedules);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", listSchedules.getTotalPages());
@@ -46,6 +49,15 @@ public class ScheduleController {
 	public String create(Model model) {
 		Schedule schedule = new Schedule();
 		schedule.setScheduleThemeColor("#FF4013");
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String startDateTimeString = LocalDateTime.now().format(formatter);
+		schedule.setStartDateTimeString(startDateTimeString);
+		String endDateTimeString = LocalDateTime.now().plusHours(1).format(formatter);
+		schedule.setEndDateTimeString(endDateTimeString);
+		schedule.setAllDayFlg(false);
+		schedule.setEventFlg(true);
+		schedule.setRepeatType("01");
 		model.addAttribute("schedule", schedule);
 
 		return "schedules/create";
@@ -65,7 +77,13 @@ public class ScheduleController {
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
 		ModelAndView mav = new ModelAndView("schedules/edit");
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		Schedule schedule = scheduleBusiness.findScheduleById(id);
+		schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
+		schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
+		schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
+		
 		mav.addObject("schedule", schedule);
 
 		return mav;

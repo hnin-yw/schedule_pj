@@ -5,6 +5,8 @@
 <%
 request.setAttribute("title", "Edit schedule");
 %>
+<c:set var="allDayFlg" value="${schedule.getAllDayFlg()}" />
+<c:set var="repeatType" value="${schedule.getRepeatType()}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -42,7 +44,9 @@ request.setAttribute("title", "Edit schedule");
 											placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
 												path="endDateTimeString" style="color:red" /></span>
 									</div>
-									<div class="col-sm-12"></div>
+									<div class="col-sm-12">
+									    <span style="color:red; display: none;" id="dateCompareError">スケジュールの開始日時は、終了日時よりも前の日時にする必要があります。</span>
+									</div>
 								</div>
 								<div class="form-group col-sm-12" style="margin-top: 10px;">
 									<label for="scheduleThemeColor">スケジュールテーマカラー </label><input
@@ -61,17 +65,28 @@ request.setAttribute("title", "Edit schedule");
 											<c:if test="${schedule.getAllDayFlg()}">checked</c:if>>
 										<label for="allDayFlgChk">一日中</label>
 									</div>
-									<div class="col-sm-3" style="margin-top: 5px;">
-										<label for="repeatType"> 繰り返しの種類 :</label> <select
+									<div class="col-sm-3">
+										<label for="repeatType">繰り返しの種類:</label> <select id="repeatType"
 											name="repeatType" onchange="onRepeatTypeChange(this)"
 											class="form-control">
 											<option value="01"
 												<c:if test="${schedule.getRepeatType() == '01'}">selected</c:if>>リピートなし</option>
 											<option value="02"
-												<c:if test="${schedule.getRepeatType() == '02'}">selected</c:if>>カスタム</option>
+												<c:if test="${schedule.getRepeatType() == '02'}">selected</c:if>>毎日</option>
+											<option value="03"
+												<c:if test="${schedule.getRepeatType() == '03'}">selected</c:if>>毎月</option>
+											<option value="04"
+												<c:if test="${schedule.getRepeatType() == '04'}">selected</c:if>>毎年</option>
 										</select>
 									</div>
-									<div class="col-sm-12"></div>
+
+									<div class="col-sm-4" id="repeateDetail">
+										<label for="repeatUntilDateTimeString"> 繰り返す終了日付 :</label> <input
+												type="text" id="repeatUntilDateTimeString"
+												name="repeatUntilDateTimeString"
+												value="${schedule.getRepeatUntilDateTimeString()}"
+												placeholder="YYYY-MM-DD HH:mm:ss" class="form-control " readonly>
+									</div>
 								</div>
 							</div>
 							<div class="col-sm-3">
@@ -81,9 +96,9 @@ request.setAttribute("title", "Edit schedule");
 										name="eventFlg" class="form-control"
 										onchange="onEventChange(this)" disabled="disabled">
 										<option value="1"
-											<c:if test="${schedule.getEventFlg() == '1'}">selected</c:if>>イベント</option>
+											<c:if test="${schedule.getEventFlg()}">selected</c:if>>イベント</option>
 										<option value="0"
-											<c:if test="${schedule.getEventFlg() == '0'}">selected</c:if>>タスク</option>
+											<c:if test="${schedule.getEventFlg()}">selected</c:if>>タスク</option>
 									</select> <br> ${reminder.getOtherVisibilityFlg()} <label
 										for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">
@@ -101,103 +116,6 @@ request.setAttribute("title", "Edit schedule");
 								</div>
 							</div>
 						</div>
-
-						<input type="hidden" id="repeatInterval" name="repeatInterval"
-							value="${schedule.getRepeatInterval()}" /> <input type="hidden"
-							id="repeatIntervalType" name="repeatIntervalType"
-							value="${schedule.getRepeatIntervalType()}" /> <input
-							type="hidden" id="repeatDayOfWeek" name="repeatDayOfWeek"
-							value="${schedule.getRepeatDayOfWeek()}" /> <input type="hidden"
-							id="repeatDayOfMonth" name="repeatDayOfMonth"
-							value="${schedule.getRepeatDayOfMonth()}" /> <input
-							type="hidden" id="repeatMonth" name="repeatMonth"
-							value="${schedule.getRepeatMonth()}" /> <input type="hidden"
-							id="repeatUntilDateTimeString" name="repeatUntilDateTimeString"
-							value="${schedule.getRepeatUntil()}" />
-
-						<!-- Repeat Confirm Modal -->
-						<div class="modal fade" id="repeatConfirmModel" tabindex="-1"
-							role="dialog" aria-labelledby="deleteConfirmModelLabel"
-							aria-hidden="true">
-							<div class="modal-dialog" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h5 class="modal-title" id="exampleModalLabel">繰り返の確認</h5>
-										<button type="button" class="close" data-dismiss="modal"
-											aria-label="Close">
-											<span aria-hidden="true">&times;</span>
-										</button>
-									</div>
-									<div class="modal-body">
-										<div class="form-group">
-											<label for="scheduleName">繰り返し間隔:</label> <input
-												type="number" id="md_repeatInterval"
-												name="md_repeatInterval" min="1" max="10" value="1"
-												class="form-control">
-										</div>
-										<div class="form-group">
-											<label for="scheduleName">繰り返し間隔タイプ:</label> <select
-												id="md_repeatIntervalType" name="md_repeatIntervalType"
-												onchange="repeatIntervalTypeChange(this)"
-												class="form-control">
-												<option value="01">日</option>
-												<option value="02">週</option>
-												<option value="03">月</option>
-												<option value="04">年</option>
-											</select>
-										</div>
-										<div id="repeatDayDiv" style="display: none">
-											<div class="form-group">
-												<label for="repeatDayOfWeek">週の繰り返し日:</label> <select
-													id="md_repeatDayOfWeek" name="md_repeatDayOfWeek"
-													class="form-control">
-													<option value="01">日曜日</option>
-													<option value="02">月曜日</option>
-													<option value="03">火曜日</option>
-													<option value="04">水曜日</option>
-													<option value="05">木曜日</option>
-													<option value="06">金曜日</option>
-													<option value="07">土曜日</option>
-												</select>
-											</div>
-										</div>
-										<div id="repeatMonthDiv" style="display: none">
-											<div class="form-group">
-												<label for="scheduleName"> 月の繰り返し日 :</label> <input
-													type="number" id="md_repeatDayOfMonth"
-													name="md_repeatDayOfMonth" min="1" max="28" value="1"
-													class="form-control">
-											</div>
-										</div>
-										<div id="repeatYearDiv" style="display: none">
-											<div class="form-group">
-												<label for="scheduleName"> 年の繰り返し日 :</label> <input
-													type="number" id="md_repeatDayOfMonth"
-													name="md_repeatDayOfMonth" min="1" max="28" value="1"
-													class="form-control">
-											</div>
-											<div class="form-group">
-												<label for="scheduleName"> 年の繰り返し月 :</label> <input
-													type="number" id="md_repeatMonth" name="md_repeatMonth"
-													min="1" max="12" value="1" class="form-control">
-											</div>
-										</div>
-										<div class="form-group">
-											<label for="repeatUntilDateTimeString"> 繰り返す終了日付 :</label> <input
-												type="text" id="md_repeatUntilDateTimeString"
-												name="md_repeatUntilDateTimeString"
-												placeholder="YYYY-MM-DD HH:mm:ss" class="form-control ">
-										</div>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-success" id="repeatDone"
-											data-dismiss="modal">OK</button>
-										<button type="button" class="btn btn-secondary"
-											id="btnDeleteCancel" data-dismiss="modal">キャンセル</button>
-									</div>
-								</div>
-							</div>
-						</div>
 						<div class="form-group col-sm-12 mt-link">
 							<label for="meetLink"> ミーティングのリンク :</label> <input type="text"
 								id="meetLink" name="meetLink" placeholder="ミーティングのリンク"
@@ -210,44 +128,72 @@ request.setAttribute("title", "Edit schedule");
 								placeholder="ロケーション" class="form-control "><span><form:errors
 									path="location" style="color:red" /></span>
 						</div>
-						<div class="form-group">
+						<div class="form-group" id="divReminder">
 							<div class="col-sm-12">
 								<label for="scheduleReminders"> 通知の種類:</label>
 							</div>
-							<c:forEach var="reminder"
-								items="${schedule.getScheduleReminders()}" varStatus="loop">
-								<div class="col-sm-12">
-									<input type="hidden" id="id${loop.index}"
-										name="scheduleReminders[${loop.index}].id"
-										value="${reminder.getId()}" class="form-control">
-								</div>
-								<div class="col-sm-2">
-									<select name="scheduleReminders[${loop.index}].notiMethodFlg"
-										class="form-control">
-										<option value="0"
-											<c:if test="${reminder.getNotiMethodFlg() == '0'}">selected</c:if>>メール</option>
-										<option value="1"
-											<c:if test="${reminder.getNotiMethodFlg() == '1'}">selected</c:if>>通知</option>
-									</select>
-								</div>
-								<div class="col-sm-2">
-									<input type="number" id="scheduleReminderTime${loop.index}"
-										name="scheduleReminders[${loop.index}].scheduleReminderTime"
-										value="${reminder.getScheduleReminderTime()}"
-										class="form-control">
-								</div>
-								<div class="col-sm-2">
-									<select
-										name="scheduleReminders[${loop.index}].scheduleReminderType"
-										class="form-control">
-										<option value="01"
-											<c:if test="${reminder.getScheduleReminderType() == '01'}">selected</c:if>>分間</option>
-										<option value="02"
-											<c:if test="${reminder.getScheduleReminderType() == '02'}">selected</c:if>>時間</option>
-									</select>
-								</div>
-								<div class="col-sm-12 mrg_form"></div>
-							</c:forEach>
+							<c:choose>
+								<c:when test="${schedule.getScheduleReminders().size() > 0}">
+									<c:forEach var="reminder" items="${schedule.getScheduleReminders()}" varStatus="loop">
+										<div class="col-sm-12">
+											<input type="hidden" id="id${loop.index}"
+												name="scheduleReminders[${loop.index}].id"
+												value="${reminder.getId()}" class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${loop.index}].notiMethodFlg"
+												class="form-control">
+												<option value="0"
+													<c:if test="${reminder.getNotiMethodFlg()}">selected</c:if>>メール</option>
+												<option value="1"
+													<c:if test="${reminder.getNotiMethodFlg()}">selected</c:if>>通知</option>
+											</select>
+										</div>
+										<div class="col-sm-2">
+											<input type="number" id="scheduleReminderTime${loop.index}"
+												name="scheduleReminders[${loop.index}].scheduleReminderTime"
+												value="${reminder.getScheduleReminderTime()}"
+												class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select
+												name="scheduleReminders[${loop.index}].scheduleReminderType"
+												class="form-control">
+												<option value="01"
+													<c:if test="${reminder.getScheduleReminderType() == '01'}">selected</c:if>>分間</option>
+												<option value="02"
+													<c:if test="${reminder.getScheduleReminderType() == '02'}">selected</c:if>>時間</option>
+											</select>
+										</div>
+										<div class="col-sm-12 mrg_form"></div>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<c:forEach var="i" begin="0" end="1">
+										<div class="col-sm-12"></div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${i}].notiMethodFlg"
+												class="form-control">
+												<option value="0">メール</option>
+												<option value="1">通知</option>
+											</select>
+										</div>
+										<div class="col-sm-2">
+											<input type="number" id="scheduleReminderTime${i}"
+												name="scheduleReminders[${i}].scheduleReminderTime" min="1"
+												value="1" class="form-control">
+										</div>
+										<div class="col-sm-2">
+											<select name="scheduleReminders[${i}].scheduleReminderType"
+												class="form-control">
+												<option value="01">分間</option>
+												<option value="02">時間</option>
+											</select>
+										</div>
+										<div class="col-sm-12 mrg_form"></div>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="scheduleDescription"> スケジュールの説明 :</label>
@@ -262,7 +208,7 @@ request.setAttribute("title", "Edit schedule");
 								value="${schedule.getId()}" /> <a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
-							<button type="submit" class="btn btn-primary">編集</button>
+							<button type="submit" class="btn btn-primary" id="btnEditSchedule">編集</button>
 						</div>
 					</div>
 				</form:form>
@@ -272,14 +218,49 @@ request.setAttribute("title", "Edit schedule");
 </div>
 </body>
 <script>
+	document.addEventListener("DOMContentLoaded", function(event) {
+		var allDayFlg = "${allDayFlg}";
+		if (allDayFlg === 'true') {
+			$('#divReminder').css('display', 'none');
+		} else {
+			$('#divReminder').css('display', 'block');
+		}
+		var repeatType = "${repeatType}";
+		if (repeatType !== '01') {
+			$('#repeateDetail').css('display', 'block');
+		} else {
+			$('#repeateDetail').css('display', 'none');
+		}
+	});
 	$(document).ready(function() {
-		$('#endDateTimeString').datetimepicker({
-			format : 'YYYY-MM-DD HH:mm:ss'
-		});
 		$('#startDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
 		});
-		$('#md_repeatUntilDateTimeString').datetimepicker({
+		$('#startDateTimeString').on('dp.change',function(e) {
+			var selectedDateTime = e.date;
+			selectedDateTime.add(1, 'hours');
+			var formattedDateTime = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
+			$('#endDateTimeString').val(formattedDateTime);
+			
+			bindMdRepeatUntilDateTimeString();
+		});
+		$('#endDateTimeString').datetimepicker({
+			format : 'YYYY-MM-DD HH:mm:ss'
+		});
+		$('#endDateTimeString').on('dp.change',function(e) {
+			var startDate = $('#startDateTimeString').data("DateTimePicker").date();
+			var endDate = $('#endDateTimeString').data("DateTimePicker").date();
+			if (endDate && startDate && endDate.isBefore(startDate)) {
+				$('#dateCompareError').show();
+				document.getElementById('btnEditSchedule').disabled = true;
+			} else {
+				$('#dateCompareError').hide();
+				document.getElementById('btnEditSchedule').disabled = false;
+				
+				bindMdRepeatUntilDateTimeString();
+			}
+		});
+		$('#repeatUntilDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
 		});
 	});
@@ -292,92 +273,43 @@ request.setAttribute("title", "Edit schedule");
 			var endDateTimeString = $('#endDateTimeString').val();
 			dateParts = endDateTimeString.split(" ");
 			$('#endDateTimeString').val(dateParts[0] + " 00:00:00");
+			$('#divReminder').css('display', 'none');
 		} else {
 			$('#allDayFlg').val("0");
+			$('#divReminder').css('display', 'block');
+		}
+	}
+	function onEventChange(select) {
+		var selectedValue = select.value;
+		if (selectedValue == '1') {
+			$('#scheduleThemeColor').val("#FF4013");
+		} else {
+			$('#scheduleThemeColor').val("#00C7FC");
 		}
 	}
 	function onRepeatTypeChange(select) {
 		var selectedValue = select.value;
 		if (selectedValue != '01') {
+			bindMdRepeatUntilDateTimeString();
 			$('#repeateDetail').css('display', 'block');
-			$('#repeatConfirmModel').modal('show');
 		} else {
-			this.valClear();
+			$('#repeatUntilDateTimeString').val("");
 			$('#repeateDetail').css('display', 'none');
-			$('#repeatConfirmModel').modal('hide');
 		}
 	}
-	function repeatIntervalTypeChange(select) {
-		var selectedValue = select.value;
-		if (selectedValue == '02') {
-			$('#repeatDayDiv').css('display', 'block');
-			$('#repeatMonthDiv').css('display', 'none');
-			$('#repeatYearDiv').css('display', 'none');
-		} else if (selectedValue == '03') {
-			$('#repeatDayDiv').css('display', 'none');
-			$('#repeatMonthDiv').css('display', 'block');
-			$('#repeatYearDiv').css('display', 'none');
-		} else if (selectedValue == '04') {
-			$('#repeatDayDiv').css('display', 'none');
-			$('#repeatMonthDiv').css('display', 'none');
-			$('#repeatYearDiv').css('display', 'block');
-		} else {
-			$('#repeatDayDiv').css('display', 'none');
-			$('#repeatMonthDiv').css('display', 'none');
-			$('#repeatYearDiv').css('display', 'none');
+	function bindMdRepeatUntilDateTimeString(){
+		var repeatType = $('#repeatType').val();
+		
+		var startDate = $('#startDateTimeString').data("DateTimePicker").date();
+		if (repeatType == '02') {
+			startDate.add(1, 'week');
+		} else if (repeatType == '03') {
+			startDate.add(3, 'months');
+		} else if (repeatType == '04') {
+			startDate.add(1, 'years');
 		}
-	}
-	$('#repeatDone').click(
-			function() {
-				var repeatInterval = $('#md_repeatInterval').val();
-				$('#repeatInterval').val(repeatInterval);
-
-				var repeatIntervalType = $('#md_repeatIntervalType').val();
-				$('#repeatIntervalType').val(repeatIntervalType);
-				if (repeatIntervalType == '02') {
-					var repeatDayOfWeek = $('#md_repeatDayOfWeek').val();
-					$('#repeatDayOfWeek').val(repeatDayOfWeek);
-					$('#repeatDayOfMonth').val("0");
-					$('#repeatMonth').val("0");
-				} else if (repeatIntervalType == '03') {
-					$('#repeatDayOfWeek').val("0");
-					var repeatDayOfMonth = $('#md_repeatDayOfMonth').val();
-					$('#repeatDayOfMonth').val(repeatDayOfMonth);
-					$('#repeatMonth').val("0");
-				} else if (repeatIntervalType == '04') {
-					$('#repeatDayOfWeek').val("0");
-					var repeatDayOfMonth = $('#md_repeatDayOfMonth').val();
-					$('#repeatDayOfMonth').val(repeatDayOfMonth);
-					var repeatMonth = $('#md_repeatMonth').val();
-					$('#repeatMonth').val(repeatMonth);
-				} else {
-					$('#repeatDayOfWeek').val("0");
-					$('#repeatDayOfMonth').val("0");
-					$('#repeatMonth').val("0");
-				}
-				var repeatUntilDateTimeString = $(
-						'#md_repeatUntilDateTimeString').val();
-				$('#repeatUntilDateTimeString').val(repeatUntilDateTimeString);
-				mdlClear();
-			});
-	$('#repeatDone').click(function() {
-		mdlClear();
-	});
-	function mdlClear() {
-		$('#md_repeatInterval').val("");
-		$('#md_repeatIntervalType').val("");
-		$('#md_repeatDayOfWeek').val("");
-		$('#md_repeatDayOfMonth').val("");
-		$('#md_repeatMonth').val("");
-		$('#md_repeatUntilDateTimeString').val("");
-	}
-	function valClear() {
-		$('#repeatInterval').val("0");
-		$('#repeatIntervalType').val("");
-		$('#repeatDayOfWeek').val("0");
-		$('#repeatDayOfMonth').val("0");
-		$('#repeatMonth').val("0");
-		$('#repeatUntilDateTimeString').val("");
+		var formattedDateTime = startDate.format('YYYY-MM-DD HH:mm:ss');
+		$('#repeatUntilDateTimeString').val(formattedDateTime);
 	}
 </script>
 </html>

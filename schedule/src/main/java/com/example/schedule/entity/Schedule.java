@@ -24,6 +24,9 @@ public class Schedule {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
+	@Column(name = "schedule_code")
+	private String scheduleCode;
+
 	@Column(name = "group_code")
 	private String groupCode;
 
@@ -49,21 +52,6 @@ public class Schedule {
 
 	@Column(name = "repeat_until")
 	private LocalDateTime repeatUntil;
-
-	@Column(name = "repeat_interval")
-	private int repeatInterval;
-
-	@Column(name = "repeat_interval_type")
-	private String repeatIntervalType;
-
-	@Column(name = "repeat_day_of_week")
-	private int repeatDayOfWeek;
-
-	@Column(name = "repeat_day_of_month")
-	private int repeatDayOfMonth;
-
-	@Column(name = "repeat_month")
-	private int repeatMonth;
 
 	@Column(name = "schedule_display_flg")
 	private Boolean scheduleDisplayFlg;
@@ -116,15 +104,15 @@ public class Schedule {
 	public Schedule() {
 	}
 
-	public Schedule(int id, String groupCode, String userCode, String userName, String scheduleTitle,
+	public Schedule(int id, String scheduleCode, String groupCode, String userCode, String userName, String scheduleTitle,
 			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg,
-			String repeatType, LocalDateTime repeatUntil, int repeatInterval, String repeatIntervalType,
-			int repeatDayOfWeek, int repeatDayOfMonth, int repeatMonth, Boolean scheduleDisplayFlg, String location,
+			String repeatType, LocalDateTime repeatUntil, Boolean scheduleDisplayFlg, String location,
 			String meetLink, String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg,
 			Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt,
 			String updatedBy, LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,
 			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString, User user) {
 		this.id = id;
+		this.scheduleCode = scheduleCode;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
 		this.scheduleTitle = scheduleTitle;
@@ -133,11 +121,6 @@ public class Schedule {
 		this.allDayFlg = allDayFlg;
 		this.repeatType = repeatType;
 		this.repeatUntil = repeatUntil;
-		this.repeatInterval = repeatInterval;
-		this.repeatIntervalType = repeatIntervalType;
-		this.repeatDayOfWeek = repeatDayOfWeek;
-		this.repeatDayOfMonth = repeatDayOfMonth;
-		this.repeatMonth = repeatMonth;
 		this.scheduleDisplayFlg = scheduleDisplayFlg;
 		this.location = location;
 		this.meetLink = meetLink;
@@ -167,6 +150,14 @@ public class Schedule {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getScheduleCode() {
+		return scheduleCode;
+	}
+
+	public void setScheduleCode(String scheduleCode) {
+		this.scheduleCode = scheduleCode;
 	}
 
 	public String getGroupCode() {
@@ -233,46 +224,6 @@ public class Schedule {
 		this.repeatUntil = repeatUntil;
 	}
 
-	public int getRepeatInterval() {
-		return repeatInterval;
-	}
-
-	public void setRepeatInterval(int repeatInterval) {
-		this.repeatInterval = repeatInterval;
-	}
-
-	public String getRepeatIntervalType() {
-		return repeatIntervalType;
-	}
-
-	public void setRepeatIntervalType(String repeatIntervalType) {
-		this.repeatIntervalType = repeatIntervalType;
-	}
-
-	public int getRepeatDayOfWeek() {
-		return repeatDayOfWeek;
-	}
-
-	public void setRepeatDayOfWeek(int repeatDayOfWeek) {
-		this.repeatDayOfWeek = repeatDayOfWeek;
-	}
-
-	public int getRepeatDayOfMonth() {
-		return repeatDayOfMonth;
-	}
-
-	public void setRepeatDayOfMonth(int repeatDayOfMonth) {
-		this.repeatDayOfMonth = repeatDayOfMonth;
-	}
-
-	public int getRepeatMonth() {
-		return repeatMonth;
-	}
-
-	public void setRepeatMonth(int repeatMonth) {
-		this.repeatMonth = repeatMonth;
-	}
-
 	public Boolean getScheduleDisplayFlg() {
 		return scheduleDisplayFlg;
 	}
@@ -298,7 +249,7 @@ public class Schedule {
 	}
 
 	public String getScheduleDescription() {
-		return meetLink;
+		return scheduleDescription;
 	}
 
 	public void setScheduleDescription(String scheduleDescription) {

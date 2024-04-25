@@ -27,6 +27,25 @@ public class ScheduleReminderDaoImpl implements ScheduleReminderDao {
 		return ScheduleReminder;
 	}
 
+	// add to the database
+	@Override
+	public ScheduleReminder saveScheduleReminder(ScheduleReminder scheduleReminder) {
+		Query query = entityManager.createQuery(
+				"INSERT INTO ScheduleReminder (scheduleId, scheduleReminderTime, scheduleReminderType, notiMethodFlg, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:scheduleId, :scheduleReminderTime, :scheduleReminderType, :notiMethodFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+		query.setParameter("scheduleId", scheduleReminder.getScheduleId());
+		query.setParameter("scheduleReminderTime", scheduleReminder.getScheduleReminderTime());
+		query.setParameter("scheduleReminderType", scheduleReminder.getScheduleReminderType());
+		query.setParameter("notiMethodFlg", scheduleReminder.getNotiMethodFlg());
+		query.setParameter("delFlg", scheduleReminder.getDelFlg());
+		query.setParameter("createdBy", scheduleReminder.getCreatedBy());
+		query.setParameter("createdAt", scheduleReminder.getCreatedAt());
+		query.setParameter("updatedBy", scheduleReminder.getUpdatedBy());
+		query.setParameter("updatedAt", scheduleReminder.getUpdatedAt());
+		query.executeUpdate();
+		return scheduleReminder;
+	}
+
 	@Override
 	public ScheduleReminder findScheduleReminderById(int id) {
 		ScheduleReminder scheduleReminder = entityManager.find(ScheduleReminder.class, id);

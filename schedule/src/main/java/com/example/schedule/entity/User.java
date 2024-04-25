@@ -66,6 +66,7 @@ public class User {
 	@Column(name = "email")
 	private String email;
 
+	@NotEmpty(message = "パスワードは必須です。")
 	@Column(name = "password")
 	private String password;
 

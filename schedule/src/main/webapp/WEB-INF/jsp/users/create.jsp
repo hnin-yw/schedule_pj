@@ -45,7 +45,8 @@ request.setAttribute("title", "Create User");
 						<div class="form-group col-sm-12">
 							<label for="password"> パスワード :</label> <input type="password"
 								id="password" name="password" placeholder="パスワード"
-								class="form-control ">
+								class="form-control "><span>
+								<form:errors path="password" style="color:red" />
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="userFirstName"> ユーザの名 :</label> <input type="text"

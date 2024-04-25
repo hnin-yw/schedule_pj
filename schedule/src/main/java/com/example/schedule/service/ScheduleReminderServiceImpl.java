@@ -9,28 +9,34 @@ import jakarta.transaction.Transactional;
 @Service
 public class ScheduleReminderServiceImpl implements ScheduleReminderService {
 
-	ScheduleReminderDao ScheduleReminderDao;
+	ScheduleReminderDao scheduleReminderDao;
 
 	@Autowired
-	public ScheduleReminderServiceImpl(ScheduleReminderDao ScheduleReminderDao) {
-		this.ScheduleReminderDao = ScheduleReminderDao;
+	public ScheduleReminderServiceImpl(ScheduleReminderDao scheduleReminderDao) {
+		this.scheduleReminderDao = scheduleReminderDao;
 	}
 
 	@Override
 	@Transactional
 	public ScheduleReminder save(ScheduleReminder scheduleReminder) {
-		return ScheduleReminderDao.save(scheduleReminder);
+		return scheduleReminderDao.save(scheduleReminder);
+	}
+
+	@Override
+	@Transactional
+	public ScheduleReminder saveScheduleReminder(ScheduleReminder scheduleReminder) {
+		return scheduleReminderDao.saveScheduleReminder(scheduleReminder);
 	}
 
 	@Override
 	public ScheduleReminder findScheduleReminderById(int id) {
-		return ScheduleReminderDao.findScheduleReminderById(id);
+		return scheduleReminderDao.findScheduleReminderById(id);
 	}
 
 	@Override
 	@Transactional
 	public int deleteBySchedulId(int scheduleId) {
-		ScheduleReminderDao.deleteBySchedulId(scheduleId);
+		scheduleReminderDao.deleteBySchedulId(scheduleId);
 		return scheduleId;
 	}
 }

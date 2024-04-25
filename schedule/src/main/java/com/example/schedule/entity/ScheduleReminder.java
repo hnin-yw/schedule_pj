@@ -1,22 +1,28 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "event_reminders")
-public class EventReminder {
+@Table(name = "schedule_reminders")
+public class ScheduleReminder {
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "schedule_id", insertable = false, updatable = false)
+	private Schedule schedule;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 
-	@Column(name = "event_id")
-	private int eventId;
+	@Column(name = "schedule_id")
+	private int scheduleId;
 
-	@Column(name = "event_reminder_time")
-	private LocalTime eventReminderTime;
+	@Column(name = "schedule_reminder_time")
+	private int scheduleReminderTime;
+
+	@Column(name = "schedule_reminder_type")
+	private String scheduleReminderType;
 
 	@Column(name = "noti_method_flg")
 	private Boolean notiMethodFlg;
@@ -36,20 +42,23 @@ public class EventReminder {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	public EventReminder() {
+	public ScheduleReminder() {
 	}
 
-	public EventReminder(int id, int eventId, LocalTime eventReminderTime, Boolean notiMethodFlg, Boolean delFlg,
-			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt) {
+	public ScheduleReminder(int id, int scheduleId, int scheduleReminderTime, String scheduleReminderType,
+			Boolean notiMethodFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
+			LocalDateTime updatedAt,Schedule schedule) {
 		this.id = id;
-		this.eventId = eventId;
-		this.eventReminderTime = eventReminderTime;
+		this.scheduleId = scheduleId;
+		this.scheduleReminderTime = scheduleReminderTime;
+		this.scheduleReminderType = scheduleReminderType;
 		this.notiMethodFlg = notiMethodFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
+		this.schedule = schedule;
 	}
 
 	/*
@@ -63,20 +72,28 @@ public class EventReminder {
 		this.id = id;
 	}
 
-	public int getEventId() {
-		return eventId;
+	public int getScheduleId() {
+		return scheduleId;
 	}
 
-	public void setEventId(int eventId) {
-		this.eventId = eventId;
+	public void setScheduleId(int scheduleId) {
+		this.scheduleId = scheduleId;
 	}
 
-	public LocalTime getEventReminderTime() {
-		return eventReminderTime;
+	public int getScheduleReminderTime() {
+		return scheduleReminderTime;
 	}
 
-	public void setEventReminderTime(LocalTime eventReminderTime) {
-		this.eventReminderTime = eventReminderTime;
+	public void setScheduleReminderTime(int scheduleReminderTime) {
+		this.scheduleReminderTime = scheduleReminderTime;
+	}
+
+	public String getScheduleReminderType() {
+		return scheduleReminderType;
+	}
+
+	public void setScheduleReminderType(String scheduleReminderType) {
+		this.scheduleReminderType = scheduleReminderType;
 	}
 
 	public Boolean getNotiMethodFlg() {
@@ -125,5 +142,25 @@ public class EventReminder {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public Schedule getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.delFlg = false;
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
 	}
 }

@@ -1,40 +1,41 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="utf-8" />
-<title>Edit Group</title>
-</head>
-<body>
-	<div align="center">
-		<h1>Edit Group</h1>
-		<br />
-		<form action='/demo/groups/update' method='post'>
-
-			<table class='table table-hover table-responsive table-bordered'>
-				<tr>
-					<td>Group Code:</td>
-					<td><input type='text' name='group_code' class='form-control'
-						value="${group.getGroupCode()}" /></td>
-				</tr>
-				<tr>
-					<td>Group Name:</td>
-					<td><input type='text' name='group_name' class='form-control'
-						value="${group.getGroupName()}" /></td>
-				</tr>
-
-
-				<input type='hidden' id='id' rows='5' class='form-control' name='id'
-					value="${group.id}" />
-				<tr>
-					<td></td>
-					<td>
-						<button type="submit" class="btn btn-primary">Update</button>
-					</td>
-				</tr>
-
-			</table>
-		</form>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+request.setAttribute("title", "Edit Group");
+%>
+<%@ include file="/WEB-INF/jsp/content.jsp"%>
+<div class="container-fluid">
+	<div class="row content">
+		<%@ include file="/WEB-INF/jsp/header_menu.jsp"%>
+		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
+		<div class="col-sm-10 content_body">
+			<h2 class="text-center">グループの編集</h2>
+			<div class="card">
+				<%@ include file="/WEB-INF/jsp/message.jsp"%>
+				<div class="card-body">
+					<form:form action='/schedule/groups/update' method='post'
+						modelAttribute="group">
+						<div class="form-group col-sm-12">
+							<label for="groupName"> グループ名 :</label> <input type='text'
+								name='groupName' id='groupName' class='form-control'
+								placeholder="グループ名" value="${group.getGroupName()}" /> <span><form:errors
+									path="groupName" cssStyle="color:red" /></span>
+						</div>
+						<input type='hidden' id='id' class='form-control' name='id'
+							value="${group.getId()}" />
+						<div class="up-btn-gp col-sm-12">
+							<a href="/schedule/groups">
+								<button type="button" class="btn btn-Light">キャンセル</button>
+							</a>
+							<button type="submit" class="btn btn-primary">編集</button>
+						</div>
+					</form:form>
+				</div>
+			</div>
+		</div>
 	</div>
+</div>
 </body>
 </html>

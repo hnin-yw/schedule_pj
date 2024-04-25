@@ -1,7 +1,11 @@
 package com.example.schedule.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.schedule.entity.Group;
 
@@ -22,12 +26,27 @@ public class GroupDaoImpl implements GroupDao {
 	}
 
 	// get all the transactions from the database
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Group> getAlls() {
-		Query q = (Query) entityManager.createQuery("from Group");
-		List<Group> transactions = q.getResultList();
+	@Transactional(readOnly = true)
+	public List<Group> getGroupLists() {
+		Query query = entityManager.createQuery("from Group WHERE delFlg = false");
+		return query.getResultList();
+	}
 
-		return transactions;
+	// get all the transactions from the database
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(readOnly = true)
+	public Page<Group> getAlls(Pageable pageable) {
+		Query query = entityManager.createQuery("SELECT COUNT(g) FROM Group g WHERE delFlg=false");
+		long total = (long) query.getSingleResult();
+
+		query = entityManager.createQuery("FROM Group WHERE delFlg=false");
+		int start = (int) pageable.getOffset();
+		List<Group> groups = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
+
+		return new PageImpl<>(groups, pageable, total);
 	}
 
 	@Override
@@ -49,5 +68,17 @@ public class GroupDaoImpl implements GroupDao {
 		Query q = (Query) entityManager.createQuery("delete from Group where id=:groupId");
 		q.setParameter("groupId", id);
 		q.executeUpdate();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Group findGroupCodeByDesc() {
+		Query query = (Query) entityManager.createQuery("from Group ORDER BY groupCode DESC LIMIT 1");
+		List<Group> groups = query.getResultList();
+		if (groups.isEmpty()) {
+			return null;
+		} else {
+			return groups.get(0);
+		}
 	}
 }

@@ -1,8 +1,8 @@
 package com.example.schedule.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -26,69 +24,79 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 @Controller
-@RequestMapping("/groups")
-public class GroupController {
+@RequestMapping("/users")
+public class UserController {
+	private final UserBusiness userBusiness;
 	private final GroupBusiness groupBusiness;
 
 	@Autowired
-	public GroupController(GroupBusiness groupBusiness) {
+	public UserController(UserBusiness userBusiness, GroupBusiness groupBusiness) {
+		this.userBusiness = userBusiness;
 		this.groupBusiness = groupBusiness;
 	}
 
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-		Page<Group> listGroups = groupBusiness.list(PageRequest.of(page, 10));
-		model.addAttribute("listGroups", listGroups);
+		Page<User> listUsers = userBusiness.list(PageRequest.of(page, 10));
+		model.addAttribute("listUsers", listUsers);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("totalPages", listGroups.getTotalPages());
-		return "groups/list";
+		model.addAttribute("totalPages", listUsers.getTotalPages());
+		return "users/list";
 	}
 
 	@RequestMapping("/create")
 	public String create(Model model) {
-		Group gp = new Group();
-		model.addAttribute("group", gp);
+		List<Group> gpLists = groupBusiness.getGroupLists();
+		model.addAttribute("gpLists", gpLists);
+		User user = new User();
+		model.addAttribute("user", user);
 
-		return "groups/create";
+		return "users/create";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(Model model, @ModelAttribute("group") @Valid Group group, BindingResult result,
+	public String save(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 		if (result.hasErrors()) {
-			return "groups/create";
+			List<Group> gpLists = groupBusiness.getGroupLists();
+			model.addAttribute("gpLists", gpLists);
+			return "users/create";
 		} else {
-			Map<String, ArrayList<String>> msgLists = groupBusiness.saveGroup(group, request);
+			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
-			return "redirect:/groups";
+			return "redirect:/users";
 		}
 	}
 
 	@RequestMapping("/edit/{id}")
-	public ModelAndView edit(@PathVariable(name = "id") int id, RedirectAttributes redirectAttributes) {
-		ModelAndView mav = new ModelAndView("groups/edit");
-		Group group = groupBusiness.findGroupById(id);
+	public ModelAndView edit(@PathVariable(name = "id") int id) {
+		ModelAndView mav = new ModelAndView("users/edit");
+		List<Group> gpLists = groupBusiness.getGroupLists();
+		mav.addObject("gpLists", gpLists);
+		User user = userBusiness.findUserById(id);
+		mav.addObject("user", user);
 
-		mav.addObject("group", group);
 		return mav;
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(Model model, @ModelAttribute("group") @Valid Group group, BindingResult result,
+	public String update(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 		if (result.hasErrors()) {
-			return "groups/edit";
+			List<Group> gpLists = groupBusiness.getGroupLists();
+			model.addAttribute("gpLists", gpLists);
+			return "users/edit";
 		} else {
-			Map<String, ArrayList<String>> msgLists = groupBusiness.updateGroup(group, request);
+			Map<String, ArrayList<String>> msgLists = userBusiness.updateUser(user, request);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
-			return "redirect:/groups";
+			return "redirect:/users";
 		}
 	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
-		Map<String, ArrayList<String>> msgLists = groupBusiness.deleteGroup(id, request);
+		Map<String, ArrayList<String>> msgLists = userBusiness.deleteUser(id, request);
 		redirectAttributes.addFlashAttribute("msgLists", msgLists);
-		return "redirect:/groups";
+		return "redirect:/users";
 	}
 }

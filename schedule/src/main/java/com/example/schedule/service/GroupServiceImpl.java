@@ -3,6 +3,8 @@ package com.example.schedule.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.example.schedule.dao.GroupDao;
 import com.example.schedule.entity.Group;
@@ -20,8 +22,13 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public List<Group> findAlls() {
-		return groupDao.getAlls();
+	public List<Group> getGroupLists() {
+		return groupDao.getGroupLists();
+	}
+
+	@Override
+	public Page<Group> findAlls(Pageable pageable) {
+		return groupDao.getAlls(pageable);
 	}
 
 	@Override
@@ -46,5 +53,11 @@ public class GroupServiceImpl implements GroupService {
 	public int deleteById(int id) {
 		groupDao.deleteById(id);
 		return id;
+	}
+
+	@Override
+	@Transactional
+	public Group findGroupCodeByDesc() {
+		return groupDao.findGroupCodeByDesc();
 	}
 }

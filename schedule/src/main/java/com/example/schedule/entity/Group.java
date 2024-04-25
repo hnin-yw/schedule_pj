@@ -1,7 +1,12 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
+
+import com.example.schedule.Consts;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "user_groups")
@@ -12,7 +17,9 @@ public class Group {
 
 	@Column(name = "group_code")
 	private String groupCode;
-
+	
+	@NotEmpty(message = "グループ名は必須です。")
+	@Size(max = Consts.MAX_NAME_LENGTH, message = "グループ名は最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "group_name")
 	private String groupName;
 
@@ -111,5 +118,17 @@ public class Group {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.delFlg = false;
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
 	}
 }

@@ -3,17 +3,23 @@ package com.example.schedule.controller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.schedule.business.ScheduleBusiness;
 import com.example.schedule.entity.*;
@@ -83,7 +89,7 @@ public class ScheduleController {
 		schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
 		schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
 		schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
-		
+
 		mav.addObject("schedule", schedule);
 
 		return mav;
@@ -100,11 +106,13 @@ public class ScheduleController {
 		}
 	}
 
-	@RequestMapping(value = "status/update", method = RequestMethod.POST)
-	public String updateScheduleStatus(Schedule Schedule, HttpServletRequest request) {
-		scheduleBusiness.updateScheduleStatus(Schedule, request);
-		return "redirect:/schedules";
-	}
+	@RequestMapping(value = "/status/update", method = RequestMethod.POST)
+    public ResponseEntity<?> updateScheduleStatus(@RequestParam int id, HttpServletRequest request) {
+        scheduleBusiness.updateScheduleStatus(id, request);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "スケジュールのステータスが正常に更新されました。"); // Corrected message
+        return ResponseEntity.ok(response);
+    }
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, HttpServletRequest request) {
@@ -122,5 +130,23 @@ public class ScheduleController {
 		headers.setContentDispositionFormData("attachment", "schedules.xlsx");
 
 		return ResponseEntity.ok().headers(headers).body(excelBytes);
+	}
+
+	@DeleteMapping("/deleteByCode/{scheduleCode}")
+	public ResponseEntity<?> deleteByCode(String scheduleCode, HttpServletRequest request) {
+		scheduleBusiness.deleteScheduleByCode(scheduleCode, request);
+
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "スケジュールは正常に削除されました。");
+		return ResponseEntity.ok(response);
+	}
+
+	@DeleteMapping("/deleteById/{scheduleCode}")
+	public ResponseEntity<?> deleteById(int scheduleCode, HttpServletRequest request) {
+		scheduleBusiness.deleteSchedule(scheduleCode, request);
+
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "スケジュールは正常に削除されました。");
+		return ResponseEntity.ok(response);
 	}
 }

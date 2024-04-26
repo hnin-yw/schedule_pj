@@ -53,6 +53,12 @@ public class Schedule {
 	@Column(name = "repeat_until")
 	private LocalDateTime repeatUntil;
 
+	@Column(name = "repeat_day_of_week")
+	private String repeatDayOfWeek;
+	
+	@Column(name = "repeat_type_of_month")
+	private String repeatTypeOfMonth;
+
 	@Column(name = "schedule_display_flg")
 	private Boolean scheduleDisplayFlg;
 
@@ -95,9 +101,9 @@ public class Schedule {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	@NotEmpty(message = "スケジュール開始日時は必須です。")
+//	@NotEmpty(message = "スケジュール開始日時は必須です。")
 	private String startDateTimeString;
-	@NotEmpty(message = "スケジュール終了日時は必須です。")
+//	@NotEmpty(message = "スケジュール終了日時は必須です。")
 	private String endDateTimeString;
 	private @Nullable String repeatUntilDateTimeString;
 
@@ -106,7 +112,7 @@ public class Schedule {
 
 	public Schedule(int id, String scheduleCode, String groupCode, String userCode, String userName, String scheduleTitle,
 			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg,
-			String repeatType, LocalDateTime repeatUntil, Boolean scheduleDisplayFlg, String location,
+			String repeatType, LocalDateTime repeatUntil, String repeatDayOfWeek, String repeatTypeOfMonth,Boolean scheduleDisplayFlg, String location,
 			String meetLink, String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg,
 			Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt,
 			String updatedBy, LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,
@@ -121,6 +127,8 @@ public class Schedule {
 		this.allDayFlg = allDayFlg;
 		this.repeatType = repeatType;
 		this.repeatUntil = repeatUntil;
+		this.repeatDayOfWeek = repeatDayOfWeek;
+		this.repeatTypeOfMonth = repeatTypeOfMonth;
 		this.scheduleDisplayFlg = scheduleDisplayFlg;
 		this.location = location;
 		this.meetLink = meetLink;
@@ -222,6 +230,22 @@ public class Schedule {
 
 	public void setRepeatUntil(LocalDateTime repeatUntil) {
 		this.repeatUntil = repeatUntil;
+	}
+
+	public String getRepeatDayOfWeek() {
+		return repeatDayOfWeek;
+	}
+
+	public void setRepeatDayOfWeek(String repeatDayOfWeek) {
+		this.repeatDayOfWeek = repeatDayOfWeek;
+	}
+
+	public String getRepeatTypeOfMonth() {
+		return repeatTypeOfMonth;
+	}
+
+	public void setRepeatTypeOfMonth(String repeatTypeOfMonth) {
+		this.repeatTypeOfMonth = repeatTypeOfMonth;
 	}
 
 	public Boolean getScheduleDisplayFlg() {

@@ -80,6 +80,16 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		return schedule;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Schedule> findScheduleListByScheduleCode(String scheduleCode) {
+		Query query = (Query) entityManager
+				.createQuery("from Schedule WHERE scheduleCode =: scheduleCode and delFlg = false");
+		query.setParameter("scheduleCode", scheduleCode);
+		List<Schedule> schedules = query.getResultList();
+		return schedules;
+	}
+
 	// add to the database
 	@Override
 	public Schedule save(Schedule schedule) {
@@ -92,8 +102,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Override
 	public int saveSchedule(Schedule schedule) {
 		Query query = entityManager.createQuery(
-				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
-						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
 		query.setParameter("scheduleCode", schedule.getScheduleCode());
 		query.setParameter("groupCode", schedule.getGroupCode());
 		query.setParameter("userCode", schedule.getUserCode());
@@ -103,6 +113,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("allDayFlg", schedule.getAllDayFlg());
 		query.setParameter("repeatType", schedule.getRepeatType());
 		query.setParameter("repeatUntil", schedule.getRepeatUntil());
+		query.setParameter("repeatDayOfWeek", schedule.getRepeatDayOfWeek());
+		query.setParameter("repeatTypeOfMonth", schedule.getRepeatTypeOfMonth());
 		query.setParameter("scheduleDisplayFlg", schedule.getScheduleDisplayFlg());
 		query.setParameter("location", schedule.getLocation());
 		query.setParameter("meetLink", schedule.getMeetLink());
@@ -117,8 +129,9 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("updatedBy", schedule.getUpdatedBy());
 		query.setParameter("updatedAt", schedule.getUpdatedAt());
 		query.executeUpdate();
-		
-		return (int) entityManager.createQuery("SELECT MAX(id) FROM Schedule ORDER BY scheduleCode DESC").getSingleResult();
+
+		return (int) entityManager.createQuery("SELECT MAX(id) FROM Schedule ORDER BY scheduleCode DESC")
+				.getSingleResult();
 	}
 
 	@Override

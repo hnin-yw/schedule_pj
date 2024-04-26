@@ -26,4 +26,6 @@ public interface ScheduleDao {
 	Schedule findScheduleCodeByDesc();
 
 	int saveSchedule(Schedule schedule);
+
+	List<Schedule> findScheduleListByScheduleCode(String scheduleCode);
 }

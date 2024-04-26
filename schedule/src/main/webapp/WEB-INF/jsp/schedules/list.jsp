@@ -34,6 +34,10 @@ if (c != null) {
 						<button type="button" class="btn btn-primary">スケジュールを登録</button>
 					</a>
 				</div>
+				<div>
+					<input type="hidden" name="scheduleCode" id="scheduleCode" /> <input
+						type="hidden" id="scheduleId" name="id" />
+				</div>
 				<table class="table table-bordered" style="maring-top: 10px;">
 					<thead>
 						<tr>
@@ -41,15 +45,15 @@ if (c != null) {
 							<th rowspan="2"></th>
 							<th rowspan="2"></th>
 							<th colspan="2"><b>イベント開始日時 ~ 終了日時</b></th>
-							<!-- <th rowspan="2"><b>繰り返しタイプ</b></th> -->
-							<th rowspan="2"><b>オーナー</b></th>
+							<th rowspan="2"><b>作成者</b></th>
+							<th><b>繰り返しタイプ</b></th>
 							<th rowspan="2"><b>ステータス</b></th>
 							<th rowspan="2" style="width: 20px;"></th>
 						</tr>
 						<tr>
 							<th><b>スケジュールタイトル</b></th>
 							<th><b>説明</b></th>
-							<!-- <th><b>繰り返す終了日付</b></th> -->
+							<th><b>繰り返す終了日付</b></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -88,9 +92,13 @@ if (c != null) {
 											</c:choose></td>
 										<td colspan="2">${schedule.getScheduleStartDateTime().format(formatter)}
 											~ ${schedule.getScheduleEndDateTime().format(formatter)}</td>
-
-										<%-- <td rowspan="2">${schedule.getRepeatType() == '01'? "無" : "カスタム"}</td> --%>
-										<td rowspan="2">${schedule.getUser().getUserFirstName()} ${schedule.getUser().getUserLastName()}</td>
+										<td rowspan="2">${schedule.getUser().getUserFirstName()}
+											${schedule.getUser().getUserLastName()}</td>
+										<td>${schedule.getRepeatType() == '01' ? "無" : 
+										schedule.getRepeatType() == '02' ? "毎日" :
+										schedule.getRepeatType() == '03' ? "毎週" :
+										schedule.getRepeatType() == '04' ? "毎月" :
+										schedule.getRepeatType() == '05' ? "毎年" : ""}</td>
 										<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
 										<td rowspan="2" style="width: 20%;"><c:if
 												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
@@ -98,6 +106,7 @@ if (c != null) {
 													<button type="button" class="btn btn-primary">編集</button>
 												</a>
 												<button type="button" data-scheduleid="${schedule.getId()}"
+													data-schedulecode="${schedule.getScheduleCode()}"
 													id="btnScheduleDelete" class="btn btn-danger"
 													data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
 												<c:if
@@ -119,7 +128,7 @@ if (c != null) {
 											</c:choose>>
 										<td>${schedule.getScheduleTitle()}</td>
 										<td>${schedule.getScheduleDescription()}</td>
-										<%-- <td>${schedule.getRepeatUntil().format(formatter)}</td> --%>
+										<td>${schedule.getRepeatUntil().format(formatter)}</td>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -155,11 +164,22 @@ if (c != null) {
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="modal-body">スケジュールの情報を削除してもよろしいですか?</div>
+					<!-- <div class="modal-body">スケジュールの情報を削除してもよろしいですか?</div> -->
+					<div class="modal-body">
+						<p>スケジュールの情報を削除してもよろしいですか?</p>
+						<div class="form-check">
+							<input type="radio" class="form-check-input" name="deleteOption"
+								value="1" checked> <label class="form-check-label">
+								すべてのイベント削除 </label>
+						</div>
+						<div class="form-check">
+							<input type="radio" class="form-check-input" name="deleteOption"
+								value="0"> <label class="form-check-label">
+								このスケジュールのみ削除 </label>
+						</div>
+					</div>
 					<div class="modal-footer">
-						<a href="" id="deleteUrl">
-							<button type="submit" class="btn btn-danger">削除</button>
-						</a>
+						<button type="button" class="btn btn-danger" id="btnDeleteOK">削除</button>
 						<button type="button" class="btn btn-secondary"
 							id="btnDeleteCancel" data-dismiss="modal">キャンセル</button>
 					</div>
@@ -170,26 +190,24 @@ if (c != null) {
 		<div class="modal fade" id="completeConfirmModel" tabindex="-1"
 			role="dialog" aria-labelledby="completeConfirmModelLabel"
 			aria-hidden="true">
-			<form action='' method='post' id="completeConfirmAction">
-				<div class="modal-dialog" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title" id="exampleModalLabel">完了の確認</h5>
-							<button type="button" class="close" data-dismiss="modal"
-								aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-						<div class="modal-body">完了としてもよろしいですか。</div>
-						<div class="modal-footer">
-							<input type="hidden" id="scheduleId" name="id" />
-							<button type="submit" class="btn btn-danger">完了</button>
-							<button type="button" class="btn btn-secondary"
-								id="btnScheduleUpdate" data-dismiss="modal">キャンセル</button>
-						</div>
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">完了の確認</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">完了としてもよろしいですか。</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-danger"
+							id="btnScheduleUpdateOK">完了</button>
+						<button type="button" class="btn btn-secondary"
+							id="btnScheduleUpdateCancel" data-dismiss="modal">キャンセル</button>
 					</div>
 				</div>
-			</form>
+			</div>
 		</div>
 		<!-- Download Confirm Modal -->
 		<div class="modal fade" id="downloadConfirmModel" tabindex="-1"
@@ -220,70 +238,89 @@ if (c != null) {
 </div>
 </body>
 <script>
-	$(document)
-			.ready(
-					function() {
-						$('body')
-								.on(
-										'click',
-										'#btnScheduleDelete',
-										function() {
-											var scheduleId = $(this).data(
-													'scheduleid');
-											var url = '/schedule/schedules/delete/'
-													+ scheduleId;
-											document
-													.getElementById('deleteUrl')
-													.setAttribute('href', url);
-										});
-						$('body')
-								.on(
-										'click',
-										'#btnScheduleUpdate',
-										function() {
-											var scheduleId = $(this).data(
-													'scheduleid');
-											var url = '/schedule/schedules/status/update';
-											$('#scheduleId').val(scheduleId);
-											document
-													.getElementById(
-															'completeConfirmAction')
-													.setAttribute('action', url);
-										});
-						$("#btnDeleteCancel").click(
-								function(e) {
-									document.getElementById('deleteUrl')
-											.setAttribute('href', "");
-								});
-						$("#btnDownloadSchedule")
-								.click(
-										function(e) {
-											var checkboxes = document
-													.querySelectorAll('input[name="chkSelectedIds"]:checked');
-											var values = [];
-											checkboxes.forEach(function(
-													checkbox) {
-												values.push(checkbox.value);
-											});
-											document
-													.getElementById('selectedIds').value = values
-													.join(',');
-											$("#selectedIds").val(
-													values.join(','));
-										});
-						$("#btnDownloadOK")
-								.click(
-										function(e) {
-											$("#downloadConfirmModel").modal(
-													"hide");
-											var checkboxes = document
-													.querySelectorAll('input[name="chkSelectedIds"]:checked');
-											for (var i = 0; i < checkboxes.length; i++) {
-												checkboxes[i].checked = false;
-											}
-										});
-					});
-
+	$(document).ready(function() {
+		$('body').on('click','#btnScheduleDelete',function() {
+			var scheduleId = $(this).data('scheduleid');
+			$('#scheduleId').val(scheduleId);
+			var scheduleCode = $(this).data('schedulecode');
+			$('#scheduleCode').val(scheduleCode);
+		}); 
+		
+		$("#btnDeleteOK").click(function(e) {
+		    var deleteOption = $("input[name='deleteOption']:checked").val();
+		    var scheduleCode = $("#scheduleCode").val();
+		    var deleteUrl = "/schedule/schedules/deleteByCode/" + scheduleCode;
+		    if (deleteOption == 0) {
+		        deleteUrl = "/schedule/schedules/deleteById/" + scheduleCode;
+			    scheduleCode = $("#scheduleId").val();
+		    }
+		    $.ajax({
+		        url: deleteUrl,
+		        type: "DELETE",
+		        data: { scheduleCode: scheduleCode },
+		        success: function(response) {
+		            $("#deleteConfirmModel").modal("hide");
+		            window.alert(response.message);
+		            window.location.reload();
+					clearTextData();
+		        },
+		        error: function(xhr, status, error) {
+		            $("#message").text("Error deleting data: " + error);
+		        }
+		    });
+		});
+		
+		$("#btnDeleteCancel").click(function(e) {
+			clearTextData();
+		});
+		
+		$('body').on('click','#btnScheduleUpdate',function() {
+			var scheduleId = $(this).data('scheduleid');
+			$('#scheduleId').val(scheduleId);
+		});
+		
+		$("#btnScheduleUpdateOK").click(function(e) {
+		    var scheduleId = $("#scheduleId").val();
+			var url = '/schedule/schedules/status/update';
+		    $.ajax({
+		        url: url,
+		        type: "POST",
+		        data: { id: scheduleId },
+		        success: function(response) {
+		            $("#deleteConfirmModel").modal("hide");
+		            window.alert(response.message);
+		            window.location.reload();
+		            clearTextData();
+		        },
+		        error: function(xhr, status, error) {
+		            $("#message").text("Error updating schedule status: " + error);
+		        }
+		    });
+		});
+		
+		$("#btnScheduleUpdateCancel").click(function(e) {
+			clearTextData();
+		});
+		
+		$("#btnDownloadSchedule").click(function(e) {
+			var checkboxes = document.querySelectorAll('input[name="chkSelectedIds"]:checked');
+			var values = [];
+			checkboxes.forEach(function(checkbox) {
+				values.push(checkbox.value);
+			});
+			document.getElementById('selectedIds').value = values.join(',');
+			$("#selectedIds").val(values.join(','));
+		});
+		
+		$("#btnDownloadOK").click(function(e) {
+			$("#downloadConfirmModel").modal("hide");
+			var checkboxes = document.querySelectorAll('input[name="chkSelectedIds"]:checked');
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = false;
+			}
+		});
+	});
+	
 	function updateButtonState() {
 		var checkboxes = document.querySelectorAll('input[type="checkbox"]');
 		var checked = false;
@@ -297,6 +334,10 @@ if (c != null) {
 		} else {
 			document.getElementById('btnDownloadSchedule').disabled = true;
 		}
+	}
+	function clearTextData() {
+		$('#scheduleId').val("");
+		$('#scheduleCode').val("");
 	}
 </script>
 </html>

@@ -7,6 +7,9 @@ request.setAttribute("title", "Edit schedule");
 %>
 <c:set var="allDayFlg" value="${schedule.getAllDayFlg()}" />
 <c:set var="repeatType" value="${schedule.getRepeatType()}" />
+<c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
+<c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
+<c:set var="repeatTypeOfMonth" value="${schedule.getRepeatTypeOfMonth()}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -33,16 +36,16 @@ request.setAttribute("title", "Edit schedule");
 											type="text" class="form-control" id="startDateTimeString"
 											name="startDateTimeString"
 											value="${schedule.getStartDateTimeString()}"
-											placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
-												path="startDateTimeString" style="color:red" /></span>
+											placeholder="YYYY-MM-DD HH:mm:ss" />
+											<span id="startDateTimeStringError" style="color:red;display:none;">スケジュール開始日時は必須です。</span>
 									</div>
 									<div class="col-sm-4">
 										<label for="endDateTimeString"> スケジュールの終了日時 :</label> <input
 											type="text" class="form-control" id="endDateTimeString"
 											name="endDateTimeString"
 											value="${schedule.getEndDateTimeString()}"
-											placeholder="YYYY-MM-DD HH:mm:ss" /><span><form:errors
-												path="endDateTimeString" style="color:red" /></span>
+											placeholder="YYYY-MM-DD HH:mm:ss" />
+											<span id="endDateTimeStringError" style="color:red;display:none;">スケジュール終了日時は必須です。</span>
 									</div>
 									<div class="col-sm-12">
 									    <span style="color:red; display: none;" id="dateCompareError">スケジュールの開始日時は、終了日時よりも前の日時にする必要があります。</span>
@@ -74,18 +77,44 @@ request.setAttribute("title", "Edit schedule");
 											<option value="02"
 												<c:if test="${schedule.getRepeatType() == '02'}">selected</c:if>>毎日</option>
 											<option value="03"
-												<c:if test="${schedule.getRepeatType() == '03'}">selected</c:if>>毎月</option>
+												<c:if test="${schedule.getRepeatType() == '03'}">selected</c:if>>毎週</option>
 											<option value="04"
-												<c:if test="${schedule.getRepeatType() == '04'}">selected</c:if>>毎年</option>
+												<c:if test="${schedule.getRepeatType() == '04'}">selected</c:if>>毎月</option>
+											<option value="05"
+												<c:if test="${schedule.getRepeatType() == '05'}">selected</c:if>>毎年</option>
 										</select>
 									</div>
 
-									<div class="col-sm-4" id="repeateDetail">
-										<label for="repeatUntilDateTimeString"> 繰り返す終了日付 :</label> <input
-												type="text" id="repeatUntilDateTimeString"
-												name="repeatUntilDateTimeString"
-												value="${schedule.getRepeatUntilDateTimeString()}"
-												placeholder="YYYY-MM-DD HH:mm:ss" class="form-control " readonly>
+									<div class="form-group" id="repeateDetail">
+										<div class="col-sm-3" id="repeatDayDiv" style="display: none">
+											<label for="repeatDayOfWeek">週の繰り返し日:</label> <select
+														id="repeatDayOfWeek" name="repeatDayOfWeek"
+														class="form-control">
+														<option value="01" <c:if test="${schedule.getRepeatDayOfWeek() == '01'}">selected</c:if>>日曜日</option>
+														<option value="02" <c:if test="${schedule.getRepeatDayOfWeek() == '02'}">selected</c:if>>月曜日</option>
+														<option value="03" <c:if test="${schedule.getRepeatDayOfWeek() == '03'}">selected</c:if>>火曜日</option>
+														<option value="04" <c:if test="${schedule.getRepeatDayOfWeek() == '04'}">selected</c:if>>水曜日</option>
+														<option value="05" <c:if test="${schedule.getRepeatDayOfWeek() == '05'}">selected</c:if>>木曜日</option>
+														<option value="06" <c:if test="${schedule.getRepeatDayOfWeek() == '06'}">selected</c:if>>金曜日</option>
+														<option value="07" <c:if test="${schedule.getRepeatDayOfWeek() == '07'}">selected</c:if>>土曜日</option>
+													</select>
+										</div>
+										<div class="col-sm-3" id="repeatMonthDiv" style="display: none">
+											<label for="repeatTypeOfMonth">月の繰り返し日:</label> <select
+														id="repeatTypeOfMonth" name="repeatTypeOfMonth"
+														class="form-control"></select>
+										</div>
+										<div class="col-sm-4">
+											<label for="repeatUntilDateTimeString"> 繰り返す終了日付 :</label> <input
+													type="text" id="repeatUntilDateTimeString"
+													name="repeatUntilDateTimeString"
+													value="${schedule.getRepeatUntilDateTimeString()}"
+													placeholder="YYYY-MM-DD HH:mm:ss" class="form-control ">
+													<span id="repeatUntilDateTimeStringError" style="color:red;display:none;">繰り返す終了日付は必須です。</span>
+										</div>
+										<div class="col-sm-12" style="margin-top:5px;">
+											<span style="color: red; display: none;" id="repeatUntilError">スケジュールの終了日時は、繰り返す終了日時よりも前の日時にする必要があります。</span>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -226,10 +255,19 @@ request.setAttribute("title", "Edit schedule");
 			$('#divReminder').css('display', 'block');
 		}
 		var repeatType = "${repeatType}";
+		$('#repeatDayDiv').css('display', 'none');
+		$('#repeateDetail').css('display', 'none');
+		$('#repeatMonthDiv').css('display', 'none');
 		if (repeatType !== '01') {
 			$('#repeateDetail').css('display', 'block');
-		} else {
-			$('#repeateDetail').css('display', 'none');
+			if (repeatType === '03') {
+				$('#repeatDayDiv').css('display', 'block');
+			}　else if (repeatType === '04') {
+				$('#repeatMonthDiv').css('display', 'block');
+				bindRepeartMonthDiv();
+			}
+		} else{
+			$('#repeatUntilDateTimeString').val("");
 		}
 	});
 	$(document).ready(function() {
@@ -238,11 +276,17 @@ request.setAttribute("title", "Edit schedule");
 		});
 		$('#startDateTimeString').on('dp.change',function(e) {
 			var selectedDateTime = e.date;
-			selectedDateTime.add(1, 'hours');
-			var formattedDateTime = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
-			$('#endDateTimeString').val(formattedDateTime);
-			
-			bindMdRepeatUntilDateTimeString();
+			if (!selectedDateTime.isValid()) {
+				$('#startDateTimeStringError').show();
+				document.getElementById('btnEditSchedule').disabled = true;
+			} else {
+				$('#startDateTimeStringError').hide();
+				selectedDateTime.add(1, 'hours');
+				var formattedDateTime = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
+				$('#endDateTimeString').val(formattedDateTime);
+				
+				bindMdRepeatUntilDateTimeString();
+			}
 		});
 		$('#endDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
@@ -250,18 +294,41 @@ request.setAttribute("title", "Edit schedule");
 		$('#endDateTimeString').on('dp.change',function(e) {
 			var startDate = $('#startDateTimeString').data("DateTimePicker").date();
 			var endDate = $('#endDateTimeString').data("DateTimePicker").date();
-			if (endDate && startDate && endDate.isBefore(startDate)) {
-				$('#dateCompareError').show();
+			if (endDate == null) {
+				$('#endDateTimeStringError').show();
 				document.getElementById('btnEditSchedule').disabled = true;
 			} else {
-				$('#dateCompareError').hide();
-				document.getElementById('btnEditSchedule').disabled = false;
-				
-				bindMdRepeatUntilDateTimeString();
+				$('#endDateTimeStringError').hide();
+				if (endDate && startDate && endDate.isBefore(startDate)) {
+					$('#dateCompareError').show();
+					document.getElementById('btnEditSchedule').disabled = true;
+				} else {
+					$('#dateCompareError').hide();
+					document.getElementById('btnEditSchedule').disabled = false;
+					
+					bindMdRepeatUntilDateTimeString();
+				}
 			}
 		});
 		$('#repeatUntilDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
+		});
+		$('#repeatUntilDateTimeString').on('dp.change',function(e) {
+			var endDate = $('#endDateTimeString').data("DateTimePicker").date();
+			var repeatUntilDate = $('#repeatUntilDateTimeString').data("DateTimePicker").date();
+			if (repeatUntilDate == null) {
+				$('#repeatUntilDateTimeStringError').show();
+				document.getElementById('btnEditSchedule').disabled = true;
+			} else {
+				$('#repeatUntilDateTimeStringError').hide();
+				if (repeatUntilDate && endDate && repeatUntilDate.isBefore(endDate)) {
+					$('#repeatUntilError').show();
+					document.getElementById('btnEditSchedule').disabled = true;
+				} else {
+					$('#repeatUntilError').hide();
+					document.getElementById('btnEditSchedule').disabled = false;
+				}
+			}
 		});
 	});
 	function onAllDayFlgChange(checkbox) {
@@ -287,29 +354,112 @@ request.setAttribute("title", "Edit schedule");
 			$('#scheduleThemeColor').val("#00C7FC");
 		}
 	}
+	
 	function onRepeatTypeChange(select) {
 		var selectedValue = select.value;
+		$('#repeatUntilDateTimeString').val("");
+		$('#repeatDayDiv').css('display', 'none');
+		$('#repeateDetail').css('display', 'none');
+		removeOption();
+		$('#repeatMonthDiv').css('display', 'none');
 		if (selectedValue != '01') {
 			bindMdRepeatUntilDateTimeString();
 			$('#repeateDetail').css('display', 'block');
-		} else {
-			$('#repeatUntilDateTimeString').val("");
-			$('#repeateDetail').css('display', 'none');
+			if (selectedValue == '03') {
+				$('#repeatDayDiv').css('display', 'block');
+			} else if (selectedValue == '04') {
+				$('#repeatMonthDiv').css('display', 'block');
+			}
 		}
 	}
+	
 	function bindMdRepeatUntilDateTimeString(){
 		var repeatType = $('#repeatType').val();
-		
 		var startDate = $('#startDateTimeString').data("DateTimePicker").date();
 		if (repeatType == '02') {
-			startDate.add(1, 'week');
-		} else if (repeatType == '03') {
-			startDate.add(3, 'months');
+			startDate.add(1, 'months');
+		} else if(repeatType == '03'){
+			var dayOfStartDate = startDate.toDate().getDay() + 1;
+			var paddedDay = ("0" + dayOfStartDate).slice(-2);
+			$('#repeatDayOfWeek').val(paddedDay);
+			startDate.add(1, 'months');
 		} else if (repeatType == '04') {
-			startDate.add(1, 'years');
+			removeOption();
+			var dateOfStartDate = startDate.toDate().getDate();
+			var select = document.getElementById("repeatTypeOfMonth");
+		    var option1 = document.createElement("option");
+		    option1.value = "01";
+		    option1.text = "毎月" + startDate.toDate().getDate() + "日";
+		    select.add(option1);
+		    var dayOfStartDate = startDate.toDate().getDay() + 1;
+			var paddedDay = ("0" + dayOfStartDate).slice(-2);
+			var dayName = getDayName(paddedDay);
+			var option2 = document.createElement("option");
+			option2.value = "02";
+			option2.text = "毎月第4" + dayName;
+		    select.add(option2);
+		    var option3 = document.createElement("option");
+		    option3.value = "03";
+		    option3.text = "毎月最後の" + dayName;
+		    select.add(option3);
+			startDate.add(3, 'months');
+		} else if (repeatType == '05') {
+			startDate.add(3, 'years');
 		}
 		var formattedDateTime = startDate.format('YYYY-MM-DD HH:mm:ss');
 		$('#repeatUntilDateTimeString').val(formattedDateTime);
+	}
+	function bindRepeartMonthDiv(){
+		var startDateTimeString = "${startDateTimeString}";
+		var repeatTypeOfMonth = "${repeatTypeOfMonth}";
+		console.log(repeatTypeOfMonth);
+		var startDate = moment(startDateTimeString, "yyyy-MM-DD HH:mm:ss").toDate();
+		var dateOfStartDate = startDate.getDate();
+		var select = document.getElementById("repeatTypeOfMonth");
+	    var option1 = document.createElement("option");
+	    option1.value = "01";
+	    option1.text = "毎月" + startDate.getDate() + "日";
+	    select.add(option1);
+	    var dayOfStartDate = startDate.getDay() + 1;
+		var paddedDay = ("0" + dayOfStartDate).slice(-2);
+		var dayName = getDayName(paddedDay);
+		var option2 = document.createElement("option");
+		option2.value = "02";
+		option2.text = "毎月第4" + dayName;
+	    if (repeatTypeOfMonth === '02') {
+	    	option2.selected = true;
+	    }
+	    select.add(option2);
+	    var option3 = document.createElement("option");
+	    option3.value = "03";
+	    option3.text = "毎月最後の" + dayName;
+	    if (repeatTypeOfMonth === '03') {
+	    	option3.selected = true;
+	    }
+	    select.add(option3);
+	}
+	
+	function removeOption() {
+		var select = document.getElementById("repeatTypeOfMonth");
+		select.innerHTML = '';
+	}
+	
+	function getDayName(type) {
+	  var dayName = "日曜日";
+	  if(type == '02'){
+		  dayName = "月曜日";
+	  } else if(type == '03'){
+		  dayName = "火曜日";
+	  } else if(type == '04'){
+		  dayName = "水曜日";
+	  } else if(type == '05'){
+		  dayName = "木曜日";
+	  } else if(type == '06'){
+		  dayName = "金曜日";
+	  } else if(type == '07'){
+		  dayName = "土曜日";
+	  }
+	  return dayName;
 	}
 </script>
 </html>

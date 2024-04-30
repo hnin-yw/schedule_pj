@@ -10,6 +10,7 @@ request.setAttribute("title", "Create schedule");
 <c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
 <c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
 <c:set var="repeatTypeOfMonth" value="${schedule.getRepeatTypeOfMonth()}" />
+<c:set var="userCode" value="${userCode}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -227,6 +228,79 @@ request.setAttribute("title", "Create schedule");
 									style="color:red" /></span>
 
 						</div>
+						<div class="form-group col-sm-12">
+						         <span style="color:red">このスケジュールには 5 人のゲストのみを招待できます。</span>
+						</div>
+						<div class="form-group">
+							<%-- <div class="col-sm-4">
+							    <input type ="text" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
+						        <label for="attendees">ゲスト :</label>
+						    </div>
+						    <div class="col-sm-8">
+						        <c:choose>
+						            <c:when test="${userLists.size() > 0}">
+						                <c:forEach var="user" items="${userLists}" varStatus="loop">
+						                    <c:choose>
+						                        <c:when test="${schedule.getAttendees().size() > 0}">
+						                            <c:set var="checked" value="false"/>
+						                            <c:forEach items="${schedule.getAttendees()}" var="attendee">
+						                                <c:if test="${attendee.getUserCode() == user.getUserCode()}">
+														    <c:set var="checked" value="true"/>
+														</c:if>
+						                            </c:forEach>
+						                        </c:when>
+						                        <c:otherwise>
+						                            <c:set var="checked" value="false"/>
+						                        </c:otherwise>
+						                    </c:choose>
+						                    <input type="checkbox" class="custom-checkbox" id="attendees${loop.index}" name="attendees[${loop.index}].userCode" value="${ user.getUserCode() }" <c:if test="${checked}">checked</c:if> />
+						                    <label for="attendees${loop.index}">${user.getUserName()} (${user.getEmail()})</label>
+						                    <c:if test="${userCode == user.getUserCode()}">
+											    <span style="color:red">*Organizer</span>
+											</c:if><br>
+						                </c:forEach>
+						            </c:when>
+						            <c:otherwise>
+						                <!-- Handle case when userLists is empty -->
+						            </c:otherwise>
+						        </c:choose>
+						    </div> --%>
+						     <div class="col-sm-4">
+							    <input type ="text" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
+						        <label for="attendees">ゲスト :</label>
+								<select id="attendeesSelect" class="form-control">
+							        <c:choose>
+										<c:when test="${userLists.size() > 0}">
+										    <option value="">-- ユーザを選択してください --</option>
+										    <c:forEach var="user" items="${userLists}">
+										        <option value="${user.getUserCode()}" data-email="${user.getEmail()}">
+										            ${user.getEmail()}
+										        </option>
+										    </c:forEach>
+										</c:when>
+										<c:otherwise>
+											<option value="">-- ユーザを選択してください --</option>
+										</c:otherwise>
+									</c:choose>
+								</select>
+						    </div>
+						   <div class="col-sm-8" id="attendeesDiv1">
+						    	<div id="attendeesDivList" class="list-group">
+								<c:choose>
+									<c:when test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
+								    	<c:forEach var="attendee" items="${schedule.getAttendees()}" varStatus="loop">
+								    		<a href="#" class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">
+								            	${attendee.getUser().getEmail()}
+									        	<input type="hidden" name="attendees[${loop.index}].user.email" value="${attendee.getUser().getEmail()}" class="form-control">
+									        	<input type="hidden" name="attendees[${loop.index}].userCode" value="${attendee.getUserCode()}" class="form-control">
+									        	<button type="button" class="close" aria-label="Close"></button>
+									        </a>
+								    	</c:forEach>
+							    	</c:when>
+						    	</c:choose>
+						    	</div>
+							</div>
+						</div>	
 						<div class="up-btn-gp col-sm-12">
 							<a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
@@ -326,6 +400,41 @@ request.setAttribute("title", "Create schedule");
 				}
 			}
 		});
+		$("#attendeesSelect").change(function() {
+		    var selectCount = parseInt($("#selectCount").val());
+		    selectCount = selectCount + 1;
+		    $("#selectCount").val(selectCount);
+		    
+		    if(selectCount >= 5){
+		        $('#attendeesSelect').prop('disabled', true);
+		    }
+		    var selectedOption = $(this).find("option:selected");
+		    var selectedValue = selectedOption.val();
+		    var selectedEmail = selectedOption.data('email');
+		    
+		    selectedOption.prop('disabled', true);
+		    $('#attendeesSelect').val("");
+	       
+		    var indexCount = selectCount - 1;
+		    var html = '<a href="#" class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">';
+		    html = html + selectedEmail;
+		    html = html + '<input type="hidden" name="attendees[' + indexCount + '].user.email" value="' + selectedEmail + '" class="form-control">';
+		    html = html + '<input type="hidden" name="attendees[' + indexCount + '].userCode" value="' + selectedValue + '" class="form-control"><button type="button" class="close" aria-label="Close">';
+		    //html = html + '<span aria-hidden="true">&times;</span>';
+		    html = html + '</button></a>';
+		    var fragment = document.createRange().createContextualFragment(html);
+			document.getElementById("attendeesDivList").appendChild(fragment);
+		});
+		$('#attendeesDivList').on('click', '.close', function() {
+		    var selectCount = parseInt($("#selectCount").val());
+		    selectCount = selectCount - 1;
+		    $("#selectCount").val(selectCount);
+	        $('#attendeesSelect').prop('disabled', false);
+		    
+	        var id = $(this).parent().find('input[type=hidden]').attr('id');
+	        $("#attendeesSelect option[value='" + id + "']").prop('disabled', false);
+		    $(this).parent().remove();
+		}); 
 	});
 	function onAllDayFlgChange(checkbox) {
 		if (checkbox.checked) {
@@ -452,6 +561,8 @@ request.setAttribute("title", "Create schedule");
 		  dayName = "土曜日";
 	  }
 	  return dayName;
-	}
+	}  
+    function addSpan() {
+    }
 </script>
 </html>

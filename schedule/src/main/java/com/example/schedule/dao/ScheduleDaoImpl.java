@@ -23,35 +23,19 @@ public class ScheduleDaoImpl implements ScheduleDao {
 
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
-//			LocalDateTime endDateTime) {
-//		Query query = (Query) entityManager.createQuery(
-//				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND scheduleStartDateTime BETWEEN :startDateTime AND :endDateTime and delFlg = false ORDER BY scheduleStartDateTime ASC");
-//		query.setParameter("userCode", userCode);
-//		query.setParameter("groupCode", groupCode);
-//		query.setParameter("startDateTime", startDateTime);
-//		query.setParameter("endDateTime", endDateTime);
-//
-//		List<Schedule> transactions = query.getResultList();
-//
-//		return transactions;
-//	}
-
 	// get all the transactions from the database
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
 		Query query = entityManager.createQuery(
-				"SELECT COUNT(s) FROM Schedule s WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
+				"SELECT COUNT(s) FROM Schedule s LEFT JOIN Attendee a ON s.id = a.scheduleId WHERE (s.userCode =: userCode OR a.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		long total = (long) query.getSingleResult();
 
 		query = entityManager.createQuery(
-				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
+				"FROM Schedule s LEFT JOIN Attendee a ON s.id = a.scheduleId WHERE (s.userCode =: userCode OR a.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		int start = (int) pageable.getOffset();

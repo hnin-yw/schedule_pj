@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import com.example.schedule.business.ScheduleBusiness;
+import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -33,10 +34,12 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/schedules")
 public class ScheduleController {
 	private final ScheduleBusiness scheduleBusiness;
+	private final UserBusiness userBusiness;
 
 	@Autowired
-	public ScheduleController(ScheduleBusiness scheduleBusiness) {
+	public ScheduleController(ScheduleBusiness scheduleBusiness, UserBusiness userBusiness) {
 		this.scheduleBusiness = scheduleBusiness;
+		this.userBusiness = userBusiness;
 	}
 
 	@GetMapping()
@@ -49,7 +52,11 @@ public class ScheduleController {
 	}
 
 	@RequestMapping("/create")
-	public String create(Model model) {
+	public String create(Model model,HttpServletRequest request) {
+		List<User> userLists = userBusiness.getUserLists();
+		model.addAttribute("userLists", userLists);
+		String userCode = scheduleBusiness.getUserUserCode(request);
+		model.addAttribute("userCode", userCode);
 		Schedule schedule = new Schedule();
 		schedule.setScheduleThemeColor("#FF4013");
 
@@ -70,6 +77,10 @@ public class ScheduleController {
 	public String save(Model model, @ModelAttribute("schedule") @Valid Schedule schedule, BindingResult result,
 			HttpServletRequest request) {
 		if (result.hasErrors()) {
+			List<User> userLists = userBusiness.getUserLists();
+			model.addAttribute("userLists", userLists);
+			String userCode = scheduleBusiness.getUserGroupCode(request);
+			model.addAttribute("userCode", userCode);
 			return "schedules/create";
 		} else {
 			scheduleBusiness.saveSchedule(schedule, request);
@@ -78,9 +89,9 @@ public class ScheduleController {
 	}
 
 	@RequestMapping("/edit/{id}")
-	public ModelAndView edit(@PathVariable(name = "id") int id) {
+	public ModelAndView edit(@PathVariable(name = "id") int id,HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("schedules/edit");
-
+		
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		Schedule schedule = scheduleBusiness.findScheduleById(id);
 		if (schedule.getScheduleStartDateTime() != null) {
@@ -94,6 +105,10 @@ public class ScheduleController {
 		}
 		mav.addObject("schedule", schedule);
 
+		List<User> userLists = userBusiness.getUserLists();
+		mav.addObject("userLists", userLists);
+		String userCode = scheduleBusiness.getUserUserCode(request);
+		mav.addObject("userCode", userCode);
 		return mav;
 	}
 
@@ -101,6 +116,11 @@ public class ScheduleController {
 	public String update(Model model, @ModelAttribute("schedule") @Valid Schedule schedule, BindingResult result,
 			HttpServletRequest request) {
 		if (result.hasErrors()) {
+			List<User> userLists = userBusiness.getUserLists();
+			model.addAttribute("userLists", userLists);
+			String userCode = scheduleBusiness.getUserUserCode(request);
+			model.addAttribute("userCode", userCode);
+			
 			return "schedules/edit";
 		} else {
 			scheduleBusiness.updateSchedule(schedule, request);
@@ -118,7 +138,7 @@ public class ScheduleController {
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, HttpServletRequest request) {
-		scheduleBusiness.deleteSchedule(id, request);
+		scheduleBusiness.deleteScheduleById(id, request);
 		return "redirect:/schedules";
 	}
 
@@ -145,7 +165,7 @@ public class ScheduleController {
 
 	@DeleteMapping("/deleteById/{scheduleCode}")
 	public ResponseEntity<?> deleteById(int scheduleCode, HttpServletRequest request) {
-		scheduleBusiness.deleteSchedule(scheduleCode, request);
+		scheduleBusiness.deleteScheduleById(scheduleCode, request);
 
 		Map<String, String> response = new HashMap<>();
 		response.put("message", "スケジュールは正常に削除されました。");

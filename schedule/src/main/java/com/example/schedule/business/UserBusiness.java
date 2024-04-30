@@ -39,6 +39,11 @@ public class UserBusiness {
 		this.scheduleBusiness = scheduleBusiness;
 	}
 
+	public List<User> getUserLists() {
+		List<User> listUsers = userService.getUserLists();
+		return listUsers;
+	}
+
 	public Page<User> list(Pageable pageable) {
 		Page<User> listUsers = userService.findAlls(pageable);
 		return listUsers;

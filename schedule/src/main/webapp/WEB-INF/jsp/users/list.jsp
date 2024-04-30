@@ -26,6 +26,7 @@ request.setAttribute("title", "List User");
 							<th><b>ユーザの名</b></th>
 							<th><b>ユーザの姓</b></th>
 							<th><b>グループ名</b></th>
+							<th><b>メール</b></th>
 							<th></th>
 						</tr>
 					</thead>
@@ -38,6 +39,7 @@ request.setAttribute("title", "List User");
 										<td>${user.getUserFirstName()}</td>
 										<td>${user.getUserLastName()}</td>
 										<td>${user.getGroup().getGroupName()}</td>
+										<td>${user.getEmail()}</td>
 
 										<td><a href="/schedule/users/edit/${user.getId()}">
 												<button type="button" class="btn btn-primary">編集</button>

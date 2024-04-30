@@ -232,6 +232,40 @@ request.setAttribute("title", "Edit schedule");
 									style="color:red" /></span>
 
 						</div>
+						<div class="form-group">
+						    <div class="col-sm-1">
+						        <label for="scheduleDescription">ゲスト :</label>
+						    </div>
+						    <div class="col-sm-11">
+						        <c:choose>
+						            <c:when test="${userLists.size() > 0}">
+						                <c:forEach var="user" items="${userLists}" varStatus="loop">
+						                    <c:choose>
+						                        <c:when test="${schedule.getAttendees().size() > 0}">
+						                            <c:set var="checked" value="false"/>
+						                            <c:forEach items="${schedule.getAttendees()}" var="attendee">
+						                                <c:if test="${attendee.getUserCode() == user.getUserCode()}">
+														    <c:set var="checked" value="true"/>
+														</c:if>
+						                            </c:forEach>
+						                        </c:when>
+						                        <c:otherwise>
+						                            <c:set var="checked" value="false"/>
+						                        </c:otherwise>
+						                    </c:choose>
+						                    <input type="checkbox" class="custom-checkbox" id="attendees${loop.index}" name="attendees[${loop.index}].userCode" value="${ user.getUserCode() }" <c:if test="${checked}">checked</c:if> />
+						                    <label for="attendees${loop.index}">${user.getUserName()} (${user.getEmail()})</label>
+						                    <c:if test="${userCode == user.getUserCode()}">
+											    <span style="color:red">*Organizer</span>
+											</c:if><br>
+						                </c:forEach>
+						            </c:when>
+						            <c:otherwise>
+						                <!-- Handle case when userLists is empty -->
+						            </c:otherwise>
+						        </c:choose>
+						    </div>
+						</div>
 						<div class="up-btn-gp col-sm-12">
 							<input type='hidden' id='id' class='form-control' name='id'
 								value="${schedule.getId()}" />

@@ -29,6 +29,15 @@ public class UserDaoImpl implements UserDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
+	public List<User> getUserLists() {
+		Query query = entityManager.createQuery("from User WHERE delFlg = false");
+		return query.getResultList();
+	}
+
+	// get all the transactions from the database
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(readOnly = true)
 	public Page<User> getAlls(Pageable pageable) {
 		Query query = entityManager.createQuery("SELECT COUNT(u) FROM User u WHERE u.delFlg = false");
 		long total = (long) query.getSingleResult();

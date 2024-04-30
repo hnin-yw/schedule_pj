@@ -26,7 +26,7 @@ public class Consts {
 	public static String REPEATE_DAY_THU = "05";
 	public static String REPEATE_DAY_THU_VALUE = "THURSDAY";
 	public static String REPEATE_DAY_FRI = "06";
-	public static String REPEATE_DAY_FRI_VALUE = "FRITHDAY";
+	public static String REPEATE_DAY_FRI_VALUE = "FRIDAY";
 	public static String REPEATE_DAY_SAT = "07";
 	public static String REPEATE_DAY_SAT_VALUE = "SATURDAY";
 	

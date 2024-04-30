@@ -14,12 +14,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.schedule.business.ScheduleBusiness;
 import com.example.schedule.entity.*;
@@ -86,10 +83,15 @@ public class ScheduleController {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		Schedule schedule = scheduleBusiness.findScheduleById(id);
-		schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
-		schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
-		schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
-
+		if (schedule.getScheduleStartDateTime() != null) {
+			schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
+		}
+		if (schedule.getScheduleEndDateTime() != null) {
+			schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
+		}
+		if (schedule.getRepeatUntil() != null) {
+			schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
+		}
 		mav.addObject("schedule", schedule);
 
 		return mav;
@@ -107,12 +109,12 @@ public class ScheduleController {
 	}
 
 	@RequestMapping(value = "/status/update", method = RequestMethod.POST)
-    public ResponseEntity<?> updateScheduleStatus(@RequestParam int id, HttpServletRequest request) {
-        scheduleBusiness.updateScheduleStatus(id, request);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "スケジュールのステータスが正常に更新されました。"); // Corrected message
-        return ResponseEntity.ok(response);
-    }
+	public ResponseEntity<?> updateScheduleStatus(@RequestParam int id, HttpServletRequest request) {
+		scheduleBusiness.updateScheduleStatus(id, request);
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "スケジュールのステータスが正常に更新されました。"); // Corrected message
+		return ResponseEntity.ok(response);
+	}
 
 	@RequestMapping("/delete/{id}")
 	public String delete(@PathVariable int id, HttpServletRequest request) {

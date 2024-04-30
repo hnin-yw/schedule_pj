@@ -217,55 +217,54 @@ public class ScheduleBusiness {
 	}
 
 	public String updateSchedule(Schedule schedule, HttpServletRequest request) {
-		Schedule updSchedule = scheduleService.findScheduleById(schedule.getId());
-		if (updSchedule == null) {
-			throw new RuntimeException("Schedule to update doesn't exist");
-		}
-		updSchedule.setScheduleTitle(schedule.getScheduleTitle());
-		updSchedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
-		updSchedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
-		updSchedule.setAllDayFlg(schedule.getAllDayFlg());
-		updSchedule.setRepeatType(schedule.getRepeatType());
-		updSchedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
-		updSchedule.setScheduleDisplayFlg(schedule.getScheduleDisplayFlg());
-		updSchedule.setLocation(schedule.getLocation());
-		updSchedule.setMeetLink(schedule.getMeetLink());
-		updSchedule.setScheduleDescription(schedule.getScheduleDescription());
-		updSchedule.setScheduleThemeColor(schedule.getScheduleThemeColor());
-		updSchedule.setOtherVisibilityFlg(schedule.getOtherVisibilityFlg());
-		updSchedule.setEventFlg(schedule.getEventFlg());
-		String userCode = getUserUserCode(request);
-		updSchedule.setUpdatedBy(userCode);
-		scheduleService.save(updSchedule);
-
-		if (!schedule.getAllDayFlg()) {
-			List<ScheduleReminder> reminders = schedule.getScheduleReminders();
-			List<ScheduleReminder> updReminders = updSchedule.getScheduleReminders();
-			if (updReminders.size() > 0 && reminders.size() > 0) {
-				for (int j = 0; j < reminders.size(); j++) {
-					ScheduleReminder reminder = reminders.get(j);
-					ScheduleReminder updReminder = scheduleReminderService.findScheduleReminderById(reminder.getId());
-					updReminder.setScheduleReminderTime(reminder.getScheduleReminderTime());
-					updReminder.setScheduleReminderType(reminder.getScheduleReminderType());
-					updReminder.setNotiMethodFlg(reminder.getNotiMethodFlg());
-					userCode = getUserUserCode(request);
-					updReminder.setUpdatedBy(userCode);
-					scheduleReminderService.save(updReminder);
-				}
-			} else if (updReminders.size() == 0 && reminders.size() > 0) {
-				for (int j = 0; j < reminders.size(); j++) {
-					ScheduleReminder reminder = reminders.get(j);
-					reminder.setScheduleId(updSchedule.getId());
-					userCode = getUserUserCode(request);
-					reminder.setCreatedBy(userCode);
-					reminder.setUpdatedBy(userCode);
-					scheduleReminderService.save(reminder);
-				}
-			}
-		} else {
-			scheduleReminderService.deleteBySchedulId(updSchedule.getId());
-		}
-		return "redirect:/schedules";
+		deleteScheduleByCode(schedule.getScheduleCode(),request);
+//		Schedule updSchedule = scheduleService.findScheduleById(schedule.getId());
+//		updSchedule.setScheduleTitle(schedule.getScheduleTitle());
+//		updSchedule.setScheduleStartDateTime(toDateTime(schedule.getStartDateTimeString()));
+//		updSchedule.setScheduleEndDateTime(toDateTime(schedule.getEndDateTimeString()));
+//		updSchedule.setAllDayFlg(schedule.getAllDayFlg());
+//		updSchedule.setRepeatType(schedule.getRepeatType());
+//		updSchedule.setRepeatUntil(toDateTime(schedule.getRepeatUntilDateTimeString()));
+//		updSchedule.setScheduleDisplayFlg(schedule.getScheduleDisplayFlg());
+//		updSchedule.setLocation(schedule.getLocation());
+//		updSchedule.setMeetLink(schedule.getMeetLink());
+//		updSchedule.setScheduleDescription(schedule.getScheduleDescription());
+//		updSchedule.setScheduleThemeColor(schedule.getScheduleThemeColor());
+//		updSchedule.setOtherVisibilityFlg(schedule.getOtherVisibilityFlg());
+//		updSchedule.setEventFlg(schedule.getEventFlg());
+//		String userCode = getUserUserCode(request);
+//		updSchedule.setUpdatedBy(userCode);
+//		scheduleService.save(updSchedule);
+//
+//		if (!schedule.getAllDayFlg()) {
+//			List<ScheduleReminder> reminders = schedule.getScheduleReminders();
+//			List<ScheduleReminder> updReminders = updSchedule.getScheduleReminders();
+//			if (updReminders.size() > 0 && reminders.size() > 0) {
+//				for (int j = 0; j < reminders.size(); j++) {
+//					ScheduleReminder reminder = reminders.get(j);
+//					ScheduleReminder updReminder = scheduleReminderService.findScheduleReminderById(reminder.getId());
+//					updReminder.setScheduleReminderTime(reminder.getScheduleReminderTime());
+//					updReminder.setScheduleReminderType(reminder.getScheduleReminderType());
+//					updReminder.setNotiMethodFlg(reminder.getNotiMethodFlg());
+//					userCode = getUserUserCode(request);
+//					updReminder.setUpdatedBy(userCode);
+//					scheduleReminderService.save(updReminder);
+//				}
+//			} else if (updReminders.size() == 0 && reminders.size() > 0) {
+//				for (int j = 0; j < reminders.size(); j++) {
+//					ScheduleReminder reminder = reminders.get(j);
+//					reminder.setScheduleId(updSchedule.getId());
+//					userCode = getUserUserCode(request);
+//					reminder.setCreatedBy(userCode);
+//					reminder.setUpdatedBy(userCode);
+//					scheduleReminderService.save(reminder);
+//				}
+//			}
+//		} else {
+//			scheduleReminderService.deleteBySchedulId(updSchedule.getId());
+//		}
+		this.saveSchedule(schedule, request);
+		return schedule.getScheduleCode();
 	}
 
 	public String updateScheduleStatus(int id, HttpServletRequest request) {
@@ -317,7 +316,7 @@ public class ScheduleBusiness {
 		String userCode = getUserUserCode(request);
 		schedule.setUpdatedBy(userCode);
 		scheduleService.save(schedule);
-		return "redirect:/schedules";
+		return schedule.getScheduleCode();
 	}
 
 	public byte[] generateExcelBytes(String[] selectedIds) throws IOException {

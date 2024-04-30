@@ -6,13 +6,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.schedule.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
-import java.math.BigInteger;
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 

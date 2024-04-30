@@ -234,7 +234,9 @@ request.setAttribute("title", "Edit schedule");
 						</div>
 						<div class="up-btn-gp col-sm-12">
 							<input type='hidden' id='id' class='form-control' name='id'
-								value="${schedule.getId()}" /> <a href="/schedule/schedules">
+								value="${schedule.getId()}" />
+							<input type='hidden' id='scheduleCode' class='form-control' name='scheduleCode'
+								value="${schedule.getScheduleCode()}" /> <a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
 							<button type="submit" class="btn btn-primary" id="btnEditSchedule">編集</button>

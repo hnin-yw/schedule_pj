@@ -35,8 +35,8 @@ if (c != null) {
 					</a>
 				</div>
 				<div>
-					<input type="hidden" name="scheduleCode" id="scheduleCode" /> <input
-						type="hidden" id="scheduleId" name="id" />
+					<input type="hidden" name="scheduleCode" id="scheduleCode" /> 
+					<input type="hidden" id="scheduleId" name="id" />
 				</div>
 				<table class="table table-bordered" style="maring-top: 10px;">
 					<thead>
@@ -100,22 +100,29 @@ if (c != null) {
 										schedule.getRepeatType() == '04' ? "毎月" :
 										schedule.getRepeatType() == '05' ? "毎年" : ""}</td>
 										<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
-										<td rowspan="2" style="width: 20%;"><c:if
-												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
-												<a href="/schedule/schedules/edit/${schedule.getId()}">
-													<button type="button" class="btn btn-primary">編集</button>
-												</a>
-												<button type="button" data-scheduleid="${schedule.getId()}"
-													data-schedulecode="${schedule.getScheduleCode()}"
-													id="btnScheduleDelete" class="btn btn-danger"
-													data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
-												<c:if
-													test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
+										<td rowspan="2" style="width: 20%;">
+											<c:if test="${schedule.getUserCode().equals(userCode) || (!schedule.getUserCode().equals(userCode) && schedule.getGuestPermissionFlg())}">
+												<c:if test="${schedule.getUserCode().equals(userCode)}">
+													<c:if test="${!schedule.getScheduleStatusFlg()}">
+													<a href="/schedule/schedules/edit/${schedule.getId()}">
+														<button type="button" class="btn btn-primary">編集</button>
+													</a>
+													</c:if>
 													<button type="button" data-scheduleid="${schedule.getId()}"
-														id="btnScheduleUpdate" class="btn btn-light"
-														data-toggle="modal" data-target="#completeConfirmModel">完了</button>
+														data-schedulecode="${schedule.getScheduleCode()}"
+														id="btnScheduleDelete" class="btn btn-danger"
+														data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
+													<c:if test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
+														<button type="button" data-scheduleid="${schedule.getId()}"
+															id="btnScheduleUpdate" class="btn btn-light"
+															data-toggle="modal" data-target="#completeConfirmModel">完了</button>
+													</c:if>
 												</c:if>
-											</c:if></td>
+												<c:if test="${!schedule.getUserCode().equals(userCode) && schedule.getGuestPermissionFlg() && !schedule.getScheduleStatusFlg()}">
+													<a href="/schedule/schedules/guest_lists/${schedule.getId()}">ゲストリスト</a>
+												</c:if>
+											</c:if>
+										</td>
 									</tr>
 									<tr
 										<c:choose>
@@ -170,7 +177,7 @@ if (c != null) {
 						<div class="form-check">
 							<input type="radio" class="form-check-input" name="deleteOption"
 								value="1" checked> <label class="form-check-label">
-								すべてのイベント削除 </label>
+								すべてのスケジュール削除 </label>
 						</div>
 						<div class="form-check">
 							<input type="radio" class="form-check-input" name="deleteOption"
@@ -318,6 +325,11 @@ if (c != null) {
 			for (var i = 0; i < checkboxes.length; i++) {
 				checkboxes[i].checked = false;
 			}
+		});
+		
+		$('body').on('click','#btnScheduleGuestList',function() {
+			var scheduleId = $(this).data('scheduleid');
+			$('#scheduleId').val(scheduleId);
 		});
 	});
 	

@@ -5,12 +5,9 @@
 <%
 request.setAttribute("title", "Create schedule");
 %>
-<c:set var="allDayFlg" value="${schedule.getAllDayFlg()}" />
-<c:set var="repeatType" value="${schedule.getRepeatType()}" />
 <c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
 <c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
 <c:set var="repeatTypeOfMonth" value="${schedule.getRepeatTypeOfMonth()}" />
-<c:set var="userCode" value="${userCode}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -22,6 +19,21 @@ request.setAttribute("title", "Create schedule");
 				<form:form action='/schedule/schedules/save' method='post'
 					modelAttribute="schedule">
 					<div class="card-body">
+						<div class="row">
+							<input type="hidden" id="userCode" name="userCode" value="${schedule.getUserCode()}">
+							<input type="hidden" id="groupCode" name="groupCode" value="${schedule.getGroupCode()}">
+							<input type="hidden" id="allDayFlg" name="allDayFlg" value="${schedule.getAllDayFlg() ? 1 : 0}">
+							<input type="hidden" id="guestPermissionFlg" name="guestPermissionFlg" value="${schedule.getGuestPermissionFlg() ? 1 : 0}">
+							<input type='hidden' id='id' name='id' value="${schedule.getId()}"/>
+							<input type='hidden' id='scheduleCode' name='scheduleCode' value="${schedule.getScheduleCode()}"/> 
+							<input type='hidden' id='delFlg' name='delFlg' value="${schedule.getDelFlg() ? 1 : 0}"/> 
+							<input type='hidden' id='createdBy' name='createdBy' value="${schedule.getCreatedBy()}"/> 
+							<input type='hidden' id='createdAt' name='createdAt' value="${schedule.getCreatedAt()}"/> 
+							<input type='hidden' id='updatedBy' name='updatedBy' value="${schedule.getUpdatedBy()}"/> 
+							<input type='hidden' id='updatedAt' name='updatedAt' value="${schedule.getUpdatedAt()}"/> 
+							<input type='hidden' id='indexArray' name='indexArray' value="${schedule.getIndexArray()}"/> 
+							<input type='hidden' id='actualIndexArray' name='actualIndexArray' value="0,1,2,3,4"/> 
+						</div>
 						<div class="row">
 							<div class="col-sm-9">
 								<div class="form-group col-sm-12">
@@ -61,11 +73,10 @@ request.setAttribute("title", "Create schedule");
 
 								<div class="form-group">
 									<div class="col-sm-2" style="margin-top: 20px;">
-										<input type="hidden" id="allDayFlg" name="allDayFlg" value="${schedule.getAllDayFlg() ? 1 : 0}">
 										<input type="checkbox" class="custom-checkbox"
 											id="allDayFlgChk" onchange="onAllDayFlgChange(this)"
 											<c:if test="${schedule.getAllDayFlg()}">checked</c:if>>
-										<label for="male">一日中</label>
+										<label for="allDayFlgChk">一日中</label>
 									</div>
 									<div class="col-sm-3">
 										<label for="repeatType">繰り返しの種類:</label> <select id="repeatType"
@@ -113,13 +124,13 @@ request.setAttribute("title", "Create schedule");
 										<div class="col-sm-12" style="margin-top:5px;">
 											<span style="color: red; display: none;" id="repeatUntilError">スケジュールの終了日時は、繰り返す終了日時よりも前の日時にする必要があります。</span>
 										</div>
-										<!-- <div class="col-sm-12" style="margin-bottom:15px;"></div> -->
 									</div>
 								</div>
 							</div>
 							<div class="col-sm-3">
 								<div class="panel cus_left-panel">
-									<label for="otherVisibilityFlg"> スケジュールタイプ</label> <select
+									<label for="otherVisibilityFlg"> スケジュールタイプ</label> 
+									<select
 										name="eventFlg" class="form-control"
 										onchange="onEventChange(this)">
 										<option value="1"
@@ -229,51 +240,32 @@ request.setAttribute("title", "Create schedule");
 
 						</div>
 						<div class="form-group col-sm-12">
-						         <span style="color:red">このスケジュールには 5 人のゲストのみを招待できます。</span>
+							<span style="color:red">このスケジュールには 5 人のゲストのみを招待できます。</span><br>
+							<label for="attendees">ゲスト :</label>
 						</div>
 						<div class="form-group">
-							<%-- <div class="col-sm-4">
-							    <input type ="text" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
-						        <label for="attendees">ゲスト :</label>
-						    </div>
-						    <div class="col-sm-8">
-						        <c:choose>
-						            <c:when test="${userLists.size() > 0}">
-						                <c:forEach var="user" items="${userLists}" varStatus="loop">
-						                    <c:choose>
-						                        <c:when test="${schedule.getAttendees().size() > 0}">
-						                            <c:set var="checked" value="false"/>
-						                            <c:forEach items="${schedule.getAttendees()}" var="attendee">
-						                                <c:if test="${attendee.getUserCode() == user.getUserCode()}">
-														    <c:set var="checked" value="true"/>
-														</c:if>
-						                            </c:forEach>
-						                        </c:when>
-						                        <c:otherwise>
-						                            <c:set var="checked" value="false"/>
-						                        </c:otherwise>
-						                    </c:choose>
-						                    <input type="checkbox" class="custom-checkbox" id="attendees${loop.index}" name="attendees[${loop.index}].userCode" value="${ user.getUserCode() }" <c:if test="${checked}">checked</c:if> />
-						                    <label for="attendees${loop.index}">${user.getUserName()} (${user.getEmail()})</label>
-						                    <c:if test="${userCode == user.getUserCode()}">
-											    <span style="color:red">*Organizer</span>
-											</c:if><br>
-						                </c:forEach>
-						            </c:when>
-						            <c:otherwise>
-						                <!-- Handle case when userLists is empty -->
-						            </c:otherwise>
-						        </c:choose>
-						    </div> --%>
 						     <div class="col-sm-4">
-							    <input type ="text" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
-						        <label for="attendees">ゲスト :</label>
-								<select id="attendeesSelect" class="form-control">
+							    <input type ="hidden" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
+						        <select id="attendeesSelect" class="form-control" 
+								<c:if test="${not empty schedule.getAttendees() && schedule.getAttendees().size() == 5}">disabled</c:if> >
 							        <c:choose>
 										<c:when test="${userLists.size() > 0}">
 										    <option value="">-- ユーザを選択してください --</option>
 										    <c:forEach var="user" items="${userLists}">
-										        <option value="${user.getUserCode()}" data-email="${user.getEmail()}">
+											    <c:choose>
+							                        <c:when test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
+							                            <c:set var="disabled" value="false"/>
+							                            <c:forEach items="${schedule.getAttendees()}" var="attendee">
+							                                <c:if test="${attendee.getUserCode() == user.getUserCode()}">
+															    <c:set var="disabled" value="true"/>
+															</c:if>
+							                            </c:forEach>
+							                        </c:when>
+							                        <c:otherwise>
+							                            <c:set var="disabled" value="false"/>
+							                        </c:otherwise>
+							                    </c:choose>
+										        <option value="${user.getUserCode()}" data-email="${user.getEmail()}" <c:if test="${disabled}">disabled</c:if> >
 										            ${user.getEmail()}
 										        </option>
 										    </c:forEach>
@@ -283,25 +275,34 @@ request.setAttribute("title", "Create schedule");
 										</c:otherwise>
 									</c:choose>
 								</select>
+								
+								<div class="mt-link">
+									<input type="checkbox" class="custom-checkbox"
+										id="guestPermissionFlgChk" onchange="guestPermissionFlgChange(this)"
+										<c:if test="${schedule.getGuestPermissionFlg()}">checked</c:if> disabled>
+									<label for="guestPermissionFlgChk">ゲストリストを見る</label>
+								</div>
 						    </div>
 						   <div class="col-sm-8" id="attendeesDiv1">
 						    	<div id="attendeesDivList" class="list-group">
 								<c:choose>
 									<c:when test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
 								    	<c:forEach var="attendee" items="${schedule.getAttendees()}" varStatus="loop">
-								    		<a href="#" class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">
-								            	${attendee.getUser().getEmail()}
-									        	<input type="hidden" name="attendees[${loop.index}].user.email" value="${attendee.getUser().getEmail()}" class="form-control">
-									        	<input type="hidden" name="attendees[${loop.index}].userCode" value="${attendee.getUserCode()}" class="form-control">
-									        	<button type="button" class="close" aria-label="Close"></button>
-									        </a>
+								    		<c:if test="${attendee.getUserCode() != null}">
+									    		<a class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">
+									            	${attendee.getUser().getEmail()}
+										        	<input type="hidden" data-index="${loop.index}" name="attendees[${loop.index}].user.email" value="${attendee.getUser().getEmail()}" class="form-control">
+										        	<input type="hidden" data-index="${loop.index}" name="attendees[${loop.index}].userCode" value="${attendee.getUserCode()}" class="form-control">
+										        	<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									        	</a>
+									        </c:if>
 								    	</c:forEach>
 							    	</c:when>
 						    	</c:choose>
 						    	</div>
 							</div>
 						</div>	
-						<div class="up-btn-gp col-sm-12">
+						<div class="form-group up-btn-gp col-sm-12">
 							<a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
@@ -317,13 +318,13 @@ request.setAttribute("title", "Create schedule");
 </body>
 <script>
 	document.addEventListener("DOMContentLoaded", function(event) {
-		var allDayFlg = "${allDayFlg}";
-		if (allDayFlg === 'true') {
+		var allDayFlg = $('#allDayFlg').val();
+		if (allDayFlg == '1') {
 			$('#divReminder').css('display', 'none');
 		} else {
 			$('#divReminder').css('display', 'block');
 		}
-		var repeatType = "${repeatType}";
+		var repeatType = $('#repeatType').val();
 		$('#repeatDayDiv').css('display', 'none');
 		$('#repeateDetail').css('display', 'none');
 		$('#repeatMonthDiv').css('display', 'none');
@@ -338,6 +339,7 @@ request.setAttribute("title", "Create schedule");
 		} else{
 			$('#repeatUntilDateTimeString').val("");
 		}
+	    guestPermissionFlgChkPermission();
 	});
 
 	$(document).ready(function() {
@@ -402,28 +404,44 @@ request.setAttribute("title", "Create schedule");
 		});
 		$("#attendeesSelect").change(function() {
 		    var selectCount = parseInt($("#selectCount").val());
+		    
+		    var actualIndexArray = $("#actualIndexArray").val().split(",");
+		    var indexArray = $("#indexArray").val().split(",");
+		    var index = 0;
+		    for (var i = 0; i < actualIndexArray.length; i++) {
+		        if (!indexArray.includes(actualIndexArray[i])) {
+		    	    index = i;
+		            indexArray.push(actualIndexArray[i]);
+		    	    break;
+		        }
+		    }
+		    var indexArrayString = indexArray.join(",");
+		    if (indexArrayString.charAt(0) === ',') {
+		        indexArrayString = indexArrayString.slice(1);
+		    }
+		    $("#indexArray").val(indexArrayString);
+
 		    selectCount = selectCount + 1;
 		    $("#selectCount").val(selectCount);
-		    
-		    if(selectCount >= 5){
-		        $('#attendeesSelect').prop('disabled', true);
-		    }
 		    var selectedOption = $(this).find("option:selected");
 		    var selectedValue = selectedOption.val();
 		    var selectedEmail = selectedOption.data('email');
-		    
-		    selectedOption.prop('disabled', true);
-		    $('#attendeesSelect').val("");
-	       
-		    var indexCount = selectCount - 1;
-		    var html = '<a href="#" class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">';
+
+		    var html = '<a class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">';
 		    html = html + selectedEmail;
-		    html = html + '<input type="hidden" name="attendees[' + indexCount + '].user.email" value="' + selectedEmail + '" class="form-control">';
-		    html = html + '<input type="hidden" name="attendees[' + indexCount + '].userCode" value="' + selectedValue + '" class="form-control"><button type="button" class="close" aria-label="Close">';
-		    //html = html + '<span aria-hidden="true">&times;</span>';
+		    html = html + '<input type="hidden" data-index="' + index + '" name="attendees[' + index + '].user.email" value="' + selectedEmail + '" class="form-control">';
+		    html = html + '<input type="hidden" data-index="' + index + '" name="attendees[' + index + '].userCode" value="' + selectedValue + '" class="form-control"><button type="button" class="close" aria-label="Close">';
+		    html = html + '<span aria-hidden="true">&times;</span>';
 		    html = html + '</button></a>';
 		    var fragment = document.createRange().createContextualFragment(html);
 			document.getElementById("attendeesDivList").appendChild(fragment);
+			
+		    selectedOption.prop('disabled', true);
+		    $('#attendeesSelect').val("");
+		    if(selectCount >= 5){
+		        $('#attendeesSelect').prop('disabled', true);
+		    }
+		    guestPermissionFlgChkPermission();
 		});
 		$('#attendeesDivList').on('click', '.close', function() {
 		    var selectCount = parseInt($("#selectCount").val());
@@ -431,11 +449,28 @@ request.setAttribute("title", "Create schedule");
 		    $("#selectCount").val(selectCount);
 	        $('#attendeesSelect').prop('disabled', false);
 		    
-	        var id = $(this).parent().find('input[type=hidden]').attr('id');
-	        $("#attendeesSelect option[value='" + id + "']").prop('disabled', false);
+	        var userCode = $(this).parent().find('input[name*="userCode"]').val();
+	        $("#attendeesSelect option[value='" + userCode + "']").prop('disabled', false);
+	        
+	        var index = $(this).parent().find('input[name*="userCode"]').data('index');
+	        var indexArray = $("#indexArray").val().split(",");
+	        indexArray = indexArray.filter(function(item) {
+	            return item !== index.toString();
+	        });
+            $("#indexArray").val(indexArray);
+	        
 		    $(this).parent().remove();
+		    guestPermissionFlgChkPermission();
 		}); 
 	});
+	function guestPermissionFlgChkPermission() {
+		var selectCount = parseInt($("#selectCount").val());
+		if(selectCount > 0){
+			$('#guestPermissionFlgChk').prop('disabled', false);
+	    }else{
+			$('#guestPermissionFlgChk').prop('disabled', true);
+		}
+	}
 	function onAllDayFlgChange(checkbox) {
 		if (checkbox.checked) {
 			$('#allDayFlg').val("1");
@@ -449,6 +484,13 @@ request.setAttribute("title", "Create schedule");
 		} else {
 			$('#allDayFlg').val("0");
 			$('#divReminder').css('display', 'block');
+		}
+	}
+	function guestPermissionFlgChange(checkbox) {
+		if (checkbox.checked) {
+			$('#guestPermissionFlg').val("1");
+		} else {
+			$('#guestPermissionFlg').val("0");
 		}
 	}
 	function onEventChange(select) {
@@ -515,7 +557,6 @@ request.setAttribute("title", "Create schedule");
 	function bindRepeartMonthDiv(){
 		var startDateTimeString = "${startDateTimeString}";
 		var repeatTypeOfMonth = "${repeatTypeOfMonth}";
-		console.log(repeatTypeOfMonth);
 		var startDate = moment(startDateTimeString, "yyyy-MM-DD HH:mm:ss").toDate();
 		var dateOfStartDate = startDate.getDate();
 		var select = document.getElementById("repeatTypeOfMonth");

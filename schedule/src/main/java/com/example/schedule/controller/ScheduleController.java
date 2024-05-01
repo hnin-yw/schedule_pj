@@ -51,15 +51,26 @@ public class ScheduleController {
 		return "schedules/list";
 	}
 
+	@RequestMapping("/guest_lists/{id}")
+	public String guestListsBySchedule(@PathVariable(name = "id") int id, Model model) {
+		Schedule schedule = scheduleBusiness.findScheduleById(id);
+		model.addAttribute("schedule", schedule);
+		return "schedules/guest_lists";
+	}
+
 	@RequestMapping("/create")
-	public String create(Model model,HttpServletRequest request) {
+	public String create(Model model, HttpServletRequest request) {
 		List<User> userLists = userBusiness.getUserLists();
 		model.addAttribute("userLists", userLists);
 		String userCode = scheduleBusiness.getUserUserCode(request);
 		model.addAttribute("userCode", userCode);
+
 		Schedule schedule = new Schedule();
 		schedule.setScheduleThemeColor("#FF4013");
 
+		schedule.setUserCode(userCode);
+		String groupCode = scheduleBusiness.getUserGroupCode(request);
+		schedule.setGroupCode(groupCode);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String startDateTimeString = LocalDateTime.now().format(formatter);
 		schedule.setStartDateTimeString(startDateTimeString);
@@ -68,6 +79,9 @@ public class ScheduleController {
 		schedule.setAllDayFlg(false);
 		schedule.setEventFlg(true);
 		schedule.setRepeatType("01");
+		schedule.setScheduleCode(scheduleBusiness.getScheduleCode());
+		schedule.setCreatedBy(userCode);
+		schedule.setUpdatedBy(userCode);
 		model.addAttribute("schedule", schedule);
 
 		return "schedules/create";
@@ -89,26 +103,18 @@ public class ScheduleController {
 	}
 
 	@RequestMapping("/edit/{id}")
-	public ModelAndView edit(@PathVariable(name = "id") int id,HttpServletRequest request) {
+	public ModelAndView edit(@PathVariable(name = "id") int id, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("schedules/edit");
-		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 		Schedule schedule = scheduleBusiness.findScheduleById(id);
-		if (schedule.getScheduleStartDateTime() != null) {
-			schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
-		}
-		if (schedule.getScheduleEndDateTime() != null) {
-			schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
-		}
-		if (schedule.getRepeatUntil() != null) {
-			schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
-		}
+		schedule = scheduleBusiness.setDatas(schedule);
 		mav.addObject("schedule", schedule);
 
 		List<User> userLists = userBusiness.getUserLists();
 		mav.addObject("userLists", userLists);
 		String userCode = scheduleBusiness.getUserUserCode(request);
 		mav.addObject("userCode", userCode);
+		schedule.setUpdatedBy(userCode);
 		return mav;
 	}
 
@@ -120,7 +126,7 @@ public class ScheduleController {
 			model.addAttribute("userLists", userLists);
 			String userCode = scheduleBusiness.getUserUserCode(request);
 			model.addAttribute("userCode", userCode);
-			
+
 			return "schedules/edit";
 		} else {
 			scheduleBusiness.updateSchedule(schedule, request);

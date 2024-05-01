@@ -90,6 +90,9 @@ public class Schedule {
 	@Column(name = "schedule_status_flg")
 	private Boolean scheduleStatusFlg;
 
+	@Column(name = "guest_permission_flg")
+	private Boolean guestPermissionFlg;
+
 	@Column(name = "del_flg")
 	private Boolean delFlg;
 
@@ -105,11 +108,10 @@ public class Schedule {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-//	@NotEmpty(message = "スケジュール開始日時は必須です。")
 	private String startDateTimeString;
-//	@NotEmpty(message = "スケジュール終了日時は必須です。")
 	private String endDateTimeString;
 	private @Nullable String repeatUntilDateTimeString;
+	private String indexArray;
 
 	public Schedule() {
 	}
@@ -119,9 +121,10 @@ public class Schedule {
 			Boolean allDayFlg, String repeatType, LocalDateTime repeatUntil, String repeatDayOfWeek,
 			String repeatTypeOfMonth, Boolean scheduleDisplayFlg, String location, String meetLink,
 			String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg, Boolean eventFlg,
-			Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
-			LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders, List<Attendee> attendees,
-			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString, User user) {
+			Boolean scheduleStatusFlg, Boolean guestPermissionFlg, Boolean delFlg, String createdBy,
+			LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt,
+			List<ScheduleReminder> scheduleReminders, List<Attendee> attendees, String startDateTimeString,
+			String endDateTimeString, String repeatUntilDateTimeString, String indexArray, User user) {
 		this.id = id;
 		this.scheduleCode = scheduleCode;
 		this.groupCode = groupCode;
@@ -142,6 +145,7 @@ public class Schedule {
 		this.otherVisibilityFlg = otherVisibilityFlg;
 		this.eventFlg = eventFlg;
 		this.scheduleStatusFlg = scheduleStatusFlg;
+		this.guestPermissionFlg = guestPermissionFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
@@ -152,6 +156,7 @@ public class Schedule {
 		this.startDateTimeString = startDateTimeString;
 		this.endDateTimeString = endDateTimeString;
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+		this.indexArray = indexArray;
 		this.user = user;
 	}
 
@@ -318,6 +323,14 @@ public class Schedule {
 		this.scheduleStatusFlg = scheduleStatusFlg;
 	}
 
+	public Boolean getGuestPermissionFlg() {
+		return guestPermissionFlg;
+	}
+
+	public void setGuestPermissionFlg(Boolean guestPermissionFlg) {
+		this.guestPermissionFlg = guestPermissionFlg;
+	}
+
 	public Boolean getDelFlg() {
 		return delFlg;
 	}
@@ -417,5 +430,13 @@ public class Schedule {
 
 	public void setRepeatUntilDateTimeString(String repeatUntilDateTimeString) {
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+	}
+
+	public String getIndexArray() {
+		return indexArray;
+	}
+
+	public void setIndexArray(String indexArray) {
+		this.indexArray = indexArray;
 	}
 }

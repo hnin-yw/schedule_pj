@@ -52,12 +52,9 @@ public class ScheduleBusiness {
 	}
 
 	public Schedule saveSchedule(Schedule schedule, HttpServletRequest request) {
-		schedule.setScheduleCode(this.getScheduleCode());
 		LocalDateTime startDateTime = toDateTime(schedule.getStartDateTimeString());
 		LocalDateTime dbStartDateTime = toDateTime(schedule.getStartDateTimeString());
 		LocalDateTime dbEndDateTime = toDateTime(schedule.getEndDateTimeString());
-		String groupCode = getUserGroupCode(request);
-		String userCode = getUserUserCode(request);
 		schedule.setScheduleStartDateTime(dbStartDateTime);
 		schedule.setScheduleEndDateTime(dbEndDateTime);
 		if (!schedule.getRepeatType().equals(Consts.REPEATE_TYPE_NONE)) {
@@ -72,7 +69,7 @@ public class ScheduleBusiness {
 					}
 					schedule.setScheduleStartDateTime(dbStartDateTime);
 					schedule.setScheduleEndDateTime(dbEndDateTime);
-					saveMultiSchedule(schedule, userCode, groupCode);
+					saveMultiSchedule(schedule);
 				}
 			} else if (schedule.getRepeatType().equals(Consts.REPEATE_TYPE_YEAR)) {
 				for (LocalDateTime dateTime = startDateTime; !dateTime.isAfter(repeatUntilDateTime); dateTime = dateTime
@@ -83,19 +80,17 @@ public class ScheduleBusiness {
 					}
 					schedule.setScheduleStartDateTime(dbStartDateTime);
 					schedule.setScheduleEndDateTime(dbEndDateTime);
-					saveMultiSchedule(schedule, userCode, groupCode);
+					saveMultiSchedule(schedule);
 				}
 			} else if (schedule.getRepeatType().equals(Consts.REPEATE_TYPE_WEEK)) {
 				DayOfWeek targetDayOfWeek = getDayOfWeek(schedule.getRepeatDayOfWeek());
-				System.out.println(schedule.getRepeatDayOfWeek());
-				System.out.println(targetDayOfWeek);
 				while (startDateTime.isBefore(repeatUntilDateTime) || startDateTime.isEqual(repeatUntilDateTime)) {
 					if (startDateTime.getDayOfWeek() == targetDayOfWeek) {
 						dbStartDateTime = startDateTime;
 
 						schedule.setScheduleStartDateTime(dbStartDateTime);
 						schedule.setScheduleEndDateTime(dbEndDateTime);
-						saveMultiSchedule(schedule, userCode, groupCode);
+						saveMultiSchedule(schedule);
 					}
 					startDateTime = startDateTime.plusDays(1);
 					dbEndDateTime = dbEndDateTime.plusDays(1);
@@ -110,7 +105,7 @@ public class ScheduleBusiness {
 							dbStartDateTime = startDateTime;
 							schedule.setScheduleStartDateTime(dbStartDateTime);
 							schedule.setScheduleEndDateTime(dbEndDateTime);
-							saveMultiSchedule(schedule, userCode, groupCode);
+							saveMultiSchedule(schedule);
 						}
 						startDateTime = startDateTime.plusMonths(1);
 						dbEndDateTime = dbEndDateTime.plusMonths(1);
@@ -129,7 +124,7 @@ public class ScheduleBusiness {
 
 							schedule.setScheduleStartDateTime(dbStartDateTime);
 							schedule.setScheduleEndDateTime(dbEndDateTime);
-							saveMultiSchedule(schedule, userCode, groupCode);
+							saveMultiSchedule(schedule);
 						}
 						startDateTime = startDateTime.plusMonths(1);
 						dbEndDateTime = dbEndDateTime.plusMonths(1);
@@ -148,7 +143,7 @@ public class ScheduleBusiness {
 
 							schedule.setScheduleStartDateTime(dbStartDateTime);
 							schedule.setScheduleEndDateTime(dbEndDateTime);
-							saveMultiSchedule(schedule, userCode, groupCode);
+							saveMultiSchedule(schedule);
 						}
 						startDateTime = startDateTime.plusMonths(1);
 						dbEndDateTime = dbEndDateTime.plusMonths(1);
@@ -156,21 +151,51 @@ public class ScheduleBusiness {
 				}
 			}
 		} else {
-			saveMultiSchedule(schedule, userCode, groupCode);
+			saveMultiSchedule(schedule);
 		}
 
 		return schedule;
 	}
 
-	public void saveMultiSchedule(Schedule schedule, String userCode, String groupCode) {
-		schedule.setUserCode(userCode);
-		schedule.setCreatedBy(userCode);
-		schedule.setUpdatedBy(userCode);
-		schedule.setGroupCode(groupCode);
+	public Schedule setDatas(Schedule schedule) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		if (schedule.getScheduleStartDateTime() != null) {
+			schedule.setStartDateTimeString(schedule.getScheduleStartDateTime().format(formatter));
+		}
+		if (schedule.getScheduleEndDateTime() != null) {
+			schedule.setEndDateTimeString(schedule.getScheduleEndDateTime().format(formatter));
+		}
+		if (schedule.getRepeatUntil() != null) {
+			schedule.setRepeatUntilDateTimeString(schedule.getRepeatUntil().format(formatter));
+		}
+		String indexArrayString = "";
+		List<Attendee> attendees = schedule.getAttendees();
+		if (attendees.size() > 0) {
+			for (int j = 0; j < attendees.size(); j++) {
+				indexArrayString += j + ",";
+			}
+		}
+		if (!indexArrayString.isEmpty()) {
+			indexArrayString = indexArrayString.substring(0, indexArrayString.length() - 1);
+		}
+		schedule.setIndexArray(indexArrayString);
+
+		return schedule;
+	}
+
+	public void saveMultiSchedule(Schedule schedule) {
 		schedule.setDelFlg(false);
 		schedule.setScheduleStatusFlg(false);
-		schedule.setCreatedAt(LocalDateTime.now());
-		schedule.setUpdatedAt(LocalDateTime.now());
+		LocalDateTime createdAt = LocalDateTime.now();
+		if (schedule.getCreatedAt() != null) {
+			createdAt = schedule.getCreatedAt();
+		}
+		LocalDateTime updatedAt = LocalDateTime.now();
+		if (schedule.getUpdatedAt() != null) {
+			updatedAt = schedule.getUpdatedAt();
+		}
+		schedule.setCreatedAt(createdAt);
+		schedule.setUpdatedAt(updatedAt);
 		int id = scheduleService.saveSchedule(schedule);
 		if (!schedule.getAllDayFlg()) {
 			List<ScheduleReminder> reminders = schedule.getScheduleReminders();
@@ -178,11 +203,11 @@ public class ScheduleBusiness {
 				for (int j = 0; j < reminders.size(); j++) {
 					ScheduleReminder reminder = reminders.get(j);
 					reminder.setScheduleId(id);
-					reminder.setCreatedBy(userCode);
-					reminder.setUpdatedBy(userCode);
+					reminder.setCreatedBy(schedule.getCreatedBy());
+					reminder.setUpdatedBy(schedule.getUpdatedBy());
 					reminder.setDelFlg(false);
-					reminder.setCreatedAt(LocalDateTime.now());
-					reminder.setUpdatedAt(LocalDateTime.now());
+					reminder.setCreatedAt(createdAt);
+					reminder.setUpdatedAt(updatedAt);
 					scheduleReminderService.saveScheduleReminder(reminder);
 				}
 			}
@@ -196,10 +221,10 @@ public class ScheduleBusiness {
 					attendee.setResponseStatusFlg(true);
 					attendee.setResponseTime(LocalTime.now());
 					attendee.setDelFlg(false);
-					attendee.setCreatedBy(userCode);
-					attendee.setUpdatedBy(userCode);
-					attendee.setCreatedAt(LocalDateTime.now());
-					attendee.setUpdatedAt(LocalDateTime.now());
+					attendee.setCreatedBy(schedule.getCreatedBy());
+					attendee.setUpdatedBy(schedule.getUpdatedBy());
+					attendee.setCreatedAt(createdAt);
+					attendee.setUpdatedAt(updatedAt);
 					attendeeService.saveAttendee(attendee);
 				}
 			}
@@ -239,7 +264,7 @@ public class ScheduleBusiness {
 
 	public String updateSchedule(Schedule schedule, HttpServletRequest request) {
 		deleteScheduleByCode(schedule.getScheduleCode(), request);
-		this.saveSchedule(schedule, request);
+		saveSchedule(schedule, request);
 		return schedule.getScheduleCode();
 	}
 

@@ -29,13 +29,13 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Transactional(readOnly = true)
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
 		Query query = entityManager.createQuery(
-				"SELECT COUNT(s) FROM Schedule s LEFT JOIN Attendee a ON s.id = a.scheduleId WHERE (s.userCode =: userCode OR a.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
+				"SELECT COUNT(s) FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		long total = (long) query.getSingleResult();
 
 		query = entityManager.createQuery(
-				"FROM Schedule s LEFT JOIN Attendee a ON s.id = a.scheduleId WHERE (s.userCode =: userCode OR a.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
+				"FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		int start = (int) pageable.getOffset();
@@ -82,8 +82,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Override
 	public int saveSchedule(Schedule schedule) {
 		Query query = entityManager.createQuery(
-				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
-						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, guestPermissionFlg,delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :guestPermissionFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
 		query.setParameter("scheduleCode", schedule.getScheduleCode());
 		query.setParameter("groupCode", schedule.getGroupCode());
 		query.setParameter("userCode", schedule.getUserCode());
@@ -103,6 +103,7 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("otherVisibilityFlg", schedule.getOtherVisibilityFlg());
 		query.setParameter("eventFlg", schedule.getEventFlg());
 		query.setParameter("scheduleStatusFlg", schedule.getScheduleStatusFlg());
+		query.setParameter("guestPermissionFlg", schedule.getGuestPermissionFlg());
 		query.setParameter("delFlg", schedule.getDelFlg());
 		query.setParameter("createdBy", schedule.getCreatedBy());
 		query.setParameter("createdAt", schedule.getCreatedAt());

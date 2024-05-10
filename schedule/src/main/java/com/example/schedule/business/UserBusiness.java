@@ -49,20 +49,30 @@ public class UserBusiness {
 		return listUsers;
 	}
 
-	public Map<String, ArrayList<String>> saveUser(User user, HttpServletRequest request) {
-		msgLists = new HashMap<>();
-		sucMsgLists = new ArrayList<>();
+//	public Map<String, ArrayList<String>> saveUser(User user, HttpServletRequest request) {
+//		msgLists = new HashMap<>();
+//		sucMsgLists = new ArrayList<>();
+//		user.setPassword(toHexString(encodePassword(user.getPassword())));
+//		user.setUserCode(this.getUserCode());
+//		String userCode = scheduleBusiness.getUserUserCode(request);
+//		user.setCreatedBy(userCode);
+//		user.setUpdatedBy(userCode);
+//		User dbUser = userService.save(user);
+//		if (dbUser != null) {
+//			sucMsgLists.add("グループは正常に更新されました。");
+//		}
+//		msgLists.put("messages", sucMsgLists);
+//		return msgLists;
+//	}
+
+	public String saveUser(User user, HttpServletRequest request) {
 		user.setPassword(toHexString(encodePassword(user.getPassword())));
 		user.setUserCode(this.getUserCode());
 		String userCode = scheduleBusiness.getUserUserCode(request);
 		user.setCreatedBy(userCode);
 		user.setUpdatedBy(userCode);
 		User dbUser = userService.save(user);
-		if (dbUser != null) {
-			sucMsgLists.add("グループは正常に更新されました。");
-		}
-		msgLists.put("messages", sucMsgLists);
-		return msgLists;
+		return dbUser.getUserCode();
 	}
 
 	public User findUserById(int id) {
@@ -134,15 +144,15 @@ public class UserBusiness {
 	public String getUserCode() {
 		String userCode = null;
 
-		// 現在の最大グループをデータベースから取得します。
+		// 現在の最大ユーザをデータベースから取得します。
 		User user = userService.findUserCodeByDesc();
 
 		if (user != null) {
 			int nextNumber = Integer.parseInt(user.getUserCode().substring(1)) + 1;
-			// 「G000001」パターンにフォーマットします
+			// 「U000001」パターンにフォーマットします
 			userCode = "U" + String.format("%06d", nextNumber);
 		} else {
-			// グループがまだ存在しない場合
+			// ユーザがまだ存在しない場合
 			userCode = "U000001";
 		}
 		return userCode;

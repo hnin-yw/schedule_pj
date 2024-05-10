@@ -1,6 +1,7 @@
 package com.example.schedule.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.schedule.business.*;
@@ -37,7 +41,7 @@ public class UserController {
 
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-		Page<User> listUsers = userBusiness.list(PageRequest.of(page, 10));
+		Page<User> listUsers = userBusiness.list(PageRequest.of(page, 15));
 		model.addAttribute("listUsers", listUsers);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", listUsers.getTotalPages());
@@ -54,18 +58,31 @@ public class UserController {
 		return "users/create";
 	}
 
-	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String save(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
-			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+//	@RequestMapping(value = "/save", method = RequestMethod.POST)
+//	public String save(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
+//			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+//		if (result.hasErrors()) {
+//			List<Group> gpLists = groupBusiness.getGroupLists();
+//			model.addAttribute("gpLists", gpLists);
+//			return "users/create";
+//		} else {
+//			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user, request);
+//			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+//			return "redirect:/users";
+//		}
+//	}
+
+	@PostMapping("/save")
+	@ResponseBody
+	public Map<String, String> save(@Valid @RequestBody User user, BindingResult result, HttpServletRequest request) {
+		Map<String, String> response = new HashMap<>();
 		if (result.hasErrors()) {
-			List<Group> gpLists = groupBusiness.getGroupLists();
-			model.addAttribute("gpLists", gpLists);
-			return "users/create";
+			response.put("error", "検証が失敗しました。 入力内容をご確認ください。");
 		} else {
-			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user, request);
-			redirectAttributes.addFlashAttribute("msgLists", msgLists);
-			return "redirect:/users";
+			userBusiness.saveUser(user, request);
+			response.put("success", "ユーザは正常に更新されました。");
 		}
+		return response;
 	}
 
 	@RequestMapping("/edit/{id}")

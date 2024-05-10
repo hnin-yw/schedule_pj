@@ -280,7 +280,7 @@ request.setAttribute("title", "Create schedule");
 									<input type="checkbox" class="custom-checkbox"
 										id="guestPermissionFlgChk" onchange="guestPermissionFlgChange(this)"
 										<c:if test="${schedule.getGuestPermissionFlg()}">checked</c:if> disabled>
-									<label for="guestPermissionFlgChk">ゲストリストを見る</label>
+									<label for="guestPermissionFlgChk">スケジュールの更新</label>
 								</div>
 						    </div>
 						   <div class="col-sm-8" id="attendeesDiv1">

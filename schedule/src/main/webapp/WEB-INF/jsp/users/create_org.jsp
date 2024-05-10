@@ -12,23 +12,14 @@ request.setAttribute("title", "Create User");
 		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
 		<div class="col-sm-10 content_body">
 			<h2 class="text-center">ユーザの登録</h2>
-			<%-- <%@ include file="/WEB-INF/jsp/message.jsp"%> --%>
-			<div class="alert alert-danger alert-dismissible" id="errorMsg"
-				style="display: none;">
-				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-				<strong></strong>
-			</div>
-			<div class="alert alert-success alert-dismissible" id="successMsg"
-				style="display: none;">
-				<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-				<strong></strong>
-			</div>
+			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="card">
 				<div class="card-body">
-					<form id="frmUser">
+					<form:form action='/schedule/users/save' method='post'
+						modelAttribute="user">
 						<div class="form-group col-sm-12">
-							<label for="groupCode"> グループ :</label> <select id="groupCode"
-								name="groupCode" class="form-control">
+							<label for="groupCode"> グループ :</label> <select name="groupCode"
+								class="form-control">
 								<c:choose>
 									<c:when test="${gpLists.size() > 0}">
 										<option value="">-- グループを選択してください --</option>
@@ -54,8 +45,8 @@ request.setAttribute("title", "Create User");
 						<div class="form-group col-sm-12">
 							<label for="password"> パスワード :</label> <input type="password"
 								id="password" name="password" placeholder="パスワード"
-								class="form-control "><span> <form:errors
-									path="password" style="color:red" /></span>
+								class="form-control "><span>
+								<form:errors path="password" style="color:red" /></span>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="userFirstName"> ユーザの名 :</label> <input type="text"
@@ -107,66 +98,13 @@ request.setAttribute("title", "Create User");
 							<a href="/schedule/users">
 								<button type="button" class="btn btn-Light">キャンセル</button>
 							</a>
-							<button type="submit" id="btnUserCreate" class="btn btn-primary">登録</button>
+							<button type="submit" class="btn btn-primary">登録</button>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 </body>
-<script>
-	$(document).ready(function() {
-		function dataClear() {
-			$('#groupCode').val("");
-			$('#userName').val("");
-			$('#password').val("");
-			$('#userFirstName').val("");
-			$('#userLastName').val("");
-			$('#postCode').val("");
-			$('#address').val("");
-			$('#telNumber').val("");
-			$('#email').val("");
-		}
-
-		$('#frmUser').on('submit', function(e) {
-			e.preventDefault();
-			var formData = {
-				groupCode : $('#groupCode').val(),
-				userName : $('#userName').val(),
-				password : $('#password').val(),
-				userFirstName : $('#userFirstName').val(),
-				userLastName : $('#userLastName').val(),
-				postCode : $('#postCode').val(),
-				address : $('#address').val(),
-				telNumber : $('#telNumber').val(),
-				email : $('#email').val()
-			};
-			$.ajax({
-				url : '/schedule/users/save',
-				type : 'POST',
-				contentType : 'application/json',
-				data : JSON.stringify(formData),
-				success : function(response) {
-					console.log(response);
-					if (response.error) {
-						console.log(response.error);
-						$('#errorMsg strong').html(response.error);
-						$('#errorMsg').show();
-						$('#successMsg').hide();
-					} else {
-						$('#successMsg strong').html(response.success);
-						$('#successMsg').show();
-						$('#errorMsg').hide();
-						dataClear();
-					}
-				},
-				error : function(xhr, status, error) {
-					console.error(xhr.responseText);
-				}
-			});
-		});
-	});
-</script>
 </html>

@@ -20,13 +20,13 @@ request.setAttribute("title", "List Group");
 				</div>
 
 				<table class="table table-bordered" style="maring-top: 10px;">
-					<thead>
+					<thead class="tbl-header-ft">
 						<tr>
 							<th><b> グループ名 </b></th>
 							<th></th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="tbl-body-ft">
 						<c:choose>
 							<c:when test="${listGroups.getTotalElements() > 0}">
 								<c:forEach items="${listGroups.content}" var="group">

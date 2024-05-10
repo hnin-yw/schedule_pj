@@ -142,7 +142,7 @@ request.setAttribute("title", "Edit schedule");
 										<option value="1"
 											<c:if test="${schedule.getEventFlg()}">selected</c:if>>イベント</option>
 										<option value="0"
-											<c:if test="${schedule.getEventFlg()}">selected</c:if>>タスク</option>
+											<c:if test="${!schedule.getEventFlg()}">selected</c:if>>タスク</option>
 									</select> <br> ${reminder.getOtherVisibilityFlg()} <label
 										for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">
@@ -287,7 +287,7 @@ request.setAttribute("title", "Edit schedule");
 									<input type="checkbox" class="custom-checkbox"
 										id="guestPermissionFlgChk" onchange="guestPermissionFlgChange(this)"
 										<c:if test="${schedule.getGuestPermissionFlg()}">checked</c:if> disabled>
-									<label for="guestPermissionFlgChk">ゲストリストを見る</label>
+									<label for="guestPermissionFlgChk">スケジュールの更新</label>
 								</div>
 						    </div>
 						   <div class="col-sm-8" id="attendeesDiv1">

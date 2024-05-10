@@ -44,7 +44,7 @@ public class ScheduleController {
 
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, HttpServletRequest request, Model model) {
-		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 7), request);
+		Page<Schedule> listSchedules = scheduleBusiness.list(PageRequest.of(page, 10), request);
 		model.addAttribute("listSchedules", listSchedules);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", listSchedules.getTotalPages());

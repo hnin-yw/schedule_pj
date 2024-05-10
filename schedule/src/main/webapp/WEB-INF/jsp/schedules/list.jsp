@@ -37,49 +37,49 @@ if (c != null) {
 				<div>
 					<input type="hidden" name="scheduleCode" id="scheduleCode" /> 
 					<input type="hidden" id="scheduleId" name="id" />
-				</div>
-				<table class="table table-bordered" style="maring-top: 10px;">
-					<thead>
-						<tr>
-							<th rowspan="2" style="width: 5px;"></th>
-							<th rowspan="2"></th>
-							<th rowspan="2"></th>
-							<th colspan="2"><b>イベント開始日時 ~ 終了日時</b></th>
-							<th rowspan="2"><b>作成者</b></th>
-							<th><b>繰り返しタイプ</b></th>
-							<th rowspan="2"><b>ステータス</b></th>
-							<th rowspan="2" style="width: 20px;"></th>
-						</tr>
-						<tr>
-							<th><b>スケジュールタイトル</b></th>
-							<th><b>説明</b></th>
-							<th><b>繰り返す終了日付</b></th>
-						</tr>
-					</thead>
-					<tbody>
+				</div>	
+				<table class="table table-bordered" style="margin-top: 10px;">
+				    <thead class="tbl-header-ft">
+				        <tr>
+				            <th scope="col" rowspan="2" style="width: 2%;"></th>
+				            <th scope="col" rowspan="2" style="width: 2%;"></th>
+				            <th scope="col" rowspan="2" style="width: 2%;"></th>
+				            <th scope="col" colspan="2" style="width: 47%;">イベント開始日時 ~ 終了日時</th>
+				            <th scope="col" rowspan="2" style="width: 4%;"><b>作成者</b></th>
+				            <th scope="col" colspan="2" style="width: 16%;"><b>繰り返しタイプ</b></th>
+				            <th scope="col" rowspan="2" style="width: 8%;"><b>タイプ</b></th>
+				            <th scope="col" rowspan="2" style="width: 19%;"></th>
+				        </tr>
+				        <tr>
+				            <th><b>スケジュールタイトル</b></th>
+				            <th><b>説明</b></th>
+				            <th><b>繰り返す終了日付</b></th>
+				        </tr>
+				    </thead>
+				  <tbody class="tbl-body-ft">
 						<c:choose>
 							<c:when test="${listSchedules.getTotalElements() > 0}">
 								<c:forEach items="${listSchedules.content}" var="schedule">
 									<tr
 										<c:choose>
-											    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
-											        style="background-color:#919191;"
-											    </c:when>
-											    <c:otherwise>
-											        style="background-color:${schedule.getScheduleThemeColor()};"
-											    </c:otherwise>
-											</c:choose>>
+										    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
+										        style="background-color:#919191;"
+										    </c:when>
+										    <c:otherwise>
+										        style="background-color:${schedule.getScheduleThemeColor()};"
+										    </c:otherwise>
+										</c:choose>>
 
-										<td rowspan="2"><c:if
+										<td rowspan="2" style="width: 2%;"><c:if
 												test="${schedule.getUserCode().equals(userCode) && !schedule.getScheduleStatusFlg()}">
 												<input type="checkbox" id="chkSelectedIds"
 													name="chkSelectedIds" class="custom-checkbox"
 													onChange="updateButtonState()" value="${schedule.getId()}" />
 											</c:if></td>
-										<td rowspan="2"><c:if test="${schedule.getAllDayFlg()}">
+										<td rowspan="2" style="width: 2%;"><c:if test="${schedule.getAllDayFlg()}">
 													一日中
 												</c:if></td>
-										<td rowspan="2"><c:choose>
+										<td rowspan="2" style="width: 2%;"><c:choose>
 												<c:when
 													test="${!schedule.getUserCode().equals(userCode) && schedule.getScheduleDisplayFlg()}">
 													<i class="bi bi-circle" style="color: red;"></i> Busy
@@ -90,49 +90,65 @@ if (c != null) {
 													</c:when>
 												<c:otherwise></c:otherwise>
 											</c:choose></td>
-										<td colspan="2">${schedule.getScheduleStartDateTime().format(formatter)}
+										<td colspan="2" style="width: 47%;">${schedule.getScheduleStartDateTime().format(formatter)}
 											~ ${schedule.getScheduleEndDateTime().format(formatter)}</td>
-										<td rowspan="2">${schedule.getUser().getUserFirstName()}
-											${schedule.getUser().getUserLastName()}</td>
-										<td>${schedule.getRepeatType() == '01' ? "無" : 
+										<td rowspan="2" style="width: 4%;">${schedule.getUser().getUserName()}</td>
+										<td colspan="2" style="width: 16%;">${schedule.getRepeatType() == '01' ? "リピート無し" : 
 										schedule.getRepeatType() == '02' ? "毎日" :
 										schedule.getRepeatType() == '03' ? "毎週" :
 										schedule.getRepeatType() == '04' ? "毎月" :
 										schedule.getRepeatType() == '05' ? "毎年" : ""}</td>
-										<td rowspan="2">${schedule.getScheduleStatusFlg()? "完了" : ""}</td>
-										<td rowspan="2" style="width: 20%;">
-											<c:if test="${schedule.getUserCode().equals(userCode) || (!schedule.getUserCode().equals(userCode) && schedule.getGuestPermissionFlg())}">
-												<c:if test="${schedule.getUserCode().equals(userCode)}">
-													<c:if test="${!schedule.getScheduleStatusFlg()}">
+										<td rowspan="2" style="width: 8%;">${schedule.getEventFlg()? "イベント" : "タスク"}</td>
+										<td rowspan="2" style="width: 19%;">
+										<c:if test="${schedule.getUserCode().equals(userCode)}">
+											<c:if test="${!schedule.getScheduleStatusFlg()}">
+												<a href="/schedule/schedules/edit/${schedule.getId()}">
+													<button type="button" class="btn btn-primary">編集</button>
+												</a>
+											</c:if>
+											<button type="button" data-scheduleid="${schedule.getId()}"
+												data-schedulecode="${schedule.getScheduleCode()}"
+												id="btnScheduleDelete" class="btn btn-danger"
+												data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
+											<%-- <c:if test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
+												<button type="button" data-scheduleid="${schedule.getId()}"
+														id="btnScheduleUpdate" class="btn btn-light"
+														data-toggle="modal" data-target="#completeConfirmModel">完了</button>
+											</c:if> --%>
+										</c:if>
+										<c:if test="${!schedule.getUserCode().equals(userCode)}">
+											<c:set var="isModifySchedule" value="false" />
+											<c:choose>
+											    <c:when test="${not empty schedule.attendees}">
+											        <c:forEach items="${schedule.attendees}" var="attendee">
+											            <c:if test="${attendee.userCode eq userCode}">
+											                <c:set var="isModifySchedule" value="true" />
+											            </c:if>
+											        </c:forEach>
+											    </c:when>
+											</c:choose>
+											<c:if test="${!schedule.getGuestPermissionFlg() || !isModifySchedule}">
+												<a href="/schedule/schedules/guest_lists/${schedule.getId()}">ゲストリスト</a>
+											</c:if>
+											<c:if test="${schedule.getGuestPermissionFlg() && isModifySchedule}">
+												<c:if test="${!schedule.getScheduleStatusFlg()}">
 													<a href="/schedule/schedules/edit/${schedule.getId()}">
 														<button type="button" class="btn btn-primary">編集</button>
 													</a>
-													</c:if>
-													<button type="button" data-scheduleid="${schedule.getId()}"
-														data-schedulecode="${schedule.getScheduleCode()}"
-														id="btnScheduleDelete" class="btn btn-danger"
-														data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
-													<c:if test="${!schedule.getEventFlg() && !schedule.getScheduleStatusFlg()}">
-														<button type="button" data-scheduleid="${schedule.getId()}"
-															id="btnScheduleUpdate" class="btn btn-light"
-															data-toggle="modal" data-target="#completeConfirmModel">完了</button>
-													</c:if>
-												</c:if>
-												<c:if test="${!schedule.getUserCode().equals(userCode) && schedule.getGuestPermissionFlg() && !schedule.getScheduleStatusFlg()}">
-													<a href="/schedule/schedules/guest_lists/${schedule.getId()}">ゲストリスト</a>
 												</c:if>
 											</c:if>
+										</c:if>
 										</td>
 									</tr>
 									<tr
 										<c:choose>
-											    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
-											        style="background-color:#919191;"
-											    </c:when>
-											    <c:otherwise>
-											        style="background-color:${schedule.getScheduleThemeColor()};"
-											    </c:otherwise>
-											</c:choose>>
+										    <c:when test="${!schedule.getEventFlg() && schedule.getScheduleStatusFlg()}">
+										        style="background-color:#919191;"
+										    </c:when>
+										    <c:otherwise>
+										        style="background-color:${schedule.getScheduleThemeColor()};"
+										    </c:otherwise>
+										</c:choose>>
 										<td>${schedule.getScheduleTitle()}</td>
 										<td>${schedule.getScheduleDescription()}</td>
 										<td>${schedule.getRepeatUntil().format(formatter)}</td>
@@ -141,7 +157,7 @@ if (c != null) {
 							</c:when>
 							<c:otherwise>
 								<tr>
-									<td colspan="9">スケジュールはありません.</td>
+									<td colspan="10">スケジュールはありません.</td>
 								</tr>
 
 							</c:otherwise>
@@ -325,6 +341,7 @@ if (c != null) {
 			for (var i = 0; i < checkboxes.length; i++) {
 				checkboxes[i].checked = false;
 			}
+			document.getElementById('btnDownloadSchedule').disabled = true;
 		});
 		
 		$('body').on('click','#btnScheduleGuestList',function() {

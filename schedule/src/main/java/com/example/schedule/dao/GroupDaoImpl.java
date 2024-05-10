@@ -39,10 +39,10 @@ public class GroupDaoImpl implements GroupDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<Group> getAlls(Pageable pageable) {
-		Query query = entityManager.createQuery("SELECT COUNT(g) FROM Group g WHERE delFlg=false");
+		Query query = entityManager.createQuery("SELECT COUNT(g) FROM Group g WHERE delFlg=false ORDER BY g.groupCode DESC");
 		long total = (long) query.getSingleResult();
 
-		query = entityManager.createQuery("FROM Group WHERE delFlg=false");
+		query = entityManager.createQuery("FROM Group WHERE delFlg=false ORDER BY groupCode DESC");
 		int start = (int) pageable.getOffset();
 		List<Group> groups = query.setFirstResult(start).setMaxResults(pageable.getPageSize()).getResultList();
 

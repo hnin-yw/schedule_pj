@@ -16,9 +16,13 @@ import jakarta.validation.constraints.Size;
 public class Schedule {
 	@OneToMany(mappedBy = "schedule")
 	protected List<ScheduleReminder> scheduleReminders;
+
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_code", referencedColumnName = "user_code", insertable = false, updatable = false)
 	private User user;
+
+	@OneToMany(mappedBy = "attSchedule")
+	protected List<Attendee> attendees;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,7 +36,7 @@ public class Schedule {
 
 	@Column(name = "user_code")
 	private String userCode;
-	
+
 	@NotEmpty(message = "スケジュールタイトルは必須です。")
 	@Size(max = Consts.MAX_NAME_LENGTH, message = "スケジュールタイトルは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "schedule_title")
@@ -52,6 +56,12 @@ public class Schedule {
 
 	@Column(name = "repeat_until")
 	private LocalDateTime repeatUntil;
+
+	@Column(name = "repeat_day_of_week")
+	private String repeatDayOfWeek;
+
+	@Column(name = "repeat_type_of_month")
+	private String repeatTypeOfMonth;
 
 	@Column(name = "schedule_display_flg")
 	private Boolean scheduleDisplayFlg;
@@ -80,6 +90,9 @@ public class Schedule {
 	@Column(name = "schedule_status_flg")
 	private Boolean scheduleStatusFlg;
 
+	@Column(name = "guest_permission_flg")
+	private Boolean guestPermissionFlg;
+
 	@Column(name = "del_flg")
 	private Boolean delFlg;
 
@@ -95,22 +108,23 @@ public class Schedule {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
-	@NotEmpty(message = "スケジュール開始日時は必須です。")
 	private String startDateTimeString;
-	@NotEmpty(message = "スケジュール終了日時は必須です。")
 	private String endDateTimeString;
 	private @Nullable String repeatUntilDateTimeString;
+	private String indexArray;
 
 	public Schedule() {
 	}
 
-	public Schedule(int id, String scheduleCode, String groupCode, String userCode, String userName, String scheduleTitle,
-			LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime, Boolean allDayFlg,
-			String repeatType, LocalDateTime repeatUntil, Boolean scheduleDisplayFlg, String location,
-			String meetLink, String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg,
-			Boolean eventFlg, Boolean scheduleStatusFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt,
-			String updatedBy, LocalDateTime updatedAt, List<ScheduleReminder> scheduleReminders,
-			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString, User user) {
+	public Schedule(int id, String scheduleCode, String groupCode, String userCode, String userName,
+			String scheduleTitle, LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime,
+			Boolean allDayFlg, String repeatType, LocalDateTime repeatUntil, String repeatDayOfWeek,
+			String repeatTypeOfMonth, Boolean scheduleDisplayFlg, String location, String meetLink,
+			String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg, Boolean eventFlg,
+			Boolean scheduleStatusFlg, Boolean guestPermissionFlg, Boolean delFlg, String createdBy,
+			LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt,
+			List<ScheduleReminder> scheduleReminders, List<Attendee> attendees, String startDateTimeString,
+			String endDateTimeString, String repeatUntilDateTimeString, String indexArray, User user) {
 		this.id = id;
 		this.scheduleCode = scheduleCode;
 		this.groupCode = groupCode;
@@ -121,6 +135,8 @@ public class Schedule {
 		this.allDayFlg = allDayFlg;
 		this.repeatType = repeatType;
 		this.repeatUntil = repeatUntil;
+		this.repeatDayOfWeek = repeatDayOfWeek;
+		this.repeatTypeOfMonth = repeatTypeOfMonth;
 		this.scheduleDisplayFlg = scheduleDisplayFlg;
 		this.location = location;
 		this.meetLink = meetLink;
@@ -129,15 +145,18 @@ public class Schedule {
 		this.otherVisibilityFlg = otherVisibilityFlg;
 		this.eventFlg = eventFlg;
 		this.scheduleStatusFlg = scheduleStatusFlg;
+		this.guestPermissionFlg = guestPermissionFlg;
 		this.delFlg = delFlg;
 		this.createdBy = createdBy;
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
 		this.scheduleReminders = scheduleReminders;
+		this.attendees = attendees;
 		this.startDateTimeString = startDateTimeString;
 		this.endDateTimeString = endDateTimeString;
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+		this.indexArray = indexArray;
 		this.user = user;
 	}
 
@@ -224,6 +243,22 @@ public class Schedule {
 		this.repeatUntil = repeatUntil;
 	}
 
+	public String getRepeatDayOfWeek() {
+		return repeatDayOfWeek;
+	}
+
+	public void setRepeatDayOfWeek(String repeatDayOfWeek) {
+		this.repeatDayOfWeek = repeatDayOfWeek;
+	}
+
+	public String getRepeatTypeOfMonth() {
+		return repeatTypeOfMonth;
+	}
+
+	public void setRepeatTypeOfMonth(String repeatTypeOfMonth) {
+		this.repeatTypeOfMonth = repeatTypeOfMonth;
+	}
+
 	public Boolean getScheduleDisplayFlg() {
 		return scheduleDisplayFlg;
 	}
@@ -288,6 +323,14 @@ public class Schedule {
 		this.scheduleStatusFlg = scheduleStatusFlg;
 	}
 
+	public Boolean getGuestPermissionFlg() {
+		return guestPermissionFlg;
+	}
+
+	public void setGuestPermissionFlg(Boolean guestPermissionFlg) {
+		this.guestPermissionFlg = guestPermissionFlg;
+	}
+
 	public Boolean getDelFlg() {
 		return delFlg;
 	}
@@ -336,6 +379,14 @@ public class Schedule {
 		this.scheduleReminders = scheduleReminders;
 	}
 
+	public List<Attendee> getAttendees() {
+		return attendees;
+	}
+
+	public void setAttendees(List<Attendee> attendees) {
+		this.attendees = attendees;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -379,5 +430,13 @@ public class Schedule {
 
 	public void setRepeatUntilDateTimeString(String repeatUntilDateTimeString) {
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
+	}
+
+	public String getIndexArray() {
+		return indexArray;
+	}
+
+	public void setIndexArray(String indexArray) {
+		this.indexArray = indexArray;
 	}
 }

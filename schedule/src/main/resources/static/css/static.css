@@ -1,12 +1,12 @@
 .row.content {
 	margin: 10px;
-	height: 950px;
+	height: 1090px;
 	box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 
 .sidenav {
 	background-color: #f1f1f1;
-	height: 900px;
+	height: 1040px;
 	padding-top: 20px;
 }
 
@@ -65,4 +65,18 @@ a:focus, a:hover {
 
 a:active {
 	outline: 0; /* Remove outline when link is active (clicked) */
+}
+
+.form-group {
+	margin-bottom: 15px;
+	/* margin-top: 15px !important; */
+}
+
+thead {
+	font-weight: bold !important;
+	font-size: 13px !important;
+}
+
+tbody {
+	font-size: 12px !important;
 }

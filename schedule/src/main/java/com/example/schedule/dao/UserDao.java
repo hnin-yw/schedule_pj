@@ -22,4 +22,6 @@ public interface UserDao {
 	User findUserByLoginData(String userName,String password);
 
 	List<User> findUserListByGroupCode(String groupCode);
+
+	List<User> getUserLists();
 }

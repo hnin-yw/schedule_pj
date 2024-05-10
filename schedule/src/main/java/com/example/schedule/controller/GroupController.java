@@ -37,7 +37,7 @@ public class GroupController {
 
 	@GetMapping()
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-		Page<Group> listGroups = groupBusiness.list(PageRequest.of(page, 10));
+		Page<Group> listGroups = groupBusiness.list(PageRequest.of(page, 15));
 		model.addAttribute("listGroups", listGroups);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("totalPages", listGroups.getTotalPages());

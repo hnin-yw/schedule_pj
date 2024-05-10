@@ -42,6 +42,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 	}
 
 	@Override
+	public List<Schedule> findScheduleListByScheduleCode(String scheduleCode) {
+		return scheduleDao.findScheduleListByScheduleCode(scheduleCode);
+	}
+
+	@Override
 	@Transactional
 	public Schedule save(Schedule schedule) {
 		return scheduleDao.save(schedule);

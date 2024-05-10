@@ -6,13 +6,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.example.schedule.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-
-import java.math.BigInteger;
-import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,35 +23,19 @@ public class ScheduleDaoImpl implements ScheduleDao {
 
 	}
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
-//			LocalDateTime endDateTime) {
-//		Query query = (Query) entityManager.createQuery(
-//				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND scheduleStartDateTime BETWEEN :startDateTime AND :endDateTime and delFlg = false ORDER BY scheduleStartDateTime ASC");
-//		query.setParameter("userCode", userCode);
-//		query.setParameter("groupCode", groupCode);
-//		query.setParameter("startDateTime", startDateTime);
-//		query.setParameter("endDateTime", endDateTime);
-//
-//		List<Schedule> transactions = query.getResultList();
-//
-//		return transactions;
-//	}
-
 	// get all the transactions from the database
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
 		Query query = entityManager.createQuery(
-				"SELECT COUNT(s) FROM Schedule s WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
+				"SELECT COUNT(s) FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		long total = (long) query.getSingleResult();
 
 		query = entityManager.createQuery(
-				"FROM Schedule WHERE (userCode =: userCode  OR (userCode <>: userCode AND groupCode =: groupCode AND otherVisibilityFlg = false)) AND delFlg = false ORDER BY scheduleStartDateTime ASC");
+				"FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		int start = (int) pageable.getOffset();
@@ -80,6 +60,16 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		return schedule;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Schedule> findScheduleListByScheduleCode(String scheduleCode) {
+		Query query = (Query) entityManager
+				.createQuery("from Schedule WHERE scheduleCode =: scheduleCode and delFlg = false");
+		query.setParameter("scheduleCode", scheduleCode);
+		List<Schedule> schedules = query.getResultList();
+		return schedules;
+	}
+
 	// add to the database
 	@Override
 	public Schedule save(Schedule schedule) {
@@ -92,8 +82,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Override
 	public int saveSchedule(Schedule schedule) {
 		Query query = entityManager.createQuery(
-				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
-						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, guestPermissionFlg,delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :guestPermissionFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
 		query.setParameter("scheduleCode", schedule.getScheduleCode());
 		query.setParameter("groupCode", schedule.getGroupCode());
 		query.setParameter("userCode", schedule.getUserCode());
@@ -103,6 +93,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("allDayFlg", schedule.getAllDayFlg());
 		query.setParameter("repeatType", schedule.getRepeatType());
 		query.setParameter("repeatUntil", schedule.getRepeatUntil());
+		query.setParameter("repeatDayOfWeek", schedule.getRepeatDayOfWeek());
+		query.setParameter("repeatTypeOfMonth", schedule.getRepeatTypeOfMonth());
 		query.setParameter("scheduleDisplayFlg", schedule.getScheduleDisplayFlg());
 		query.setParameter("location", schedule.getLocation());
 		query.setParameter("meetLink", schedule.getMeetLink());
@@ -111,14 +103,16 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("otherVisibilityFlg", schedule.getOtherVisibilityFlg());
 		query.setParameter("eventFlg", schedule.getEventFlg());
 		query.setParameter("scheduleStatusFlg", schedule.getScheduleStatusFlg());
+		query.setParameter("guestPermissionFlg", schedule.getGuestPermissionFlg());
 		query.setParameter("delFlg", schedule.getDelFlg());
 		query.setParameter("createdBy", schedule.getCreatedBy());
 		query.setParameter("createdAt", schedule.getCreatedAt());
 		query.setParameter("updatedBy", schedule.getUpdatedBy());
 		query.setParameter("updatedAt", schedule.getUpdatedAt());
 		query.executeUpdate();
-		
-		return (int) entityManager.createQuery("SELECT MAX(id) FROM Schedule ORDER BY scheduleCode DESC").getSingleResult();
+
+		return (int) entityManager.createQuery("SELECT MAX(id) FROM Schedule ORDER BY scheduleCode DESC")
+				.getSingleResult();
 	}
 
 	@Override

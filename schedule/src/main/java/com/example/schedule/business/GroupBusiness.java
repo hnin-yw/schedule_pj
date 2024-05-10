@@ -51,7 +51,7 @@ public class GroupBusiness {
 		group.setUpdatedBy(userCode);
 		Group dbGroup = groupService.save(group);
 		if (dbGroup != null) {
-			sucMsgLists.add("グループは正常に更新されました。");
+			sucMsgLists.add("グループは正常に登録されました。");
 		}
 		msgLists.put("messages", sucMsgLists);
 		return msgLists;

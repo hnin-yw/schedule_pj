@@ -20,16 +20,17 @@ request.setAttribute("title", "List User");
 				</div>
 
 				<table class="table table-bordered" style="maring-top: 10px;">
-					<thead>
+					<thead class="tbl-header-ft">
 						<tr>
 							<th><b>ユーザ名</b></th>
 							<th><b>ユーザの名</b></th>
 							<th><b>ユーザの姓</b></th>
 							<th><b>グループ名</b></th>
+							<th><b>メール</b></th>
 							<th></th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="tbl-body-ft">
 						<c:choose>
 							<c:when test="${listUsers.getTotalElements() > 0}">
 								<c:forEach items="${listUsers.content}" var="user">
@@ -38,6 +39,7 @@ request.setAttribute("title", "List User");
 										<td>${user.getUserFirstName()}</td>
 										<td>${user.getUserLastName()}</td>
 										<td>${user.getGroup().getGroupName()}</td>
+										<td>${user.getEmail()}</td>
 
 										<td><a href="/schedule/users/edit/${user.getId()}">
 												<button type="button" class="btn btn-primary">編集</button>
@@ -50,7 +52,7 @@ request.setAttribute("title", "List User");
 							</c:when>
 							<c:otherwise>
 								<tr>
-									<td colspan="5">ユーザレコードはありません.</td>
+									<td colspan="6">ユーザレコードはありません.</td>
 								</tr>
 
 							</c:otherwise>

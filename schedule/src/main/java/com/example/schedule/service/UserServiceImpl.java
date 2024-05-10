@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<User> getUserLists() {
+		return userDao.getUserLists();
+	}
+
+	@Override
 	public Page<User> findAlls(Pageable pageable) {
 		return userDao.getAlls(pageable);
 	}

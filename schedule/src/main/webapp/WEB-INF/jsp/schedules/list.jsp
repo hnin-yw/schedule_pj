@@ -45,15 +45,15 @@ if (c != null) {
 				            <th scope="col" rowspan="2" style="width: 2%;"></th>
 				            <th scope="col" rowspan="2" style="width: 2%;"></th>
 				            <th scope="col" colspan="2" style="width: 47%;">イベント開始日時 ~ 終了日時</th>
-				            <th scope="col" rowspan="2" style="width: 4%;"><b>作成者</b></th>
-				            <th scope="col" colspan="2" style="width: 16%;"><b>繰り返しタイプ</b></th>
-				            <th scope="col" rowspan="2" style="width: 8%;"><b>タイプ</b></th>
-				            <th scope="col" rowspan="2" style="width: 19%;"></th>
+				            <th scope="col" rowspan="2" style="width: 4%;">作成者</th>
+				            <th scope="col" colspan="2" style="width: 16%;">繰り返しタイプ</th>
+				            <th scope="col" rowspan="2" style="width: 8%;">タイプ</th>
+				            <th scope="col" rowspan="2" style="width: 19%;">アクション</th>
 				        </tr>
 				        <tr>
-				            <th><b>スケジュールタイトル</b></th>
-				            <th><b>説明</b></th>
-				            <th><b>繰り返す終了日付</b></th>
+				            <th>スケジュールタイトル</th>
+				            <th>説明</th>
+				            <th>繰り返す終了日付</th>
 				        </tr>
 				    </thead>
 				  <tbody class="tbl-body-ft">

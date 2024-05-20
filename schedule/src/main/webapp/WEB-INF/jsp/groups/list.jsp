@@ -22,8 +22,8 @@ request.setAttribute("title", "List Group");
 				<table class="table table-bordered" style="maring-top: 10px;">
 					<thead class="tbl-header-ft">
 						<tr>
-							<th><b> グループ名 </b></th>
-							<th></th>
+							<th> グループ名 </th>
+							<th>アクション</th>
 						</tr>
 					</thead>
 					<tbody class="tbl-body-ft">

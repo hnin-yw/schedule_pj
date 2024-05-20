@@ -22,12 +22,12 @@ request.setAttribute("title", "List User");
 				<table class="table table-bordered" style="maring-top: 10px;">
 					<thead class="tbl-header-ft">
 						<tr>
-							<th><b>ユーザ名</b></th>
-							<th><b>ユーザの名</b></th>
-							<th><b>ユーザの姓</b></th>
-							<th><b>グループ名</b></th>
-							<th><b>メール</b></th>
-							<th></th>
+							<th>ユーザ名</th>
+							<th>ユーザの名</th>
+							<th>ユーザの姓</th>
+							<th>グループ名</th>
+							<th>メール</th>
+							<th>アクション</th>
 						</tr>
 					</thead>
 					<tbody class="tbl-body-ft">

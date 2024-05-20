@@ -77,6 +77,18 @@ thead {
 	font-size: 13px !important;
 }
 
+.tbl-header-ft {
+  font-weight: bold;
+}
+
 tbody {
 	font-size: 12px !important;
+}
+
+table {
+  border: 1px black !important;
+}
+
+th {
+  background-color: #cee2f5 !important;
 }

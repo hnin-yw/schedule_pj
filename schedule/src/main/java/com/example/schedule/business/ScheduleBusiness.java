@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.schedule.Consts;
+import com.example.schedule.MyUserDetails;
 import com.example.schedule.entity.*;
 import com.example.schedule.service.*;
 import jakarta.servlet.http.Cookie;
@@ -28,6 +29,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
@@ -45,8 +48,8 @@ public class ScheduleBusiness {
 	}
 
 	public Page<Schedule> list(Pageable pageable, HttpServletRequest request) {
-		String userCode = getUserUserCode(request);
-		String groupCode = getUserGroupCode(request);
+		String userCode = getUserUserCode();
+		String groupCode = getUserGroupCode();
 		Page<Schedule> listSchedules = scheduleService.findAlls(pageable, userCode, groupCode);
 		return listSchedules;
 	}
@@ -274,7 +277,7 @@ public class ScheduleBusiness {
 			throw new RuntimeException("Schedule to update doesn't exist");
 		}
 		updSchedule.setScheduleStatusFlg(true);
-		String userCode = getUserUserCode(request);
+		String userCode = getUserUserCode();
 		updSchedule.setUpdatedBy(userCode);
 		scheduleService.save(updSchedule);
 		return "redirect:/schedules";
@@ -294,7 +297,7 @@ public class ScheduleBusiness {
 			for (int j = 0; j < reminders.size(); j++) {
 				ScheduleReminder reminder = reminders.get(j);
 				reminder.setDelFlg(true);
-				String userCode = getUserUserCode(request);
+				String userCode = getUserUserCode();
 				reminder.setUpdatedBy(userCode);
 				scheduleReminderService.save(reminder);
 			}
@@ -305,13 +308,13 @@ public class ScheduleBusiness {
 			for (int j = 0; j < attendees.size(); j++) {
 				Attendee attendee = attendees.get(j);
 				attendee.setDelFlg(true);
-				String userCode = getUserUserCode(request);
+				String userCode = getUserUserCode();
 				attendee.setUpdatedBy(userCode);
 				attendeeService.save(attendee);
 			}
 		}
 		schedule.setDelFlg(true);
-		String userCode = getUserUserCode(request);
+		String userCode = getUserUserCode();
 		schedule.setUpdatedBy(userCode);
 		scheduleService.save(schedule);
 		return schedule.getScheduleCode();
@@ -400,30 +403,26 @@ public class ScheduleBusiness {
 		}
 	}
 
-	public String getUserGroupCode(HttpServletRequest request) {
-		String dataValue = null;
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("groupCode")) {
-					dataValue = cookie.getValue();
-				}
-			}
-		}
-		return dataValue;
+	public String getUserGroupCode() {
+		String groupCode = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && auth.getPrincipal() instanceof MyUserDetails) {
+	        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+	    	User user = userDetails.getUser();
+	    	groupCode = user.getGroupCode();
+	    }
+		return groupCode;
 	}
 
-	public String getUserUserCode(HttpServletRequest request) {
-		String dataValue = null;
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals("userCode")) {
-					dataValue = cookie.getValue();
-				}
-			}
-		}
-		return dataValue;
+	public String getUserUserCode() {
+		String userCode = null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if (auth != null && auth.getPrincipal() instanceof MyUserDetails) {
+	        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+	    	User user = userDetails.getUser();
+	    	userCode = user.getUserCode();
+	    }
+		return userCode;
 	}
 
 	public String getScheduleCode() {

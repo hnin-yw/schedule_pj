@@ -1,12 +1,14 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.schedule.Consts;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +18,14 @@ public class User {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "group_code", referencedColumnName = "group_code", insertable = false, updatable = false)
 	private Group group;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "users_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -90,7 +100,7 @@ public class User {
 
 	public User(int id, String groupCode, String userCode, String userName, String userFirstName, String userLastName,
 			String postCode, String address, String telNumber, String email, String password, Boolean delFlg,
-			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, Group group) {
+			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, Group group,List<Role> roles) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -107,6 +117,7 @@ public class User {
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
 		this.group = group;
+		this.roles = roles;
 	}
 
 	/*
@@ -246,6 +257,14 @@ public class User {
 
 	public void setGroup(Group group) {
 		this.group = group;
+	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
 	}
 
 	@PrePersist

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.example.schedule.business.*;
 import com.example.schedule.entity.*;
 
@@ -29,13 +32,15 @@ import org.springframework.validation.BindingResult;
 @RequestMapping("/groups")
 public class GroupController {
 	private final GroupBusiness groupBusiness;
+	private final UserBusiness userBusiness;
 
 	@Autowired
-	public GroupController(GroupBusiness groupBusiness) {
+	public GroupController(GroupBusiness groupBusiness, UserBusiness userBusiness) {
 		this.groupBusiness = groupBusiness;
+		this.userBusiness = userBusiness;
 	}
 
-	@GetMapping()
+	@GetMapping("")
 	public String list(@RequestParam(defaultValue = "0") int page, Model model) {
 		Page<Group> listGroups = groupBusiness.list(PageRequest.of(page, 15));
 		model.addAttribute("listGroups", listGroups);
@@ -46,6 +51,13 @@ public class GroupController {
 
 	@RequestMapping("/create")
 	public String create(Model model) {
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (!auth.isAuthenticated() || !auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
+//            //throw new AccessDeniedException("You don't have permission to access this page");
+
+//            return "auth_message";
+//        }
+		model.addAttribute("isAuthList", "/schedule/groups");
 		Group gp = new Group();
 		model.addAttribute("group", gp);
 
@@ -70,6 +82,7 @@ public class GroupController {
 		Group group = groupBusiness.findGroupById(id);
 
 		mav.addObject("group", group);
+		mav.addObject("isAuthList", "/schedule/groups");
 		return mav;
 	}
 

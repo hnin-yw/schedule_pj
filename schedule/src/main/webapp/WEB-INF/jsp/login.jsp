@@ -23,7 +23,7 @@
 							</div>
 						</c:if>
 						<div class="card-body">
-							<form action="schedule/login" method="post">
+							<form action="/login" method="post">
 								<div class="form-group">
 									<label for="email"> ユーザ名 :</label> <input type="text"
 										class="form-control" id="userName" name="userName"

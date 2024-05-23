@@ -13,11 +13,17 @@ public interface UserDao {
 
 	User findUserById(int id);
 
-	User save(User user);
+	//User save(User user);
+
+	int save(User user);
+
+	int updateUser(User user);
 
 	void deleteById(int id);
 
 	User findUserCodeByDesc();
+	
+	User findUserByUserName(String userName);
 
 	User findUserByLoginData(String userName,String password);
 

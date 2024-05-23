@@ -32,11 +32,13 @@ import org.springframework.validation.BindingResult;
 public class UserController {
 	private final UserBusiness userBusiness;
 	private final GroupBusiness groupBusiness;
+	private final RoleBusiness roleBusiness;
 
 	@Autowired
-	public UserController(UserBusiness userBusiness, GroupBusiness groupBusiness) {
+	public UserController(UserBusiness userBusiness, GroupBusiness groupBusiness, RoleBusiness roleBusiness) {
 		this.userBusiness = userBusiness;
 		this.groupBusiness = groupBusiness;
+		this.roleBusiness = roleBusiness;
 	}
 
 	@GetMapping()
@@ -50,12 +52,31 @@ public class UserController {
 
 	@RequestMapping("/create")
 	public String create(Model model) {
+		model.addAttribute("isAuthList", "/schedule/users");
 		List<Group> gpLists = groupBusiness.getGroupLists();
 		model.addAttribute("gpLists", gpLists);
+		List<Role> roleLists = roleBusiness.getRoleList();
+		model.addAttribute("roleLists", roleLists);
 		User user = new User();
 		model.addAttribute("user", user);
 
 		return "users/create";
+	}
+
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String save(Model model, @ModelAttribute("user") @Valid User user, BindingResult result,
+			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		if (result.hasErrors()) {
+			List<Group> gpLists = groupBusiness.getGroupLists();
+			model.addAttribute("gpLists", gpLists);
+			List<Role> roleLists = roleBusiness.getRoleList();
+			model.addAttribute("roleLists", roleLists);
+			return "users/create";
+		} else {
+			Map<String, ArrayList<String>> msgLists = userBusiness.saveUser(user);
+			redirectAttributes.addFlashAttribute("msgLists", msgLists);
+			return "redirect:/users";
+		}
 	}
 
 //	@RequestMapping(value = "/save", method = RequestMethod.POST)
@@ -72,18 +93,18 @@ public class UserController {
 //		}
 //	}
 
-	@PostMapping("/save")
-	@ResponseBody
-	public Map<String, String> save(@Valid @RequestBody User user, BindingResult result, HttpServletRequest request) {
-		Map<String, String> response = new HashMap<>();
-		if (result.hasErrors()) {
-			response.put("error", "検証が失敗しました。 入力内容をご確認ください。");
-		} else {
-			userBusiness.saveUser(user, request);
-			response.put("success", "ユーザは正常に更新されました。");
-		}
-		return response;
-	}
+//	@PostMapping("/save")
+//	@ResponseBody
+//	public Map<String, String> save(@Valid @RequestBody User user, BindingResult result, HttpServletRequest request) {
+//		Map<String, String> response = new HashMap<>();
+//		if (result.hasErrors()) {
+//			response.put("error", "検証が失敗しました。 入力内容をご確認ください。");
+//		} else {
+//			userBusiness.saveUser(user, request);
+//			response.put("success", "ユーザは正常に更新されました。");
+//		}
+//		return response;
+//	}
 
 	@RequestMapping("/edit/{id}")
 	public ModelAndView edit(@PathVariable(name = "id") int id) {
@@ -92,6 +113,9 @@ public class UserController {
 		mav.addObject("gpLists", gpLists);
 		User user = userBusiness.findUserById(id);
 		mav.addObject("user", user);
+		List<Role> roleLists = roleBusiness.getRoleList();
+		mav.addObject("roleLists", roleLists);
+		mav.addObject("isAuthList", "/schedule/users");
 
 		return mav;
 	}
@@ -104,7 +128,7 @@ public class UserController {
 			model.addAttribute("gpLists", gpLists);
 			return "users/edit";
 		} else {
-			Map<String, ArrayList<String>> msgLists = userBusiness.updateUser(user, request);
+			Map<String, ArrayList<String>> msgLists = userBusiness.updateUser(user);
 			redirectAttributes.addFlashAttribute("msgLists", msgLists);
 			return "redirect:/users";
 		}

@@ -36,10 +36,21 @@ public class UserServiceImpl implements UserService {
 		return userDao.findUserById(id);
 	}
 
+//	@Override
+//	@Transactional
+//	public User save(User user) {
+//		return userDao.save(user);
+//	}
 	@Override
 	@Transactional
-	public User save(User user) {
+	public int save(User user) {
 		return userDao.save(user);
+	}
+	
+	@Override
+	@Transactional
+	public int updateUser(User user) {
+		return userDao.updateUser(user);
 	}
 
 	@Override
@@ -54,6 +65,13 @@ public class UserServiceImpl implements UserService {
 	public User findUserCodeByDesc() {
 		return userDao.findUserCodeByDesc();
 	}
+
+	@Override
+	public User findUserByUserName(String userName) {
+		User user = userDao.findUserByUserName(userName);
+		return user;
+	}
+
 
 	@Override
 	public User findUserByLoginData(String userName, String password) {

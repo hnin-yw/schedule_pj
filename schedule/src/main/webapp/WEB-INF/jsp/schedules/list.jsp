@@ -20,6 +20,7 @@ if (c != null) {
 
 <c:set var="userCode" value="<%=userCode%>" />
 <c:set var="formatter" value="<%=formatter%>" />
+<%@ include file="/WEB-INF/jsp/var.jsp"%>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">

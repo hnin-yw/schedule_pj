@@ -62,14 +62,14 @@ public class ScheduleController {
 	public String create(Model model, HttpServletRequest request) {
 		List<User> userLists = userBusiness.getUserLists();
 		model.addAttribute("userLists", userLists);
-		String userCode = scheduleBusiness.getUserUserCode(request);
+		String userCode = scheduleBusiness.getUserUserCode();
 		model.addAttribute("userCode", userCode);
 
 		Schedule schedule = new Schedule();
 		schedule.setScheduleThemeColor("#FF4013");
 
 		schedule.setUserCode(userCode);
-		String groupCode = scheduleBusiness.getUserGroupCode(request);
+		String groupCode = scheduleBusiness.getUserGroupCode();
 		schedule.setGroupCode(groupCode);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String startDateTimeString = LocalDateTime.now().format(formatter);
@@ -93,7 +93,7 @@ public class ScheduleController {
 		if (result.hasErrors()) {
 			List<User> userLists = userBusiness.getUserLists();
 			model.addAttribute("userLists", userLists);
-			String userCode = scheduleBusiness.getUserGroupCode(request);
+			String userCode = scheduleBusiness.getUserGroupCode();
 			model.addAttribute("userCode", userCode);
 			return "schedules/create";
 		} else {
@@ -112,7 +112,7 @@ public class ScheduleController {
 
 		List<User> userLists = userBusiness.getUserLists();
 		mav.addObject("userLists", userLists);
-		String userCode = scheduleBusiness.getUserUserCode(request);
+		String userCode = scheduleBusiness.getUserUserCode();
 		mav.addObject("userCode", userCode);
 		schedule.setUpdatedBy(userCode);
 		return mav;
@@ -124,7 +124,7 @@ public class ScheduleController {
 		if (result.hasErrors()) {
 			List<User> userLists = userBusiness.getUserLists();
 			model.addAttribute("userLists", userLists);
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			model.addAttribute("userCode", userCode);
 
 			return "schedules/edit";

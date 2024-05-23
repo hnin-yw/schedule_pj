@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @ComponentScan(basePackages = { "com.example.schedule.business" })
 public class UserBusiness {
 	private final UserService userService;
+	private final RoleService roleService;
 	private final ScheduleService scheduleService;
 	private final ScheduleBusiness scheduleBusiness;
 
@@ -33,10 +35,12 @@ public class UserBusiness {
 	private ArrayList<String> sucMsgLists = new ArrayList<>();
 
 	@Autowired
-	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness) {
+	public UserBusiness(UserService userService, ScheduleService scheduleService, ScheduleBusiness scheduleBusiness,
+			RoleService roleService) {
 		this.userService = userService;
 		this.scheduleService = scheduleService;
 		this.scheduleBusiness = scheduleBusiness;
+		this.roleService = roleService;
 	}
 
 	public List<User> getUserLists() {
@@ -49,38 +53,51 @@ public class UserBusiness {
 		return listUsers;
 	}
 
-//	public Map<String, ArrayList<String>> saveUser(User user, HttpServletRequest request) {
-//		msgLists = new HashMap<>();
-//		sucMsgLists = new ArrayList<>();
+	public Map<String, ArrayList<String>> saveUser(User user) {
+		msgLists = new HashMap<>();
+		sucMsgLists = new ArrayList<>();
+		user.setPassword(toHexString(encodePassword(user.getPassword())));
+		user.setUserCode(this.getUserCode());
+		user.setDelFlg(false);
+		user.setCreatedAt(LocalDateTime.now());
+		user.setUpdatedAt(LocalDateTime.now());
+		String userCode = scheduleBusiness.getUserUserCode();
+		user.setCreatedBy(userCode);
+		user.setUpdatedBy(userCode);
+		int id = userService.save(user);
+		List<Role> roles = user.getRoles();
+		if (roles.size() > 0) {
+			for (int j = 0; j < roles.size(); j++) {
+				UserRole userRole = new UserRole();
+				Role role = roles.get(j);
+				userRole.setUserId(id);
+				userRole.setRoleId(role.getId());
+				roleService.saveUserRoles(userRole);
+			}
+		}
+
+		sucMsgLists.add("グループは正常に更新されました。");
+
+		msgLists.put("messages", sucMsgLists);
+		return msgLists;
+	}
+
+//	public String saveUser(User user, HttpServletRequest request) {
 //		user.setPassword(toHexString(encodePassword(user.getPassword())));
 //		user.setUserCode(this.getUserCode());
-//		String userCode = scheduleBusiness.getUserUserCode(request);
+//		String userCode = scheduleBusiness.getUserUserCode();
 //		user.setCreatedBy(userCode);
 //		user.setUpdatedBy(userCode);
 //		User dbUser = userService.save(user);
-//		if (dbUser != null) {
-//			sucMsgLists.add("グループは正常に更新されました。");
-//		}
-//		msgLists.put("messages", sucMsgLists);
-//		return msgLists;
+//		return dbUser.getUserCode();
 //	}
-
-	public String saveUser(User user, HttpServletRequest request) {
-		user.setPassword(toHexString(encodePassword(user.getPassword())));
-		user.setUserCode(this.getUserCode());
-		String userCode = scheduleBusiness.getUserUserCode(request);
-		user.setCreatedBy(userCode);
-		user.setUpdatedBy(userCode);
-		User dbUser = userService.save(user);
-		return dbUser.getUserCode();
-	}
 
 	public User findUserById(int id) {
 		User User = userService.findUserById(id);
 		return User;
 	}
 
-	public Map<String, ArrayList<String>> updateUser(User user, HttpServletRequest request) {
+	public Map<String, ArrayList<String>> updateUser(User user) {
 		msgLists = new HashMap<>();
 		errMsgLists = new ArrayList<>();
 		sucMsgLists = new ArrayList<>();
@@ -99,9 +116,25 @@ public class UserBusiness {
 			updUser.setAddress(user.getAddress());
 			updUser.setTelNumber(user.getTelNumber());
 			updUser.setEmail(user.getEmail());
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			updUser.setUpdatedBy(userCode);
-			userService.save(updUser);
+			updUser.setUpdatedAt(LocalDateTime.now());
+
+			userService.updateUser(updUser);
+
+			if (updUser.getRoles().size() > 0) {
+				roleService.deleteUserRolesByUserId(user.getId());
+			}
+			List<Role> roles = user.getRoles();
+			if (roles != null && roles.size() > 0) {
+				for (int j = 0; j < roles.size(); j++) {
+					UserRole userRole = new UserRole();
+					Role role = roles.get(j);
+					userRole.setUserId(user.getId());
+					userRole.setRoleId(role.getId());
+					roleService.saveUserRoles(userRole);
+				}
+			}
 			sucMsgLists.add("ユーザは正常に更新されました。");
 			msgLists.put("messages", sucMsgLists);
 		} else {
@@ -122,7 +155,7 @@ public class UserBusiness {
 			errMsgLists.add("ユーザが見つかりません。");
 		} else {
 			List<Schedule> schedules = scheduleService.findScheduleListByUserCode(user.getUserCode());
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			if (schedules.size() > 0 || userCode.equals(user.getUserCode())) {
 				isError = true;
 				errMsgLists.add("このユーザは削除できません。");
@@ -130,7 +163,7 @@ public class UserBusiness {
 		}
 		if (!isError) {
 			user.setDelFlg(true);
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			user.setUpdatedBy(userCode);
 			userService.save(user);
 			sucMsgLists.add("ユーザは正常に削除されました。");

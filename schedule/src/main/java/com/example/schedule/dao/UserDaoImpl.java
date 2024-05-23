@@ -39,7 +39,8 @@ public class UserDaoImpl implements UserDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<User> getAlls(Pageable pageable) {
-		Query query = entityManager.createQuery("SELECT COUNT(u) FROM User u WHERE u.delFlg = false ORDER BY u.userCode DESC");
+		Query query = entityManager
+				.createQuery("SELECT COUNT(u) FROM User u WHERE u.delFlg = false ORDER BY u.userCode DESC");
 		long total = (long) query.getSingleResult();
 
 		query = entityManager.createQuery("FROM User WHERE delFlg = false ORDER BY userCode DESC");
@@ -56,11 +57,64 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	// add to the database
+//	@Override
+//	public User save(User user) {
+//		User userdb = entityManager.merge(user);
+//		user.setId(userdb.getId());
+//		return user;
+//	}
+
+	// add to the database
 	@Override
-	public User save(User user) {
-		User userdb = entityManager.merge(user);
-		user.setId(userdb.getId());
-		return user;
+	public int save(User user) {
+		Query query = entityManager.createQuery(
+				"INSERT INTO User (userCode, groupCode, userName, userFirstName, userLastName, postCode, address, telNumber, email, password, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:userCode, :groupCode, :userName, :userFirstName, :userLastName, :postCode, :address, :telNumber, :email, :password, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+		query.setParameter("userCode", user.getUserCode());
+		query.setParameter("groupCode", user.getGroupCode());
+		query.setParameter("userName", user.getUserName());
+		query.setParameter("userFirstName", user.getUserFirstName());
+		query.setParameter("userLastName", user.getUserLastName());
+		query.setParameter("postCode", user.getPostCode());
+		query.setParameter("address", user.getAddress());
+		query.setParameter("telNumber", user.getTelNumber());
+		query.setParameter("email", user.getEmail());
+		query.setParameter("password", user.getPassword());
+
+		query.setParameter("delFlg", user.getDelFlg());
+		query.setParameter("createdBy", user.getCreatedBy());
+		query.setParameter("createdAt", user.getCreatedAt());
+		query.setParameter("updatedBy", user.getUpdatedBy());
+		query.setParameter("updatedAt", user.getUpdatedAt());
+		query.executeUpdate();
+
+		return (int) entityManager.createQuery("SELECT MAX(id) FROM User ORDER BY userCode DESC").getSingleResult();
+	}
+
+	// add to the database
+	@Override
+	public int updateUser(User user) {
+		Query query = entityManager.createQuery(
+				"UPDATE User SET groupCode =: groupCode, userFirstName =: userFirstName, userLastName =: userLastName, postCode =: postCode, address =: address, telNumber =: telNumber, email =: email, updatedBy =: updatedBy, updatedAt =: updatedAt WHERE id=: userId");
+		// query.setParameter("userCode", user.getUserCode());
+		query.setParameter("groupCode", user.getGroupCode());
+		// query.setParameter("userName", user.getUserName());
+		query.setParameter("userFirstName", user.getUserFirstName());
+		query.setParameter("userLastName", user.getUserLastName());
+		query.setParameter("postCode", user.getPostCode());
+		query.setParameter("address", user.getAddress());
+		query.setParameter("telNumber", user.getTelNumber());
+		query.setParameter("email", user.getEmail());
+		// query.setParameter("password", user.getPassword());
+
+		// query.setParameter("delFlg", user.getDelFlg());
+		// query.setParameter("createdBy", user.getCreatedBy());
+		// query.setParameter("createdAt", user.getCreatedAt());
+		query.setParameter("updatedBy", user.getUpdatedBy());
+		query.setParameter("updatedAt", user.getUpdatedAt());
+		query.setParameter("userId", user.getId());
+		query.executeUpdate();
+		return user.getId();
 	}
 
 	@Override
@@ -89,6 +143,20 @@ public class UserDaoImpl implements UserDao {
 				.createQuery("from User WHERE userName=:userName and password =: password and delFlg = false");
 		query.setParameter("userName", username);
 		query.setParameter("password", password);
+		List<User> users = query.getResultList();
+		if (users.isEmpty()) {
+			return null;
+		} else {
+			return users.get(0);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public User findUserByUserName(String username) {
+		String queryString = "from User WHERE userName=:userName AND delFlg = false";
+		Query query = entityManager.createQuery(queryString, User.class);
+		query.setParameter("userName", username);
 		List<User> users = query.getResultList();
 		if (users.isEmpty()) {
 			return null;

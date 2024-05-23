@@ -13,11 +13,17 @@ public interface UserService {
 
 	public User findUserById(int id);
 
-	public User save(User User);
+	//public User save(User User);
+	
+	public int save(User User);
+	
+	public int updateUser(User User);
 
 	public int deleteById(int id);
 
 	public User findUserCodeByDesc();
+
+	public User findUserByUserName(String userName);
 
 	User findUserByLoginData(String userName,String password);
 

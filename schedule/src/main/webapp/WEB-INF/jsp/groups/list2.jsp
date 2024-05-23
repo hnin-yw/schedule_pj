@@ -7,7 +7,6 @@
 <%
 request.setAttribute("title", "List Group");
 %>
-<%@ include file="/WEB-INF/jsp/var.jsp"%>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -17,8 +16,20 @@ request.setAttribute("title", "List Group");
 			<h2 class="text-center">グループ一覧</h2>
 			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="col-sm-12">
+				<sec:authorize access="isAuthenticated()">
+					<p>
+						Welcome,
+						<sec:authentication property="name" />
+						!
+					</p>
+					<p>Your roles are:</p>
+					<sec:authentication property="authorities" var="authorities" />
+					<c:forEach items="${authorities}" var="auth">
+						<h3>Each- ${auth.authority}</h3>
+					</c:forEach>
+				</sec:authorize>
 				<div class="up-btn-gp">
-					<sec:authorize access="hasAnyRole('ADMIN', 'USER')">
+					<sec:authorize access="hasAnyRole('ADMIN','CREATOR')">
 						<a href="/schedule/groups/create">
 							<button type="button" class="btn btn-primary">グループを登録</button>
 						</a>
@@ -29,9 +40,7 @@ request.setAttribute("title", "List Group");
 					<thead class="tbl-header-ft">
 						<tr>
 							<th>グループ名</th>
-							<sec:authorize access="hasAnyRole('ADMIN', 'USER')">
-								<th>アクション</th>
-							</sec:authorize>
+							<th>アクション</th>
 						</tr>
 					</thead>
 					<tbody class="tbl-body-ft">
@@ -41,20 +50,13 @@ request.setAttribute("title", "List Group");
 									<tr>
 										<td>${group.getGroupName()}</td>
 
-										<sec:authorize access="hasAnyRole('ADMIN', 'USER')">
-											<td style="width: 20%;"><c:if
-													test="${isAdmin || isUser && group.getCreatedBy() == userCode}">
-													<a href="/schedule/groups/edit/${group.getId()}">
-														<button type="submit" class="btn btn-primary">編集</button>
-													</a>
-												</c:if>
-												<c:if
-													test="${isAdmin || isUser && group.getCreatedBy() == userCode}">
-													<button type="button" data-gpid="${group.getId()}"
-														id="btnGroupDelete" class="btn btn-danger"
-														data-toggle="modal" data-target="#deleteConfirmModel">削除</button>
-												</c:if></td>
-										</sec:authorize>
+										<td style="width: 20%;"><a
+											href="/schedule/groups/edit/${group.getId()}">
+												<button type="submit" class="btn btn-primary">編集</button>
+										</a>
+											<button type="button" data-gpid="${group.getId()}"
+												id="btnGroupDelete" class="btn btn-danger"
+												data-toggle="modal" data-target="#deleteConfirmModel">削除</button></td>
 									</tr>
 								</c:forEach>
 							</c:when>

@@ -13,31 +13,31 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
-public class HomeController {
-	private final UserBusiness userBusiness;
+@RequestMapping("/")
+public class LoginController {
+    private final UserBusiness userBusiness;
 
-	@Autowired
-	public HomeController(UserBusiness userBusiness) {
-		this.userBusiness = userBusiness;
-	}
+    @Autowired
+    public LoginController(UserBusiness userBusiness) {
+        this.userBusiness = userBusiness;
+    }
 
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String login() {
-		return "login";
-	}
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login() {    	
+        return "login";
+    }
 
-	@RequestMapping(value = "schedule/login", method = RequestMethod.POST)
-	public String showWelcomePage(User user, RedirectAttributes redirectAttributes, HttpServletResponse response) {
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String showWelcomePage(User user, RedirectAttributes redirectAttributes, HttpServletResponse response) {
+        Boolean isLoginFail = userBusiness.login(user, response);
 
-		Boolean isLoginFail = userBusiness.login(user, response);
-
-		if (isLoginFail) {
-			redirectAttributes.addFlashAttribute("error", "ユーザー名またはパスワードが正しくありません！");
-			return "redirect:/";
-		} else {
-			return "redirect:/schedules";
-		}
-	}
+        if (isLoginFail) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名またはパスワードが正しくありません！");
+            return "redirect:/login";
+        } else {
+            return "redirect:/schedules";
+        }
+    }
 
 	@RequestMapping(value = "/main_menu", method = RequestMethod.GET)
 	public String menu() {

@@ -46,7 +46,7 @@ public class GroupBusiness {
 		msgLists = new HashMap<>();
 		sucMsgLists = new ArrayList<>();
 		group.setGroupCode(this.getGroupCode());
-		String userCode = scheduleBusiness.getUserUserCode(request);
+		String userCode = scheduleBusiness.getUserUserCode();
 		group.setCreatedBy(userCode);
 		group.setUpdatedBy(userCode);
 		Group dbGroup = groupService.save(group);
@@ -74,7 +74,7 @@ public class GroupBusiness {
 		}
 		if (!isError) {
 			updGroup.setGroupName(group.getGroupName());
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			updGroup.setUpdatedBy(userCode);
 			groupService.save(updGroup);
 			sucMsgLists.add("グループは正常に更新されました。");
@@ -104,7 +104,7 @@ public class GroupBusiness {
 		}
 		if (!isError) {
 			gp.setDelFlg(true);
-			String userCode = scheduleBusiness.getUserUserCode(request);
+			String userCode = scheduleBusiness.getUserUserCode();
 			gp.setUpdatedBy(userCode);
 			groupService.save(gp);
 			sucMsgLists.add("グループは正常に削除されました。");

@@ -4,6 +4,7 @@
 <%
 request.setAttribute("title", "List User");
 %>
+<%@ include file="/WEB-INF/jsp/var.jsp"%>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
@@ -14,9 +15,11 @@ request.setAttribute("title", "List User");
 			<%@ include file="/WEB-INF/jsp/message.jsp"%>
 			<div class="col-sm-12">
 				<div class="up-btn-gp">
-					<a href="/schedule/users/create">
-						<button type="button" class="btn btn-primary">ユーザ登録</button>
-					</a>
+					<sec:authorize access="hasAnyRole('ADMIN', 'USER')">
+						<a href="/schedule/users/create">
+							<button type="button" class="btn btn-primary">ユーザ登録</button>
+						</a>
+					</sec:authorize>
 				</div>
 
 				<table class="table table-bordered" style="maring-top: 10px;">
@@ -27,7 +30,11 @@ request.setAttribute("title", "List User");
 							<th>ユーザの姓</th>
 							<th>グループ名</th>
 							<th>メール</th>
-							<th>アクション</th>
+
+							<sec:authorize
+								access="hasAnyRole('ADMIN', 'USER')">
+								<th>アクション</th>
+							</sec:authorize>
 						</tr>
 					</thead>
 					<tbody class="tbl-body-ft">
@@ -40,13 +47,21 @@ request.setAttribute("title", "List User");
 										<td>${user.getUserLastName()}</td>
 										<td>${user.getGroup().getGroupName()}</td>
 										<td>${user.getEmail()}</td>
-
-										<td><a href="/schedule/users/edit/${user.getId()}">
-												<button type="button" class="btn btn-primary">編集</button>
-										</a>
-											<button type="button" data-userid="${user.getId()}"
-												id="btnUserDelete" class="btn btn-danger"
-												data-toggle="modal" data-target="#deleteConfirmModel">削除</button></td>
+										<sec:authorize access="hasAnyRole('ADMIN', 'USER')">
+											<td>
+												<c:if test="${isAdmin || isUser && user.getCreatedBy() == userCode}">
+													<a href="/schedule/users/edit/${user.getId()}">
+														<button type="button" class="btn btn-primary">編集</button>
+													</a>
+												</c:if> 
+												<c:if
+													test="${isAdmin || isUser && user.getCreatedBy() == userCode}">
+													<button type="button" data-userid="${user.getId()}"
+														id="btnUserDelete" class="btn btn-danger"
+														data-toggle="modal" data-target="#deleteConfirmModel">削除
+													</button>
+												</c:if></td>
+										</sec:authorize>
 									</tr>
 								</c:forEach>
 							</c:when>

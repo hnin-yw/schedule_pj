@@ -3,6 +3,8 @@ package com.example.schedule.entity;
 import java.time.LocalDateTime;
 
 import com.example.schedule.Consts;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,12 +31,16 @@ public class Group {
 	@Column(name = "created_by")
 	private String createdBy;
 
+	@JsonProperty("createdAt")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Column(name = "updated_by")
 	private String updatedBy;
 
+	@JsonProperty("updatedAt")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 

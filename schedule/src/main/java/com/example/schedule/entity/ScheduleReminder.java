@@ -7,10 +7,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "schedule_reminders")
 public class ScheduleReminder {
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "schedule_id", insertable = false, updatable = false)
-	private Schedule schedule;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
@@ -47,7 +43,7 @@ public class ScheduleReminder {
 
 	public ScheduleReminder(int id, int scheduleId, int scheduleReminderTime, String scheduleReminderType,
 			Boolean notiMethodFlg, Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy,
-			LocalDateTime updatedAt,Schedule schedule) {
+			LocalDateTime updatedAt) {
 		this.id = id;
 		this.scheduleId = scheduleId;
 		this.scheduleReminderTime = scheduleReminderTime;
@@ -58,7 +54,6 @@ public class ScheduleReminder {
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
-		this.schedule = schedule;
 	}
 
 	/*
@@ -142,14 +137,6 @@ public class ScheduleReminder {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	public Schedule getSchedule() {
-		return schedule;
-	}
-
-	public void setSchedule(Schedule schedule) {
-		this.schedule = schedule;
 	}
 
 	@PrePersist

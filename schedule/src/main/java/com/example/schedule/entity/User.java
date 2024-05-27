@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.schedule.Consts;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -86,12 +87,16 @@ public class User {
 	@Column(name = "created_by")
 	private String createdBy;
 
+	@JsonProperty("createdAt")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Column(name = "updated_by")
 	private String updatedBy;
 
+	@JsonProperty("updatedAt")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 

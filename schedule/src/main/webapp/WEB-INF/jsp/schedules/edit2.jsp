@@ -76,14 +76,14 @@ request.setAttribute("title", "Edit schedule");
 							</div>
 							<div class="col-sm-3">
 								<div class="panel cus_left-panel">
-									<label for="eventFlg"> スケジュールタイプ</label> <input type="hidden"
-										name="eventFlg" value="${schedule.getEventFlg()}"> <select
-										name="eventFlg" class="form-control"
+									<label for="task"> スケジュールタイプ</label> <input type="hidden"
+										name="task" value="${schedule.getIsTask()}"> <select
+										name="task" class="form-control"
 										onchange="onEventChange(this)" disabled="disabled">
 										<option value="1"
-											<c:if test="${schedule.getEventFlg() == '1'}">selected</c:if>>イベント</option>
+											<c:if test="${schedule.getIsTask() == '0'}">selected</c:if>>イベント</option>
 										<option value="0"
-											<c:if test="${schedule.getEventFlg() == '0'}">selected</c:if>>タスク</option>
+											<c:if test="${schedule.getIsTask() == '1'}">selected</c:if>>タスク</option>
 									</select> <br> ${reminder.getOtherVisibilityFlg()} <label
 										for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">

@@ -23,6 +23,8 @@ public interface ScheduleDao {
 
 	Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode);
 
+	List<Schedule> findAllSchedules(String userCode, String groupCode);
+
 	Schedule findScheduleCodeByDesc();
 
 	int saveSchedule(Schedule schedule);

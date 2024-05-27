@@ -3,90 +3,85 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
-request.setAttribute("title", "Edit schedule");
+request.setAttribute("title", "スケジュールの編集");
 %>
-<c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
-<c:set var="startDateTimeString" value="${schedule.getStartDateTimeString()}" />
-<c:set var="repeatTypeOfMonth" value="${schedule.getRepeatTypeOfMonth()}" />
+<c:set var="startDateTimeString"
+	value="${schedule.getStartDateTimeString()}" />
+<c:set var="startDateTimeString"
+	value="${schedule.getStartDateTimeString()}" />
+<c:set var="repeatTypeOfMonth"
+	value="${schedule.getRepeatTypeOfMonth()}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
 <div class="container-fluid">
 	<div class="row content">
-		<%@ include file="/WEB-INF/jsp/header_menu.jsp"%>
-		<%@ include file="/WEB-INF/jsp/nav_bar.jsp"%>
-		<div class="col-sm-10 content_body">
+		<div class="col-sm-12 content_body">
 			<h2 class="text-center">スケジュールの編集</h2>
 			<div class="card">
 				<form:form action='/schedule/schedules/update' method='post'
-					modelAttribute="schedule">
+					modelAttribute="schedule" id="FrmSubmit">
 					<div class="card-body">
 						<div class="row">
-							<input type="hidden" id="userCode" name="userCode" value="${schedule.getUserCode()}">
-							<input type="hidden" id="groupCode" name="groupCode" value="${schedule.getGroupCode()}">
-							<input type="hidden" id="allDayFlg" name="allDayFlg" value="${schedule.getAllDayFlg() ? 1 : 0}"/> 
-							<input type="hidden" name="eventFlg" value="${schedule.getEventFlg()}">
-							<input type="hidden" id="guestPermissionFlg" name="guestPermissionFlg" value="${schedule.getGuestPermissionFlg() ? 1 : 0}"/>
-							<input type='hidden' id='id' name='id' value="${schedule.getId()}"/>
-							<input type='hidden' id='scheduleCode' name='scheduleCode' value="${schedule.getScheduleCode()}"/> 
-							<input type='hidden' id='delFlg' name='delFlg' value="${schedule.getDelFlg() ? 1 : 0}"/>  
-							<input type='hidden' id='createdBy' name='createdBy' value="${schedule.getCreatedBy()}"/> 
-							<input type='hidden' id='createdAt' name='createdAt' value="${schedule.getCreatedAt()}"/> 
-							<input type='hidden' id='updatedBy' name='updatedBy' value="${schedule.getUpdatedBy()}"/> 
-							<input type='hidden' id='updatedAt' name='updatedAt' value="${schedule.getUpdatedAt()}"/> 
-							<input type='hidden' id='indexArray' name='indexArray' value="${schedule.getIndexArray()}"/> 
-							<input type='hidden' id='actualIndexArray' name='actualIndexArray' value="0,1,2,3,4"/> 
+							<input type="hidden" id="userCode" name="userCode" value="${schedule.getUserCode()}"> 
+							<input type="hidden" id="groupCode" name="groupCode" value="${schedule.getGroupCode()}"> 
+							<input type="hidden" id="allDayFlg" name="allDay" value="${schedule.getAllDay() ? 1 : 0}" /> 
+							<input type="hidden" name="isTask" value="${schedule.getIsTask()}"> 
+							<input type="hidden" id="guestPermissionFlg" name="guestPermissionFlg" value="${schedule.getGuestPermissionFlg() ? 1 : 0}" /> 
+							<input type='hidden' id='id' name='id' value="${schedule.getId()}" />
+							<input type='hidden' id='scheduleCode' name='scheduleCode' value="${schedule.getScheduleCode()}" /> 
+							<input type='hidden' id='delFlg' name='delFlg' value="${schedule.getDelFlg() ? 1 : 0}" /> 
+							<input type='hidden' id='createdBy' name='createdBy' value="${schedule.getCreatedBy()}" /> 
+							<input type='hidden' id='createdAt' name='createdAt' value="${schedule.getCreatedAt()}" /> 
+							<input type='hidden' id='updatedBy' name='updatedBy' value="${schedule.getUpdatedBy()}" /> 
+							<input type='hidden' id='updatedAt' name='updatedAt' value="${schedule.getUpdatedAt()}" /> 
+							<input type='hidden' id='indexArray' name='indexArray' value="${schedule.getIndexArray()}" /> 
+							<input type='hidden' id='actualIndexArray' name='actualIndexArray' value="0,1,2,3,4" />
 						</div>
 						<div class="row">
 							<div class="col-sm-9">
 								<div class="form-group col-sm-12">
-									<span style="color:red"><i class="bi bi-exclamation-triangle"></i><b> このスケジュールとその後のすべてのスケジュールが更新されます。</b></span>
-									<br><br>
-									<label for="scheduleTitle"> スケジュールタイトル :</label> <input
-										type="text" id="scheduleTitle" name="scheduleTitle"
-										placeholder="スケジュールタイトル"
-										value="${schedule.getScheduleTitle()}" class="form-control "><span><form:errors
-											path="scheduleTitle" style="color:red" /></span>
+									<span style="color: red"><i
+										class="bi bi-exclamation-triangle"></i><b>
+											このスケジュールとその後のすべてのスケジュールが更新されます。</b></span> <br> <br> <label
+										for="title"> スケジュールタイトル :</label> <input type="text"
+										id="title" name="title" placeholder="スケジュールタイトル"
+										value="${schedule.getTitle()}" class="form-control "><span
+										id="titleError" class="error" style="color: red;"></span>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-4">
 										<label for="startDateTimeString"> スケジュールの開始日時 :</label> <input
-											type="text" class="form-control" id="startDateTimeString"
+											type="text" class="form-control" id="start"
 											name="startDateTimeString"
 											value="${schedule.getStartDateTimeString()}"
 											placeholder="YYYY-MM-DD HH:mm:ss" />
-											<span id="startDateTimeStringError" style="color:red;display:none;">スケジュール開始日時は必須です。</span>
+											<span id="startError" class="error" style="color: red;"></span>
 									</div>
 									<div class="col-sm-4">
 										<label for="endDateTimeString"> スケジュールの終了日時 :</label> <input
-											type="text" class="form-control" id="endDateTimeString"
+											type="text" class="form-control" id="end"
 											name="endDateTimeString"
 											value="${schedule.getEndDateTimeString()}"
-											placeholder="YYYY-MM-DD HH:mm:ss" />
-											<span id="endDateTimeStringError" style="color:red;display:none;">スケジュール終了日時は必須です。</span>
-									</div>
-									<div class="col-sm-12">
-									    <span style="color:red; display: none;" id="dateCompareError">スケジュールの開始日時は、終了日時よりも前の日時にする必要があります。</span>
+											placeholder="YYYY-MM-DD HH:mm:ss" /><span
+											id="endError" class="error" style="color: red;"></span>
 									</div>
 								</div>
 								<div class="form-group col-sm-12" style="margin-top: 10px;">
-									<label for="scheduleThemeColor">スケジュールテーマカラー </label><input
-										type="color" class="custom-color_box" id="scheduleThemeColor"
-										name="scheduleThemeColor"
-										value="${schedule.getScheduleThemeColor()}"
-										class="form-control ">
+									<label for="color">スケジュールテーマカラー </label><input type="color"
+										class="custom-color_box" id="color" name="color"
+										value="${schedule.getColor()}" class="form-control ">
 								</div>
 
 								<div class="form-group">
 									<div class="col-sm-2" style="margin-top: 20px;">
-										<input
-											type="checkbox" class="custom-checkbox" id="allDayFlgChk"
-											onchange="onAllDayFlgChange(this)"
-											<c:if test="${schedule.getAllDayFlg()}">checked</c:if>>
+										<input type="checkbox" class="custom-checkbox"
+											id="allDayFlgChk"
+											<c:if test="${schedule.getAllDay()}">checked</c:if>>
 										<label for="allDayFlgChk">一日中</label>
 									</div>
 									<div class="col-sm-3">
-										<label for="repeatType">繰り返しの種類:</label> <select id="repeatType"
-											name="repeatType" onchange="onRepeatTypeChange(this)"
-											class="form-control">
+										<label for="repeatType">繰り返しの種類:</label> <select
+											id="repeatType" name="repeatType"
+											onchange="onRepeatTypeChange(this)" class="form-control">
 											<option value="01"
 												<c:if test="${schedule.getRepeatType() == '01'}">selected</c:if>>リピートなし</option>
 											<option value="02"
@@ -103,46 +98,49 @@ request.setAttribute("title", "Edit schedule");
 									<div class="form-group" id="repeateDetail">
 										<div class="col-sm-3" id="repeatDayDiv" style="display: none">
 											<label for="repeatDayOfWeek">週の繰り返し日:</label> <select
-														id="repeatDayOfWeek" name="repeatDayOfWeek"
-														class="form-control">
-														<option value="01" <c:if test="${schedule.getRepeatDayOfWeek() == '01'}">selected</c:if>>日曜日</option>
-														<option value="02" <c:if test="${schedule.getRepeatDayOfWeek() == '02'}">selected</c:if>>月曜日</option>
-														<option value="03" <c:if test="${schedule.getRepeatDayOfWeek() == '03'}">selected</c:if>>火曜日</option>
-														<option value="04" <c:if test="${schedule.getRepeatDayOfWeek() == '04'}">selected</c:if>>水曜日</option>
-														<option value="05" <c:if test="${schedule.getRepeatDayOfWeek() == '05'}">selected</c:if>>木曜日</option>
-														<option value="06" <c:if test="${schedule.getRepeatDayOfWeek() == '06'}">selected</c:if>>金曜日</option>
-														<option value="07" <c:if test="${schedule.getRepeatDayOfWeek() == '07'}">selected</c:if>>土曜日</option>
-													</select>
+												id="repeatDayOfWeek" name="repeatDayOfWeek"
+												class="form-control">
+												<option value="01"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '01'}">selected</c:if>>日曜日</option>
+												<option value="02"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '02'}">selected</c:if>>月曜日</option>
+												<option value="03"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '03'}">selected</c:if>>火曜日</option>
+												<option value="04"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '04'}">selected</c:if>>水曜日</option>
+												<option value="05"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '05'}">selected</c:if>>木曜日</option>
+												<option value="06"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '06'}">selected</c:if>>金曜日</option>
+												<option value="07"
+													<c:if test="${schedule.getRepeatDayOfWeek() == '07'}">selected</c:if>>土曜日</option>
+											</select>
 										</div>
-										<div class="col-sm-3" id="repeatMonthDiv" style="display: none">
+										<div class="col-sm-3" id="repeatMonthDiv"
+											style="display: none">
 											<label for="repeatTypeOfMonth">月の繰り返し日:</label> <select
-														id="repeatTypeOfMonth" name="repeatTypeOfMonth"
-														class="form-control"></select>
+												id="repeatTypeOfMonth" name="repeatTypeOfMonth"
+												class="form-control"></select>
 										</div>
 										<div class="col-sm-4">
 											<label for="repeatUntilDateTimeString"> 繰り返す終了日付 :</label> <input
-													type="text" id="repeatUntilDateTimeString"
-													name="repeatUntilDateTimeString"
-													value="${schedule.getRepeatUntilDateTimeString()}"
-													placeholder="YYYY-MM-DD HH:mm:ss" class="form-control ">
-													<span id="repeatUntilDateTimeStringError" style="color:red;display:none;">繰り返す終了日付は必須です。</span>
-										</div>
-										<div class="col-sm-12" style="margin-top:5px;">
-											<span style="color: red; display: none;" id="repeatUntilError">スケジュールの終了日時は、繰り返す終了日時よりも前の日時にする必要があります。</span>
+												type="text" id="repeatUntil"
+												name="repeatUntilDateTimeString"
+												value="${schedule.getRepeatUntilDateTimeString()}"
+												placeholder="YYYY-MM-DD HH:mm:ss" class="form-control ">
 										</div>
 									</div>
 								</div>
 							</div>
 							<div class="col-sm-3">
 								<div class="panel cus_left-panel">
-									<label for="eventFlg"> スケジュールタイプ</label> 
-									<select
-										name="eventFlg" class="form-control"
-										onchange="onEventChange(this)" disabled="disabled">
+									<label for="isTask"> スケジュールタイプ</label> <select name="isTaskChk"
+										class="form-control" onchange="onEventChange(this)"
+										disabled="disabled">
 										<option value="1"
-											<c:if test="${schedule.getEventFlg()}">selected</c:if>>イベント</option>
+											<c:if test="${!schedule.getIsTask()}">selected</c:if>>イベント</option>
 										<option value="0"
-											<c:if test="${!schedule.getEventFlg()}">selected</c:if>>タスク</option>
+											<c:if test="${schedule.getIsTask()}">selected</c:if>>タスク</option>
 									</select> <br> ${reminder.getOtherVisibilityFlg()} <label
 										for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">
@@ -163,14 +161,14 @@ request.setAttribute("title", "Edit schedule");
 						<div class="form-group col-sm-12 mt-link">
 							<label for="meetLink"> ミーティングのリンク :</label> <input type="text"
 								id="meetLink" name="meetLink" placeholder="ミーティングのリンク"
-								value="${schedule.getMeetLink()}" class="form-control "><span><form:errors
-									path="meetLink" style="color:red" /></span>
+								value="${schedule.getMeetLink()}" class="form-control ">
+							<span id="meetLinkError" class="error" style="color: red;"></span>
 						</div>
 						<div class="form-group col-sm-12">
 							<label for="location"> ロケーション :</label> <input type="text"
 								id="location" name="location" value="${schedule.getLocation()}"
-								placeholder="ロケーション" class="form-control "><span><form:errors
-									path="location" style="color:red" /></span>
+								placeholder="ロケーション" class="form-control ">
+							<span id="locationError" class="error" style="color: red;"></span>
 						</div>
 						<div class="form-group" id="divReminder">
 							<div class="col-sm-12">
@@ -178,7 +176,8 @@ request.setAttribute("title", "Edit schedule");
 							</div>
 							<c:choose>
 								<c:when test="${schedule.getScheduleReminders().size() > 0}">
-									<c:forEach var="reminder" items="${schedule.getScheduleReminders()}" varStatus="loop">
+									<c:forEach var="reminder"
+										items="${schedule.getScheduleReminders()}" varStatus="loop">
 										<div class="col-sm-12">
 											<input type="hidden" id="id${loop.index}"
 												name="scheduleReminders[${loop.index}].id"
@@ -243,75 +242,92 @@ request.setAttribute("title", "Edit schedule");
 							<label for="scheduleDescription"> スケジュールの説明 :</label>
 							<textarea id="scheduleDescription" name="scheduleDescription"
 								placeholder="ケジュールの説明" class="form-control">${schedule.getScheduleDescription()}</textarea>
-							<span><form:errors path="scheduleDescription"
-									style="color:red" /></span>
+							<span id="scheduleDescriptionError" class="error" style="color: red;"></span>
 						</div>
 						<div class="form-group col-sm-12">
-							<span style="color:red">このスケジュールには 5 人のゲストのみを招待できます。</span><br>
+							<span style="color: red">このスケジュールには 5 人のゲストのみを招待できます。</span><br>
 							<label for="attendees">ゲスト :</label>
 						</div>
 						<div class="form-group">
-						     <div class="col-sm-4">
-							    <input type ="hidden" id="selectCount" value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}" class="form-control" />
-						        <select id="attendeesSelect" class="form-control" 
-								<c:if test="${not empty schedule.getAttendees() && schedule.getAttendees().size() == 5}">disabled</c:if> >
-							        <c:choose>
+							<div class="col-sm-4">
+								<input type="hidden" id="selectCount"
+									value="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0 ? schedule.getAttendees().size() : 0}"
+									class="form-control" /> <select id="attendeesSelect"
+									class="form-control"
+									<c:if test="${not empty schedule.getAttendees() && schedule.getAttendees().size() == 5}">disabled</c:if>>
+									<c:choose>
 										<c:when test="${userLists.size() > 0}">
-										    <option value="">-- ユーザを選択してください --</option>
-										    <c:forEach var="user" items="${userLists}">
-											    <c:choose>
-							                        <c:when test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
-							                            <c:set var="disabled" value="false"/>
-							                            <c:forEach items="${schedule.getAttendees()}" var="attendee">
-							                                <c:if test="${attendee.getUserCode() == user.getUserCode()}">
-															    <c:set var="disabled" value="true"/>
+											<option value="">-- ユーザを選択してください --</option>
+											<c:forEach var="user" items="${userLists}">
+												<c:choose>
+													<c:when
+														test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
+														<c:set var="disabled" value="false" />
+														<c:forEach items="${schedule.getAttendees()}"
+															var="attendee">
+															<c:if
+																test="${attendee.getUserCode() == user.getUserCode()}">
+																<c:set var="disabled" value="true" />
 															</c:if>
-							                            </c:forEach>
-							                        </c:when>
-							                        <c:otherwise>
-							                            <c:set var="disabled" value="false"/>
-							                        </c:otherwise>
-							                    </c:choose>
-										        <option value="${user.getUserCode()}" data-email="${user.getEmail()}" <c:if test="${disabled}">disabled</c:if> >
-										            ${user.getEmail()}
-										        </option>
-										    </c:forEach>
+														</c:forEach>
+													</c:when>
+													<c:otherwise>
+														<c:set var="disabled" value="false" />
+													</c:otherwise>
+												</c:choose>
+												<option value="${user.getUserCode()}"
+													data-email="${user.getEmail()}"
+													<c:if test="${disabled}">disabled</c:if>>
+													${user.getEmail()}</option>
+											</c:forEach>
 										</c:when>
 										<c:otherwise>
 											<option value="">-- ユーザを選択してください --</option>
 										</c:otherwise>
 									</c:choose>
 								</select>
-								
+
 								<div class="mt-link">
 									<input type="checkbox" class="custom-checkbox"
-										id="guestPermissionFlgChk" onchange="guestPermissionFlgChange(this)"
-										<c:if test="${schedule.getGuestPermissionFlg()}">checked</c:if> disabled>
-									<label for="guestPermissionFlgChk">スケジュールの更新</label>
+										id="guestPermissionFlgChk"
+										onchange="guestPermissionFlgChange(this)"
+										<c:if test="${schedule.getGuestPermissionFlg()}">checked</c:if>
+										disabled> <label for="guestPermissionFlgChk">スケジュールの更新</label>
 								</div>
-						    </div>
-						   <div class="col-sm-8" id="attendeesDiv1">
-						    	<div id="attendeesDivList" class="list-group">
-								<c:choose>
-									<c:when test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
-								    	<c:forEach var="attendee" items="${schedule.getAttendees()}" varStatus="loop">
-								    		<a class="list-group-item list-group-item-action col-sm-6" style="margin-left:3px;margin-bottom:3px;">
-								            	${attendee.getUser().getEmail()}
-									        	<input type="hidden" data-index="${loop.index}" name="attendees[${loop.index}].user.email" value="${attendee.getUser().getEmail()}" class="form-control">
-									        	<input type="hidden" data-index="${loop.index}" name="attendees[${loop.index}].userCode" value="${attendee.getUserCode()}" class="form-control">
-									        	<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-									        </a>
-								    	</c:forEach>
-							    	</c:when>
-						    	</c:choose>
-						    	</div>
+							</div>
+							<div class="col-sm-8" id="attendeesDiv1">
+								<div id="attendeesDivList" class="list-group">
+									<c:choose>
+										<c:when
+											test="${not empty schedule.getAttendees() && schedule.getAttendees().size() > 0}">
+											<c:forEach var="attendee" items="${schedule.getAttendees()}"
+												varStatus="loop">
+												<a class="list-group-item list-group-item-action col-sm-6"
+													style="margin-left: 3px; margin-bottom: 3px;">
+													${attendee.getUser().getEmail()} <input type="hidden"
+													data-index="${loop.index}"
+													name="attendees[${loop.index}].user.email"
+													value="${attendee.getUser().getEmail()}"
+													class="form-control"> <input type="hidden"
+													data-index="${loop.index}"
+													name="attendees[${loop.index}].userCode"
+													value="${attendee.getUserCode()}" class="form-control">
+													<button type="button" class="close" aria-label="Close">
+														<span aria-hidden="true">&times;</span>
+													</button>
+												</a>
+											</c:forEach>
+										</c:when>
+									</c:choose>
+								</div>
 							</div>
 						</div>
 						<div class="form-group up-btn-gp col-sm-12">
-							<a href="/schedule/schedules">
+							<!-- <a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
-							</a>
-							<button type="submit" class="btn btn-primary" id="btnEditSchedule">編集</button>
+							</a> -->
+							<button type="submit" class="btn btn-primary"
+								id="btnEditSchedule">編集</button>
 						</div>
 					</div>
 				</form:form>
@@ -346,50 +362,28 @@ request.setAttribute("title", "Edit schedule");
 	    guestPermissionFlgChkPermission();
 	});
 	$(document).ready(function() {
-		$('#startDateTimeString').datetimepicker({
+		$('#start').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
 		});
-		$('#startDateTimeString').on('dp.change',function(e) {
-			var selectedDateTime = e.date;
+		$('#start').on('dp.change',function(e) {
+            var selectedDateTime = moment(e.date);
 			if (!selectedDateTime.isValid()) {
-				$('#startDateTimeStringError').show();
-				document.getElementById('btnEditSchedule').disabled = true;
+				var formattedDateTime = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss');
+            	$('#end').val(formattedDateTime);
 			} else {
-				$('#startDateTimeStringError').hide();
-				selectedDateTime.add(1, 'hours');
-				var formattedDateTime = selectedDateTime.format('YYYY-MM-DD HH:mm:ss');
-				$('#endDateTimeString').val(formattedDateTime);
-				
+				onAllDayFlgChange($("#allDayFlgChk").prop('checked'));
+
 				bindMdRepeatUntilDateTimeString();
 			}
 		});
-		$('#endDateTimeString').datetimepicker({
+		$('#end').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
-		});
-		$('#endDateTimeString').on('dp.change',function(e) {
-			var startDate = $('#startDateTimeString').data("DateTimePicker").date();
-			var endDate = $('#endDateTimeString').data("DateTimePicker").date();
-			if (endDate == null) {
-				$('#endDateTimeStringError').show();
-				document.getElementById('btnEditSchedule').disabled = true;
-			} else {
-				$('#endDateTimeStringError').hide();
-				if (endDate && startDate && endDate.isBefore(startDate)) {
-					$('#dateCompareError').show();
-					document.getElementById('btnEditSchedule').disabled = true;
-				} else {
-					$('#dateCompareError').hide();
-					document.getElementById('btnEditSchedule').disabled = false;
-					
-					bindMdRepeatUntilDateTimeString();
-				}
-			}
 		});
 		$('#repeatUntilDateTimeString').datetimepicker({
 			format : 'YYYY-MM-DD HH:mm:ss'
 		});
 		$('#repeatUntilDateTimeString').on('dp.change',function(e) {
-			var endDate = $('#endDateTimeString').data("DateTimePicker").date();
+			var endDate = $('#end').data("DateTimePicker").date();
 			var repeatUntilDate = $('#repeatUntilDateTimeString').data("DateTimePicker").date();
 			if (repeatUntilDate == null) {
 				$('#repeatUntilDateTimeStringError').show();
@@ -481,27 +475,32 @@ request.setAttribute("title", "Edit schedule");
 			$('#guestPermissionFlg').val("0");
 		}
 	}
-	function onAllDayFlgChange(checkbox) {
-		if (checkbox.checked) {
-			$('#allDayFlg').val("1");
-			var startDateTimeString = $('#startDateTimeString').val();
-			var dateParts = startDateTimeString.split(" ");
-			$('#startDateTimeString').val(dateParts[0] + " 00:00:00");
-			var endDateTimeString = $('#endDateTimeString').val();
-			dateParts = endDateTimeString.split(" ");
-			$('#endDateTimeString').val(dateParts[0] + " 00:00:00");
-			$('#divReminder').css('display', 'none');
-		} else {
-			$('#allDayFlg').val("0");
-			$('#divReminder').css('display', 'block');
-		}
+
+	$('#allDayFlgChk').change(function() {
+	    $('#allDayFlg').val($(this).prop('checked') ? "1" : "0");
+	    $('#divReminder').toggle(!$(this).is(':checked'));
+
+	    onAllDayFlgChange($(this).prop('checked'));
+	}).trigger('change');
+	function onAllDayFlgChange(checked) {
+	    if (checked){
+	        var start = moment($('#start').val()).startOf('day');
+	        $('#start').val(start.format('YYYY-MM-DD HH:mm:ss'));
+	        var end = start.clone().endOf('day');
+	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+	    } else {
+	        var start = moment($('#start').val());
+	        var end = start.clone().add(30, 'minutes');
+	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+	    }
 	}
+
 	function onEventChange(select) {
 		var selectedValue = select.value;
 		if (selectedValue == '1') {
-			$('#scheduleThemeColor').val("#FF4013");
+			$('#color').val("#039BE5");
 		} else {
-			$('#scheduleThemeColor').val("#00C7FC");
+			$('#color').val("#D81B60");
 		}
 	}
 	
@@ -525,7 +524,10 @@ request.setAttribute("title", "Edit schedule");
 	
 	function bindMdRepeatUntilDateTimeString(){
 		var repeatType = $('#repeatType').val();
-		var startDate = $('#startDateTimeString').data("DateTimePicker").date();
+		var startDate = $('#start').data("DateTimePicker").date();
+		if (!startDate.isValid()) {
+            startDate = moment();
+        }
 		if (repeatType == '02') {
 			startDate.add(1, 'months');
 		} else if(repeatType == '03'){
@@ -557,7 +559,7 @@ request.setAttribute("title", "Edit schedule");
 			startDate.add(3, 'years');
 		}
 		var formattedDateTime = startDate.format('YYYY-MM-DD HH:mm:ss');
-		$('#repeatUntilDateTimeString').val(formattedDateTime);
+		$('#repeatUntil').val(formattedDateTime);
 	}
 	function bindRepeartMonthDiv(){
 		var startDateTimeString = "${startDateTimeString}";
@@ -610,5 +612,75 @@ request.setAttribute("title", "Edit schedule");
 	  }
 	  return dayName;
 	}
+	
+    function clearModalError() {
+        $("#titleError").text("");
+        $("#startError").text("");
+        $("#endError").text("");
+        $("#meetLinkError").text("");
+        $("#locationError").text("");
+        $("#scheduleDescriptionError").text("");
+        $("#repeatUntilError").text("");
+    }
+    $('#FrmSubmit').submit(function(event) {
+        event.preventDefault();
+
+        var errors = 0;
+        var title = $("#title").val();
+        var start = $("#start").val();
+        var end = $("#end").val();
+        var repeatType = $("#repeatType").val();
+        var repeatUntil = $("#repeatUntil").val();
+        var meetLink = $("#meetLink").val();
+        var location = $("#location").val();
+        var scheduleDescription = $("#scheduleDescription").val();
+        clearModalError();
+
+        if (title === '') {
+            $("#titleError").text("スケジュールタイトルは必須です。");
+            errors += 1;
+        } else if (title.length > 100) {
+            $("#titleError").text("スケジュールタイトルは最大100文字までです。");
+            errors += 1;
+        }
+        if (start === '') {
+            $("#startError").text("スケジュールの開始日時は必須です。");
+            errors += 1;
+        }
+        if (end === '') {
+            $("#endError").text("スケジュールの終了日時は必須です。");
+            errors += 1;
+        }
+        if (start !== '' && end !== '') {
+            if (moment(start).isAfter(moment(end))) {
+                $("#endError").text("終了日時は開始日時より後でなければなりません。");
+                errors += 1;
+            }
+        }
+        if (end !== '' && repeatUntil !== '' && repeatType !== '01') {
+            if (moment(end).isAfter(moment(repeatUntil))) {
+                $("#repeatUntilError").text("繰り返す終了日付はスケジュールの終了日時より後でなければなりません。");
+                errors += 1;
+            }
+        }
+        if (meetLink !== '' && meetLink.length > 100) {
+            $("#meetLinkError").text("ミーティングのリンクは最大100文字までです。");
+            errors += 1;
+        }
+        if (location !== '' && location.length > 100) {
+            $("#locationError").text("ロケーションは最大100文字までです。");
+            errors += 1;
+        }
+        if (scheduleDescription !== '' && scheduleDescription.length > 250) {
+            $("#scheduleDescriptionError").text("スケジュールの説明は最大250文字までです。");
+            errors += 1;
+        }
+        
+        if (errors > 0) {
+            return;
+        }
+
+        this.submit();
+    });
 </script>
 </html>

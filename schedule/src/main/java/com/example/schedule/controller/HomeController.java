@@ -14,11 +14,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/")
-public class LoginController {
+public class HomeController {
     private final UserBusiness userBusiness;
 
     @Autowired
-    public LoginController(UserBusiness userBusiness) {
+    public HomeController(UserBusiness userBusiness) {
         this.userBusiness = userBusiness;
     }
 

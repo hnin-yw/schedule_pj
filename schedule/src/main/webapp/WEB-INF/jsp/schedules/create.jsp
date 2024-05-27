@@ -22,7 +22,7 @@ request.setAttribute("title", "Create schedule");
 						<div class="row">
 							<input type="hidden" id="userCode" name="userCode" value="${schedule.getUserCode()}">
 							<input type="hidden" id="groupCode" name="groupCode" value="${schedule.getGroupCode()}">
-							<input type="hidden" id="allDayFlg" name="allDayFlg" value="${schedule.getAllDayFlg() ? 1 : 0}">
+							<input type="hidden" id="allDayFlg" name="allDay" value="${schedule.getAllDay() ? 1 : 0}">
 							<input type="hidden" id="guestPermissionFlg" name="guestPermissionFlg" value="${schedule.getGuestPermissionFlg() ? 1 : 0}">
 							<input type='hidden' id='id' name='id' value="${schedule.getId()}"/>
 							<input type='hidden' id='scheduleCode' name='scheduleCode' value="${schedule.getScheduleCode()}"/> 
@@ -37,11 +37,11 @@ request.setAttribute("title", "Create schedule");
 						<div class="row">
 							<div class="col-sm-9">
 								<div class="form-group col-sm-12">
-									<label for="scheduleTitle"> スケジュールタイトル :</label> <input
-										type="text" id="scheduleTitle" name="scheduleTitle"
+									<label for="title"> スケジュールタイトル :</label> <input
+										type="text" id="title" name="title"
 										placeholder="スケジュールタイトル"
-										value="${schedule.getScheduleTitle()}" class="form-control "><span><form:errors
-											path="scheduleTitle" style="color:red" /></span>
+										value="${schedule.getTitle()}" class="form-control "><span><form:errors
+											path="title" style="color:red" /></span>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-4">
@@ -64,10 +64,10 @@ request.setAttribute("title", "Create schedule");
 									</div>
 								</div>
 								<div class="form-group col-sm-12" style="margin-top: 10px;">
-									<label for="scheduleThemeColor">スケジュールテーマカラー </label><input
-										type="color" class="custom-color_box" id="scheduleThemeColor"
-										name="scheduleThemeColor"
-										value="${schedule.getScheduleThemeColor()}"
+									<label for="color">スケジュールテーマカラー </label><input
+										type="color" class="custom-color_box" id="color"
+										name="color"
+										value="${schedule.getColor()}"
 										class="form-control ">
 								</div>
 
@@ -75,7 +75,7 @@ request.setAttribute("title", "Create schedule");
 									<div class="col-sm-2" style="margin-top: 20px;">
 										<input type="checkbox" class="custom-checkbox"
 											id="allDayFlgChk" onchange="onAllDayFlgChange(this)"
-											<c:if test="${schedule.getAllDayFlg()}">checked</c:if>>
+											<c:if test="${schedule.getAllDay()}">checked</c:if>>
 										<label for="allDayFlgChk">一日中</label>
 									</div>
 									<div class="col-sm-3">
@@ -131,12 +131,12 @@ request.setAttribute("title", "Create schedule");
 								<div class="panel cus_left-panel">
 									<label for="otherVisibilityFlg"> スケジュールタイプ</label> 
 									<select
-										name="eventFlg" class="form-control"
+										name="task" class="form-control"
 										onchange="onEventChange(this)">
 										<option value="1"
-											<c:if test="${schedule.getEventFlg()}">selected</c:if>>イベント</option>
+											<c:if test="${!schedule.getIsTask()}">selected</c:if>>イベント</option>
 										<option value="0"
-											<c:if test="${!schedule.getEventFlg()}">selected</c:if>>タスク</option>
+											<c:if test="${schedule.getIsTask()}">selected</c:if>>タスク</option>
 									</select> <br> <label for="otherVisibilityFlg"> 公開・非公開の表示</label> <select
 										name="otherVisibilityFlg" class="form-control">
 										<option value="0"
@@ -166,7 +166,7 @@ request.setAttribute("title", "Create schedule");
 								placeholder="ロケーション" class="form-control "><span><form:errors
 									path="location" style="color:red" /></span>
 						</div>
-						<div class="form-group" id="divReminder">
+						<%-- <div class="form-group" id="divReminder">
 							<div class="col-sm-12">
 								<label for="reminder"> 通知の種類:</label>
 							</div>
@@ -230,7 +230,7 @@ request.setAttribute("title", "Create schedule");
 									</c:forEach>
 								</c:otherwise>
 							</c:choose>
-						</div>
+						</div> --%>
 						<div class="form-group col-sm-12">
 							<label for="scheduleDescription"> スケジュールの説明 :</label>
 							<textarea id="scheduleDescription" name="scheduleDescription"
@@ -239,7 +239,7 @@ request.setAttribute("title", "Create schedule");
 									style="color:red" /></span>
 
 						</div>
-						<div class="form-group col-sm-12">
+						<%-- <div class="form-group col-sm-12">
 							<span style="color:red">このスケジュールには 5 人のゲストのみを招待できます。</span><br>
 							<label for="attendees">ゲスト :</label>
 						</div>
@@ -301,7 +301,7 @@ request.setAttribute("title", "Create schedule");
 						    	</c:choose>
 						    	</div>
 							</div>
-						</div>	
+						</div>	 --%>
 						<div class="form-group up-btn-gp col-sm-12">
 							<a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
@@ -496,9 +496,9 @@ request.setAttribute("title", "Create schedule");
 	function onEventChange(select) {
 		var selectedValue = select.value;
 		if (selectedValue == '1') {
-			$('#scheduleThemeColor').val("#FF4013");
+			$('#color').val("#FF4013");
 		} else {
-			$('#scheduleThemeColor').val("#00C7FC");
+			$('#color').val("#00C7FC");
 		}
 	}
 	function onRepeatTypeChange(select) {

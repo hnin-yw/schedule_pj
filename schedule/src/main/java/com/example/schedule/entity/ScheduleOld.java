@@ -1,15 +1,10 @@
 package com.example.schedule.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.lang.Nullable;
 
 import com.example.schedule.Consts;
-import com.example.schedule.CustomBooleanDeserializer;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,18 +12,16 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "schedules")
-public class Schedule {
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "schedule_id", referencedColumnName = "id", insertable = false, updatable = false)
-	protected List<ScheduleReminder> scheduleReminders;
+public class ScheduleOld {
+//	@OneToMany(mappedBy = "schedule")
+//	protected List<ScheduleReminder> scheduleReminders;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_code", referencedColumnName = "user_code", insertable = false, updatable = false)
 	private User user;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "schedule_id", referencedColumnName = "id", insertable = false, updatable = false)
-	protected List<Attendee> attendees;
+//	@OneToMany(mappedBy = "attSchedule")
+//	protected List<Attendee> attendees;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -46,16 +39,16 @@ public class Schedule {
 	@NotEmpty(message = "スケジュールタイトルは必須です。")
 	@Size(max = Consts.MAX_NAME_LENGTH, message = "スケジュールタイトルは最大 " + Consts.MAX_NAME_LENGTH + " 文字までです。")
 	@Column(name = "schedule_title")
-	private String title;
+	private String scheduleTitle;
 
 	@Column(name = "schedule_start_date_time")
-	private LocalDateTime start;
+	private LocalDateTime scheduleStartDateTime;
 
 	@Column(name = "schedule_end_date_time")
-	private LocalDateTime end;
+	private LocalDateTime scheduleEndDateTime;
 
 	@Column(name = "allday_flg")
-	private Boolean allDay;
+	private Boolean allDayFlg;
 
 	@Column(name = "repeat_type")
 	private String repeatType;
@@ -69,7 +62,6 @@ public class Schedule {
 	@Column(name = "repeat_type_of_month")
 	private String repeatTypeOfMonth;
 
-    @JsonDeserialize(using = CustomBooleanDeserializer.class)
 	@Column(name = "schedule_display_flg")
 	private Boolean scheduleDisplayFlg;
 
@@ -86,21 +78,17 @@ public class Schedule {
 	private String scheduleDescription;
 
 	@Column(name = "schedule_theme_color")
-	private String color;
+	private String scheduleThemeColor;
 
-    @JsonDeserialize(using = CustomBooleanDeserializer.class)
 	@Column(name = "other_visibility_flg")
 	private Boolean otherVisibilityFlg;
 
-    @JsonDeserialize(using = CustomBooleanDeserializer.class)
 	@Column(name = "event_flg")
-	private Boolean isTask;
+	private Boolean eventFlg;
 
-    @JsonDeserialize(using = CustomBooleanDeserializer.class)
 	@Column(name = "schedule_status_flg")
 	private Boolean scheduleStatusFlg;
 
-    @JsonDeserialize(using = CustomBooleanDeserializer.class)
 	@Column(name = "guest_permission_flg")
 	private Boolean guestPermissionFlg;
 
@@ -110,16 +98,12 @@ public class Schedule {
 	@Column(name = "created_by")
 	private String createdBy;
 
-	@JsonProperty("createdAt")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Column(name = "updated_by")
 	private String updatedBy;
 
-	@JsonProperty("updatedAt")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
@@ -128,25 +112,28 @@ public class Schedule {
 	private @Nullable String repeatUntilDateTimeString;
 	private String indexArray;
 
-	public Schedule() {
+	public ScheduleOld() {
 	}
 
-	public Schedule(int id, String scheduleCode, String groupCode, String userCode, String userName, String title,
-			LocalDateTime start, LocalDateTime end, Boolean allDay, String repeatType, LocalDateTime repeatUntil,
-			String repeatDayOfWeek, String repeatTypeOfMonth, Boolean scheduleDisplayFlg, String location,
-			String meetLink, String scheduleDescription, String color, Boolean otherVisibilityFlg, Boolean isTask,
+	public ScheduleOld(int id, String scheduleCode, String groupCode, String userCode, String userName,
+			String scheduleTitle, LocalDateTime scheduleStartDateTime, LocalDateTime scheduleEndDateTime,
+			Boolean allDayFlg, String repeatType, LocalDateTime repeatUntil, String repeatDayOfWeek,
+			String repeatTypeOfMonth, Boolean scheduleDisplayFlg, String location, String meetLink,
+			String scheduleDescription, String scheduleThemeColor, Boolean otherVisibilityFlg, Boolean eventFlg,
 			Boolean scheduleStatusFlg, Boolean guestPermissionFlg, Boolean delFlg, String createdBy,
-			LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, String startDateTimeString,
-			String endDateTimeString, String repeatUntilDateTimeString, String indexArray,
-			List<ScheduleReminder> scheduleReminders, User user, List<Attendee> attendees) {
+			LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt,
+			// List<ScheduleReminder> scheduleReminders,
+			// List<Attendee> attendees,
+			String startDateTimeString, String endDateTimeString, String repeatUntilDateTimeString, String indexArray,
+			User user) {
 		this.id = id;
 		this.scheduleCode = scheduleCode;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
-		this.title = title;
-		this.start = start;
-		this.end = end;
-		this.allDay = allDay;
+		this.scheduleTitle = scheduleTitle;
+		this.scheduleStartDateTime = scheduleStartDateTime;
+		this.scheduleEndDateTime = scheduleEndDateTime;
+		this.allDayFlg = allDayFlg;
 		this.repeatType = repeatType;
 		this.repeatUntil = repeatUntil;
 		this.repeatDayOfWeek = repeatDayOfWeek;
@@ -155,9 +142,9 @@ public class Schedule {
 		this.location = location;
 		this.meetLink = meetLink;
 		this.scheduleDescription = scheduleDescription;
-		this.color = color;
+		this.scheduleThemeColor = scheduleThemeColor;
 		this.otherVisibilityFlg = otherVisibilityFlg;
-		this.isTask = isTask;
+		this.eventFlg = eventFlg;
 		this.scheduleStatusFlg = scheduleStatusFlg;
 		this.guestPermissionFlg = guestPermissionFlg;
 		this.delFlg = delFlg;
@@ -165,13 +152,13 @@ public class Schedule {
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
+		// this.scheduleReminders = scheduleReminders;
+		// this.attendees = attendees;
 		this.startDateTimeString = startDateTimeString;
 		this.endDateTimeString = endDateTimeString;
 		this.repeatUntilDateTimeString = repeatUntilDateTimeString;
 		this.indexArray = indexArray;
-		this.scheduleReminders = scheduleReminders;
 		this.user = user;
-		this.attendees = attendees;
 	}
 
 	/*
@@ -209,36 +196,36 @@ public class Schedule {
 		this.userCode = userCode;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getScheduleTitle() {
+		return scheduleTitle;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setScheduleTitle(String scheduleTitle) {
+		this.scheduleTitle = scheduleTitle;
 	}
 
-	public LocalDateTime getStart() {
-		return start;
+	public LocalDateTime getScheduleStartDateTime() {
+		return scheduleStartDateTime;
 	}
 
-	public void setStart(LocalDateTime start) {
-		this.start = start;
+	public void setScheduleStartDateTime(LocalDateTime scheduleStartDateTime) {
+		this.scheduleStartDateTime = scheduleStartDateTime;
 	}
 
-	public LocalDateTime getEnd() {
-		return end;
+	public LocalDateTime getScheduleEndDateTime() {
+		return scheduleEndDateTime;
 	}
 
-	public void setEnd(LocalDateTime end) {
-		this.end = end;
+	public void setScheduleEndDateTime(LocalDateTime scheduleEndDateTime) {
+		this.scheduleEndDateTime = scheduleEndDateTime;
 	}
 
-	public Boolean getAllDay() {
-		return allDay;
+	public Boolean getAllDayFlg() {
+		return allDayFlg;
 	}
 
-	public void setAllDay(Boolean allDay) {
-		this.allDay = allDay;
+	public void setAllDayFlg(Boolean allDayFlg) {
+		this.allDayFlg = allDayFlg;
 	}
 
 	public String getRepeatType() {
@@ -305,12 +292,12 @@ public class Schedule {
 		this.scheduleDescription = scheduleDescription;
 	}
 
-	public String getColor() {
-		return color;
+	public String getScheduleThemeColor() {
+		return scheduleThemeColor;
 	}
 
-	public void setColor(String color) {
-		this.color = color;
+	public void setScheduleThemeColor(String scheduleThemeColor) {
+		this.scheduleThemeColor = scheduleThemeColor;
 	}
 
 	public Boolean getOtherVisibilityFlg() {
@@ -321,12 +308,12 @@ public class Schedule {
 		this.otherVisibilityFlg = otherVisibilityFlg;
 	}
 
-	public Boolean getIsTask() {
-		return isTask;
+	public Boolean getEventFlg() {
+		return eventFlg;
 	}
 
-	public void setIsTask(Boolean isTask) {
-		this.isTask = isTask;
+	public void setEventFlg(Boolean eventFlg) {
+		this.eventFlg = eventFlg;
 	}
 
 	public Boolean getScheduleStatusFlg() {
@@ -385,6 +372,30 @@ public class Schedule {
 		this.updatedAt = updatedAt;
 	}
 
+//	public List<ScheduleReminder> getScheduleReminders() {
+//		return scheduleReminders;
+//	}
+//
+//	public void setScheduleReminders(List<ScheduleReminder> scheduleReminders) {
+//		this.scheduleReminders = scheduleReminders;
+//	}
+
+//	public List<Attendee> getAttendees() {
+//		return attendees;
+//	}
+//
+//	public void setAttendees(List<Attendee> attendees) {
+//		this.attendees = attendees;
+//	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		this.scheduleStatusFlg = false;
@@ -428,29 +439,5 @@ public class Schedule {
 
 	public void setIndexArray(String indexArray) {
 		this.indexArray = indexArray;
-	}
-
-	public List<ScheduleReminder> getScheduleReminders() {
-		return scheduleReminders;
-	}
-
-	public void setScheduleReminders(List<ScheduleReminder> scheduleReminders) {
-		this.scheduleReminders = scheduleReminders;
-	}
-
-//	public User getUser() {
-//		return user;
-//	}
-//
-//	public void setUser(User user) {
-//		this.user = user;
-//	}
-
-	public List<Attendee> getAttendees() {
-		return attendees;
-	}
-
-	public void setAttendees(List<Attendee> attendees) {
-		this.attendees = attendees;
 	}
 }

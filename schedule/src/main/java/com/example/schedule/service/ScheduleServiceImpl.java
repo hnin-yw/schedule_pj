@@ -20,11 +20,10 @@ public class ScheduleServiceImpl implements ScheduleService {
 		this.scheduleDao = scheduleDao;
 	}
 
-//	@Override
-//	public List<Schedule> findAlls(String userCode, String groupCode, LocalDateTime startDateTime,
-//			LocalDateTime endDateTime) {
-//		return scheduleDao.findAlls(userCode, groupCode, startDateTime, endDateTime);
-//	}
+	@Override
+	public List<Schedule> findAllSchedules(String userCode, String groupCode) {
+		return scheduleDao.findAllSchedules(userCode, groupCode);
+	}
 
 	@Override
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {

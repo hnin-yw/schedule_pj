@@ -44,6 +44,20 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		return new PageImpl<>(schedules, pageable, total);
 	}
 
+	// get all the transactions from the database
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(readOnly = true)
+	public List<Schedule> findAllSchedules(String userCode, String groupCode) {
+		Query query = entityManager.createQuery(
+				"SELECT s FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false");
+		query.setParameter("userCode", userCode);
+		query.setParameter("groupCode", groupCode);
+		List<Schedule> scheduleList = query.getResultList();
+
+		return scheduleList;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Schedule> findSelectedAlls(Integer[] selectedIds) {
@@ -82,15 +96,15 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Override
 	public int saveSchedule(Schedule schedule) {
 		Query query = entityManager.createQuery(
-				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, scheduleTitle, scheduleStartDateTime, scheduleEndDateTime, allDayFlg, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, scheduleThemeColor, otherVisibilityFlg, eventFlg, scheduleStatusFlg, guestPermissionFlg,delFlg, createdBy, createdAt, updatedBy, updatedAt) "
-						+ "VALUES (:scheduleCode, :groupCode, :userCode, :scheduleTitle, :scheduleStartDateTime, :scheduleEndDateTime, :allDayFlg, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :scheduleThemeColor, :otherVisibilityFlg, :eventFlg, :scheduleStatusFlg, :guestPermissionFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+				"INSERT INTO Schedule (scheduleCode, groupCode, userCode, title, start, end, allDay, repeatType, repeatUntil, repeatDayOfWeek, repeatTypeOfMonth, scheduleDisplayFlg, location, meetLink, scheduleDescription, color, otherVisibilityFlg, isTask, scheduleStatusFlg, guestPermissionFlg,delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:scheduleCode, :groupCode, :userCode, :title, :start, :end, :allDay, :repeatType, :repeatUntil, :repeatDayOfWeek, :repeatTypeOfMonth, :scheduleDisplayFlg, :location, :meetLink, :scheduleDescription, :color, :otherVisibilityFlg, :isTask, :scheduleStatusFlg, :guestPermissionFlg, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
 		query.setParameter("scheduleCode", schedule.getScheduleCode());
 		query.setParameter("groupCode", schedule.getGroupCode());
 		query.setParameter("userCode", schedule.getUserCode());
-		query.setParameter("scheduleTitle", schedule.getScheduleTitle());
-		query.setParameter("scheduleStartDateTime", schedule.getScheduleStartDateTime());
-		query.setParameter("scheduleEndDateTime", schedule.getScheduleEndDateTime());
-		query.setParameter("allDayFlg", schedule.getAllDayFlg());
+		query.setParameter("title", schedule.getTitle());
+		query.setParameter("start", schedule.getStart());
+		query.setParameter("end", schedule.getEnd());
+		query.setParameter("allDay", schedule.getAllDay());
 		query.setParameter("repeatType", schedule.getRepeatType());
 		query.setParameter("repeatUntil", schedule.getRepeatUntil());
 		query.setParameter("repeatDayOfWeek", schedule.getRepeatDayOfWeek());
@@ -99,9 +113,9 @@ public class ScheduleDaoImpl implements ScheduleDao {
 		query.setParameter("location", schedule.getLocation());
 		query.setParameter("meetLink", schedule.getMeetLink());
 		query.setParameter("scheduleDescription", schedule.getScheduleDescription());
-		query.setParameter("scheduleThemeColor", schedule.getScheduleThemeColor());
+		query.setParameter("color", schedule.getColor());
 		query.setParameter("otherVisibilityFlg", schedule.getOtherVisibilityFlg());
-		query.setParameter("eventFlg", schedule.getEventFlg());
+		query.setParameter("isTask", schedule.getIsTask());
 		query.setParameter("scheduleStatusFlg", schedule.getScheduleStatusFlg());
 		query.setParameter("guestPermissionFlg", schedule.getGuestPermissionFlg());
 		query.setParameter("delFlg", schedule.getDelFlg());

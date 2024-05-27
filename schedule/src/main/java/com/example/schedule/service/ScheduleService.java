@@ -13,6 +13,8 @@ public interface ScheduleService {
 
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode);
 
+	public List<Schedule> findAllSchedules(String userCode, String groupCode);
+
 	public String findById(int id);
 
 	public Schedule findScheduleById(int id);

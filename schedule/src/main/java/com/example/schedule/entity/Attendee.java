@@ -7,10 +7,6 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "attendees")
 public class Attendee {
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "schedule_id", insertable = false, updatable = false)
-	private Schedule attSchedule;
-
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "user_code", referencedColumnName = "user_code", insertable = false, updatable = false)
 	private User user;
@@ -51,7 +47,7 @@ public class Attendee {
 
 	public Attendee(int id, int scheduleId, String userCode, Boolean responseStatusFlg, LocalTime responseTime,
 			Boolean delFlg, String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt,
-			Schedule attSchedule,User user) {
+			User user) {
 		this.id = id;
 		this.scheduleId = scheduleId;
 		this.userCode = userCode;
@@ -62,7 +58,6 @@ public class Attendee {
 		this.createdAt = createdAt;
 		this.updatedBy = updatedBy;
 		this.updatedAt = updatedAt;
-		this.attSchedule = attSchedule;
 		this.user = user;
 	}
 
@@ -147,14 +142,6 @@ public class Attendee {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	public Schedule getSchedule() {
-		return attSchedule;
-	}
-
-	public void setSchedule(Schedule attSchedule) {
-		this.attSchedule = attSchedule;
 	}
 
 	public User getUser() {

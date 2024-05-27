@@ -78,7 +78,7 @@ thead {
 }
 
 .tbl-header-ft {
-  font-weight: bold;
+	font-weight: bold;
 }
 
 tbody {
@@ -86,9 +86,57 @@ tbody {
 }
 
 table {
-  border: 1px black !important;
+	border: 1px black !important;
 }
 
 th {
-  background-color: #cee2f5 !important;
+	background-color: #cee2f5 !important;
+}
+
+.fc-axis {
+	border-right: none;
+}
+
+.toast-success {
+	background-color: black !important;
+	color: #fff;
+	font-size: 13px !important;
+	font-weight: bold;
+	width: 400px !important;
+}
+
+.event-content {
+	display: flex;
+	align-items: center;
+}
+
+.task-icon {
+	margin-right: 5px;
+	color: #d81b60; /* Use the color you prefer for the icon */
+}
+
+.event-title {
+	flex-grow: 1;
+}
+
+.event-display-free {
+    background-color: green !important;
+    color: #fff;
+    border-color: green !important;
+}
+
+.event-display-busy {
+    background-color: red !important;
+    color: #fff;
+    border-color: red !important;
+}
+
+.event-edit {
+    border-color: blue !important;
+    background-color: blue !important;
+}
+
+.event-not-edit {
+    border-color: gray !important;
+    background-color: gray !important;
 }

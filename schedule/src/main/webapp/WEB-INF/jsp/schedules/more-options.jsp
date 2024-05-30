@@ -248,7 +248,14 @@ $(document).ready(function() {
 	    	var formattedDateTime = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss');
             $('#end').val(formattedDateTime);
 	    } else {
-			onAllDayFlgChange($("#allDayFlgChk").prop('checked'));
+			if(!$("#allDayFlgChk").prop('checked')){
+			    var end = selectedDateTime.add(30, 'minutes');
+			    $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+			}else{
+		        var start = moment($('#start').val()).startOf('day');
+		        var end = start.clone().endOf('day');
+		        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+			}
 	        
 	        modifyParamObjec = 1;
 	        bindMdRepeatUntilDateTimeString();
@@ -299,10 +306,6 @@ $(document).ready(function() {
 	        var start = moment($('#start').val()).startOf('day');
 	        $('#start').val(start.format('YYYY-MM-DD HH:mm:ss'));
 	        var end = start.clone().endOf('day');
-	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
-	    } else {
-	        var start = moment($('#start').val());
-	        var end = start.clone().add(30, 'minutes');
 	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
 	    }
 	}
@@ -471,7 +474,6 @@ $(document).ready(function() {
         } else {
         	$('#guestPermissionFlg').val("0");
         }
-        onAllDayFlgChange(this);
     }).trigger('change');
 
     function clearModalError() {

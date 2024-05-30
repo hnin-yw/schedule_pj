@@ -27,64 +27,74 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class OAuthLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private UserBusiness userBusiness;
+	@Autowired
+	private UserBusiness userBusiness;
 
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private OAuth2AuthorizedClientService authorizedClientService;
+	@Autowired
+	private UserService userService;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
-        OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
-            oauthToken.getAuthorizedClientRegistrationId(), oauthToken.getName());
-        String clientName = client.getClientRegistration().getClientName();
-        
-        OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-        String email = oauth2User.getAttribute("email");
-        
-        User user = userService.findUserByUserName(email);
-        if (user == null) {
-            user = new User();
-            String userCode = userBusiness.getUserCode();
-            user.setUserCode(userCode);
-            user.setUserName(email);
-            user.setUserFirstName(oauth2User.getAttribute("given_name"));
-            user.setUserLastName(oauth2User.getAttribute("family_name"));
-            user.setEmail(email);
-            user.setProvider(clientName); // Set provider using clientName
-            user.setDelFlg(false);
-            user.setCreatedBy(userCode);
-            user.setCreatedAt(LocalDateTime.now());
-            user.setUpdatedBy(userCode);
-            user.setUpdatedAt(LocalDateTime.now());
-            userService.save(user);
-        } else {
-            user.setProvider(clientName); // Update provider using clientName
-            user.setUpdatedAt(LocalDateTime.now());
-            userService.updateProvider(email, clientName);
-        }
+	@Autowired
+	private OAuth2AuthorizedClientService authorizedClientService;
 
-        User dbUser = userService.findUserByUserName(email);
-        Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
-        attributes.put("userCode", dbUser.getUserCode());
-        attributes.put("118416904140371092145", "118416904140371092145");
+	@Override
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
+		OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+		OAuth2AuthorizedClient client = authorizedClientService
+				.loadAuthorizedClient(oauthToken.getAuthorizedClientRegistrationId(), oauthToken.getName());
+		String clientName = client.getClientRegistration().getClientName();
+		OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
 
-        DefaultOAuth2User enhancedOAuth2User = new DefaultOAuth2User(oauth2User.getAuthorities(), attributes, oauth2User.getName());
-        
-        OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
-        SecurityContextHolder.getContext().setAuthentication(
-            new OAuth2AuthenticationToken(
-                enhancedOAuth2User,
-                authenticationToken.getAuthorities(),
-                authenticationToken.getAuthorizedClientRegistrationId()
-            )
-        );
+		String userName = null;
+		String userFirstName = null;
+		String userLastName = null;
+		if ("GOOGLE".equals(clientName)) {
+			userName = oauth2User.getAttribute("email");
+			userFirstName = oauth2User.getAttribute("given_name");
+			userLastName = oauth2User.getAttribute("family_name");
+		} else if ("LINE".equals(clientName)) {
+			userName = oauth2User.getAttribute("userId");
+			userFirstName = oauth2User.getAttribute("displayName");
+		}
 
-        response.sendRedirect("/schedule/schedules");
-    }
+		User user = userService.findUserByUserName(userName);
+		if (user == null) {
+			user = new User();
+			String userCode = userBusiness.getUserCode();
+			user.setUserCode(userCode);
+			user.setUserName(userName);
+			user.setUserFirstName(userFirstName);
+			user.setUserLastName(userLastName);
+			user.setEmail(userName);
+			user.setProvider(clientName);
+			user.setDelFlg(false);
+			user.setCreatedBy(userCode);
+			user.setCreatedAt(LocalDateTime.now());
+			user.setUpdatedBy(userCode);
+			user.setUpdatedAt(LocalDateTime.now());
+			userService.save(user);
+		} else {
+			user.setProvider(clientName); // Update provider using clientName
+			user.setUpdatedAt(LocalDateTime.now());
+			userService.updateProvider(userName, clientName);
+		}
+
+		User dbUser = userService.findUserByUserName(userName);
+		Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
+		attributes.put("userCode", dbUser.getUserCode());
+		if (userLastName != null) {
+			attributes.put("userName", userFirstName + " " + userLastName);
+		} else {
+			attributes.put("userName", userFirstName);
+		}
+
+		DefaultOAuth2User enhancedOAuth2User = new DefaultOAuth2User(oauth2User.getAuthorities(), attributes,
+				"userCode");
+
+		OAuth2AuthenticationToken authenticationToken = (OAuth2AuthenticationToken) authentication;
+		SecurityContextHolder.getContext().setAuthentication(new OAuth2AuthenticationToken(enhancedOAuth2User,
+				authenticationToken.getAuthorities(), authenticationToken.getAuthorizedClientRegistrationId()));
+
+		response.sendRedirect("/schedule/schedules");
+	}
 }

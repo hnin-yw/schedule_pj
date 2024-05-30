@@ -4,8 +4,9 @@
 request.setAttribute("title", "Schedules");
 %>
 <%@ include file="/WEB-INF/jsp/var.jsp"%>
+<%@ include file="/WEB-INF/jsp/header_menu.jsp"%>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
-<div id='notificationCount'></div>
+
 <div id='calendar'></div>
 <div id="toastContainer" aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 <c:set var="isEdit" value="true" />
@@ -642,6 +643,26 @@ request.setAttribute("title", "Schedules");
         });
 
         calendar.render();
+        
+        setInterval(function() {
+        	fetch(initialEventURL).then(response => response.json()).then(events => {
+            	var userCode = "${userCode}";
+               	var notificationCount = 0;
+           		events.forEach(function(event) {
+              		if (event.attendees && event.attendees.length > 0) {
+                    	event.attendees.forEach(function(attendee) {
+                      		if (attendee.userCode === userCode) {
+                           		notificationCount++;
+                       		}
+                  		});
+                 	}
+             	});
+           		const html = document.getElementById('showNotiCount');
+           		if(html){
+           		    html.innerText = notificationCount;
+           		}
+           	});
+        }, 1000);
 
         function showAddEventForm(start, end) {
             document.getElementById('start').value = start;

@@ -49,12 +49,20 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Schedule> findAllSchedules(String userCode, String groupCode) {
-		Query query = entityManager.createQuery(
-				"SELECT s FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false");
-		query.setParameter("userCode", userCode);
-		query.setParameter("groupCode", groupCode);
-		List<Schedule> scheduleList = query.getResultList();
+		String queryString;
+		if (groupCode != null) {
+			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR (s.userCode <> :userCode AND s.groupCode = :groupCode) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.delFlg = false)) AND s.delFlg = false";
+		} else {
+			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.delFlg = false)) AND s.delFlg = false";
+		}
 
+		Query query = entityManager.createQuery(queryString);
+		query.setParameter("userCode", userCode);
+		if (groupCode != null) {
+			query.setParameter("groupCode", groupCode);
+		}
+
+		List<Schedule> scheduleList = query.getResultList();
 		return scheduleList;
 	}
 

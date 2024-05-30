@@ -7,8 +7,8 @@ request.setAttribute("title", "スケジュールの編集");
 %>
 <c:set var="startDateTimeString"
 	value="${schedule.getStartDateTimeString()}" />
-<c:set var="startDateTimeString"
-	value="${schedule.getStartDateTimeString()}" />
+<c:set var="endDateTimeString"
+	value="${schedule.getEndDateTimeString()}" />
 <c:set var="repeatTypeOfMonth"
 	value="${schedule.getRepeatTypeOfMonth()}" />
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
@@ -371,8 +371,15 @@ request.setAttribute("title", "スケジュールの編集");
 				var formattedDateTime = moment().add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss');
             	$('#end').val(formattedDateTime);
 			} else {
-				onAllDayFlgChange($("#allDayFlgChk").prop('checked'));
-
+				if(!$("#allDayFlgChk").prop('checked')){
+				    var end = selectedDateTime.add(30, 'minutes');
+				    $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+				}else{
+			        var start = moment($('#start').val()).startOf('day');
+			        var end = start.clone().endOf('day');
+			        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
+				}
+		        
 				bindMdRepeatUntilDateTimeString();
 			}
 		});
@@ -479,7 +486,6 @@ request.setAttribute("title", "スケジュールの編集");
 	$('#allDayFlgChk').change(function() {
 	    $('#allDayFlg').val($(this).prop('checked') ? "1" : "0");
 	    $('#divReminder').toggle(!$(this).is(':checked'));
-
 	    onAllDayFlgChange($(this).prop('checked'));
 	}).trigger('change');
 	function onAllDayFlgChange(checked) {
@@ -487,10 +493,6 @@ request.setAttribute("title", "スケジュールの編集");
 	        var start = moment($('#start').val()).startOf('day');
 	        $('#start').val(start.format('YYYY-MM-DD HH:mm:ss'));
 	        var end = start.clone().endOf('day');
-	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
-	    } else {
-	        var start = moment($('#start').val());
-	        var end = start.clone().add(30, 'minutes');
 	        $('#end').val(end.format('YYYY-MM-DD HH:mm:ss'));
 	    }
 	}

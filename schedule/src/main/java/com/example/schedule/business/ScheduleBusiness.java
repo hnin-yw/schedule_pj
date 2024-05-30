@@ -29,6 +29,7 @@ import java.time.temporal.TemporalAdjusters;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.example.schedule.business" })
@@ -44,16 +45,16 @@ public class ScheduleBusiness {
 		this.scheduleReminderService = scheduleReminderService;
 		this.attendeeService = attendeeService;
 	}
-	
+
 	public List<Schedule> getAllSchedules() {
 		String userCode = getUserUserCode();
 		String groupCode = getUserGroupCode();
 
 		List<Schedule> schedules = scheduleService.findAllSchedules(userCode, groupCode);
-        
-        return schedules;
-    }
-	
+
+		return schedules;
+	}
+
 	public Page<Schedule> list(Pageable pageable) {
 		String userCode = getUserUserCode();
 		String groupCode = getUserGroupCode();
@@ -418,25 +419,38 @@ public class ScheduleBusiness {
 	public String getUserGroupCode() {
 		String groupCode = null;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    if (auth != null && auth.getPrincipal() instanceof MyUserDetails) {
-	        MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-	    	User user = userDetails.getUser();
-	    	groupCode = user.getGroupCode();
-	    }
+		if (auth != null) {
+			Object principal = auth.getPrincipal();
+			if (principal instanceof MyUserDetails) {
+				User user = ((MyUserDetails) principal).getUser();
+				groupCode = user.getGroupCode();
+			}
+		}
 		return groupCode;
 	}
 
 	public String getUserUserCode() {
-        String userCode = null;
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getPrincipal() instanceof MyUserDetails) {
-            MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-            User user = userDetails.getUser();
-            userCode = user.getUserCode();
-        }
-        return userCode;
-    }
+		String userCode = null;
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			Object principal = auth.getPrincipal();
+			if (principal instanceof MyUserDetails) {
+				User user = ((MyUserDetails) principal).getUser();
+				userCode = user.getUserCode();
+			} else if (principal instanceof OAuth2User) {
+				OAuth2User oauth2User = (OAuth2User) principal;
+				String loginUserCode = null;
+				Object userCodeObj = oauth2User.getAttribute("userCode");
+				if (userCodeObj != null) {
+				    loginUserCode = userCodeObj.toString();
+				}
+				userCode = loginUserCode != null ? loginUserCode : "Unknown";
+			}
+		}
+
+		return userCode;
+	}
 
 	public String getScheduleCode() {
 		String scheduleCode = null;

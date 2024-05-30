@@ -100,12 +100,15 @@ public class User {
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
 
+	@Column(name = "provider")
+    private String provider;
+    
 	public User() {
 	}
 
 	public User(int id, String groupCode, String userCode, String userName, String userFirstName, String userLastName,
 			String postCode, String address, String telNumber, String email, String password, Boolean delFlg,
-			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, Group group,List<Role> roles) {
+			String createdBy, LocalDateTime createdAt, String updatedBy, LocalDateTime updatedAt, Group group,List<Role> roles,String provider) {
 		this.id = id;
 		this.groupCode = groupCode;
 		this.userCode = userCode;
@@ -123,6 +126,7 @@ public class User {
 		this.updatedAt = updatedAt;
 		this.group = group;
 		this.roles = roles;
+		this.provider = provider;
 	}
 
 	/*
@@ -272,12 +276,20 @@ public class User {
 		this.roles = roles;
 	}
 
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
 	@PrePersist
 	protected void onCreate() {
-		this.delFlg = false;
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
-	}
+        this.delFlg = false;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
 	@PreUpdate
 	protected void onUpdate() {

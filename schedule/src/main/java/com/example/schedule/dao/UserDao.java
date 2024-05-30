@@ -30,4 +30,6 @@ public interface UserDao {
 	List<User> findUserListByGroupCode(String groupCode);
 
 	List<User> getUserLists();
+
+	String updateProvider(String userName, String provider);
 }

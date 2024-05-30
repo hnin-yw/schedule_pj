@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
@@ -17,25 +17,37 @@
 			<div class="row justify-content-center">
 				<div class="col-md-6">
 					<div class="card">
-						<c:if test="${not empty error}">
-							<div class="alert alert-danger" role="alert">
-								<strong>${error}</strong>
-							</div>
-						</c:if>
 						<div class="card-body">
-							<form action="/login" method="post">
+							<c:if test="${not empty error}">
+								<div class="alert alert-danger">${error}</div>
+							</c:if>
+
+							<form action="<c:url value='/doLogin' />" method="post">
+								<input type="hidden" name="${_csrf.parameterName}"
+									value="${_csrf.token}" />
+
 								<div class="form-group">
-									<label for="email"> ユーザ名 :</label> <input type="text"
-										class="form-control" id="userName" name="userName"
-										placeholder="ユーザ名" />
+									<label for="userName">ユーザ名 :</label>
+									<!-- corrected the input id to "userName" -->
+									<input type="text" class="form-control" id="userName"
+										name="username" placeholder="ユーザ名" />
 								</div>
 								<div class="form-group">
-									<label for="password"> パスワード :</label> <input type="password"
+									<label for="password">パスワード :</label> <input type="password"
 										class="form-control" id="password" name="password"
 										placeholder="パスワード" />
 								</div>
 								<button type="submit" class="btn btn-primary">ログイン</button>
 							</form>
+							<div>
+								<a href="<c:url value="/oauth2/authorization/line" />">Login
+									with LINE Account</a>
+							</div>
+							<div>
+								<a href="<c:url value="/oauth2/authorization/google" />">Login
+									with Google</a>
+							</div>
+
 						</div>
 					</div>
 				</div>

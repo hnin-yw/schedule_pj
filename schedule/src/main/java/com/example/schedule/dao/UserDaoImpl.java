@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.schedule.entity.*;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 
 import java.util.List;
@@ -57,19 +58,11 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	// add to the database
-//	@Override
-//	public User save(User user) {
-//		User userdb = entityManager.merge(user);
-//		user.setId(userdb.getId());
-//		return user;
-//	}
-
-	// add to the database
 	@Override
 	public int save(User user) {
 		Query query = entityManager.createQuery(
-				"INSERT INTO User (userCode, groupCode, userName, userFirstName, userLastName, postCode, address, telNumber, email, password, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
-						+ "VALUES (:userCode, :groupCode, :userName, :userFirstName, :userLastName, :postCode, :address, :telNumber, :email, :password, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
+				"INSERT INTO User (userCode, groupCode, userName, userFirstName, userLastName, postCode, address, telNumber, email, password, provider, delFlg, createdBy, createdAt, updatedBy, updatedAt) "
+						+ "VALUES (:userCode, :groupCode, :userName, :userFirstName, :userLastName, :postCode, :address, :telNumber, :email, :password, :provider, :delFlg, :createdBy, :createdAt, :updatedBy, :updatedAt)");
 		query.setParameter("userCode", user.getUserCode());
 		query.setParameter("groupCode", user.getGroupCode());
 		query.setParameter("userName", user.getUserName());
@@ -80,7 +73,7 @@ public class UserDaoImpl implements UserDao {
 		query.setParameter("telNumber", user.getTelNumber());
 		query.setParameter("email", user.getEmail());
 		query.setParameter("password", user.getPassword());
-
+		query.setParameter("provider", user.getProvider());
 		query.setParameter("delFlg", user.getDelFlg());
 		query.setParameter("createdBy", user.getCreatedBy());
 		query.setParameter("createdAt", user.getCreatedAt());
@@ -172,5 +165,14 @@ public class UserDaoImpl implements UserDao {
 		query.setParameter("groupCode", groupCode);
 		List<User> users = query.getResultList();
 		return users;
+	}
+	
+	@Override
+	public String updateProvider(String userName, String provider) {
+		Query query = entityManager.createQuery("UPDATE User SET provider =: provider WHERE userName=: userName");
+		query.setParameter("provider", provider);
+		query.setParameter("userName", userName);
+		query.executeUpdate();
+		return userName;
 	}
 }

@@ -1,15 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
 <%
 request.setAttribute("title", "Schedules");
 %>
 <%@ include file="/WEB-INF/jsp/var.jsp"%>
 <%@ include file="/WEB-INF/jsp/content.jsp"%>
+<div id='notificationCount'></div>
 <div id='calendar'></div>
 <div id="toastContainer" aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
-<c:set var="userCode" value="${userCode}" />
-<c:set var="groupCode" value="${groupCode}" />
 <c:set var="isEdit" value="true" />
 <c:set var="isDelete" value="true" />
 <input type="hidden" id="scheduleId" class="form-control" value=""/>
@@ -512,6 +510,7 @@ request.setAttribute("title", "Schedules");
 	}
 
     document.addEventListener('DOMContentLoaded', function() {
+    	var initialEventURL = '/schedule/schedules/api/all';
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'timeGridWeek',
@@ -521,44 +520,49 @@ request.setAttribute("title", "Schedules");
                 right: 'timeGridDay,timeGridWeek,dayGridMonth'
             },
             events: {
-                url: '/schedule/schedules/api/all'
+                url: initialEventURL
             },
             eventDidMount: function(info) {
                 var eventContent = info.el.querySelector('.fc-event-main');
                 var icon = document.createElement('i');
-
-                var isAdmin = ${isAdmin};
+                var isOauth2User = ${isOauth2User};
                 var userCode = "${userCode}";
-                var groupCode = "${groupCode}";
-
-                if(eventContent){
-
-                    if (!isAdmin) {
-                        if (userCode !== info.event.extendedProps.userCode) {
-                            if (groupCode === info.event.extendedProps.groupCode) {
-                                var isGroupAdmin = ${isGroupAdmin};
-                                if (!isGroupAdmin) {
-                                    //icon.className = info.event.extendedProps.otherVisibilityFlg ? 'fas fa-globe' : 'fas fa-lock';
-                                    if (!info.event.extendedProps.scheduleDisplayFlg) {
-                                        eventContent.classList.add('event-display-free');
-                                    } else {
-                                        eventContent.classList.add('event-display-busy');
-                                    }
-                                }
-                            } else {
-                                if (info.event.extendedProps.guestPermissionFlg) {
-                                    eventContent.classList.add('event-edit');
-                                } else {
-                                    eventContent.classList.add('event-not-edit');
-                                }
-                                //icon.className = info.event.extendedProps.guestPermissionFlg ? 'fas fa-pencil-alt' : 'fas fa-lock';
-                            }
-                        }
-                        if (eventContent) {
-                        	eventContent.insertBefore(icon, eventContent.firstChild);
-                        }
-                        console.log(eventContent);
-                	}
+	            if(eventContent){
+	            	if(!isOauth2User){
+	    	        	var isAdmin = ${isAdmin};
+	    	        	var groupCode = "${groupCode}";
+	                    if (!isAdmin) {
+	                        if (userCode !== info.event.extendedProps.userCode) {
+	                            if (groupCode === info.event.extendedProps.groupCode) {
+	                                var isGroupAdmin = ${isGroupAdmin};
+	                                if (!isGroupAdmin) {
+	                                    //icon.className = info.event.extendedProps.otherVisibilityFlg ? 'fas fa-globe' : 'fas fa-lock';
+	                                    if (!info.event.extendedProps.scheduleDisplayFlg) {
+	                                        eventContent.classList.add('event-display-free');
+	                                    } else {
+	                                        eventContent.classList.add('event-display-busy');
+	                                    }
+	                                }
+	                            } else {
+	                                if (info.event.extendedProps.guestPermissionFlg) {
+	                                    eventContent.classList.add('event-edit');
+	                                } else {
+	                                    eventContent.classList.add('event-not-edit');
+	                                }
+	                                //icon.className = info.event.extendedProps.guestPermissionFlg ? 'fas fa-pencil-alt' : 'fas fa-lock';
+	                            }
+	                        }
+	                	}
+	                } else{
+	                	if (userCode !== info.event.extendedProps.userCode) {
+		                	if (info.event.extendedProps.guestPermissionFlg) {
+	                            eventContent.classList.add('event-edit');
+	                        } else {
+	                            eventContent.classList.add('event-not-edit');
+	                        }
+	                	}
+	                }
+                    eventContent.insertBefore(icon, eventContent.firstChild);
                 }
             },
             dateClick: function(info) {
@@ -571,34 +575,50 @@ request.setAttribute("title", "Schedules");
             },
             eventClick: function(info) {
                 info.jsEvent.preventDefault();
-                var isAdmin = ${isAdmin};
+                var isOauth2User = ${isOauth2User};
                 var userCode = "${userCode}";
-                var groupCode = "${groupCode}";
-                var isGroupAdmin = ${isGroupAdmin};
-                if (!isAdmin) {
-                    if (userCode !== info.event.extendedProps.userCode) {
-                        if (groupCode === info.event.extendedProps.groupCode) {
-                            if (!isGroupAdmin) {
-                                $("#btnEventEdit").hide();
-                                $("#btnEventDelete").hide();
-                            }
+                if(!isOauth2User){
+	                var isAdmin = ${isAdmin};
+	                var groupCode = "${groupCode}";
+	                var isGroupAdmin = ${isGroupAdmin};
+	                if (!isAdmin) {
+	                    if (userCode !== info.event.extendedProps.userCode) {
+	                        if (groupCode === info.event.extendedProps.groupCode) {
+	                            if (!isGroupAdmin) {
+	                                $("#btnEventEdit").hide();
+	                                $("#btnEventDelete").hide();
+	                            }
+	                        } else {
+	                            if (info.event.extendedProps.guestPermissionFlg) {
+	                                $("#btnEventEdit").show();
+	                                $("#btnEventDelete").hide();
+	                            } else {
+	                                $("#btnEventEdit").hide();
+	                                $("#btnEventDelete").hide();
+	                            }
+	                        }
+	                    } else {
+	                        $("#btnEventEdit").show();
+	                        $("#btnEventDelete").show();
+	                    }
+	                } else {
+	                    $("#btnEventEdit").show();
+	                    $("#btnEventDelete").show();
+	                }
+                } else {
+                	if (userCode !== info.event.extendedProps.userCode) {
+                        if (info.event.extendedProps.guestPermissionFlg) {
+                            $("#btnEventEdit").show();
+                            $("#btnEventDelete").hide();
                         } else {
-                            if (info.event.extendedProps.guestPermissionFlg) {
-                                $("#btnEventEdit").show();
-                                $("#btnEventDelete").hide();
-                            } else {
-                                $("#btnEventEdit").hide();
-                                $("#btnEventDelete").hide();
-                            }
+                            $("#btnEventEdit").hide();
+                            $("#btnEventDelete").hide();
                         }
                     } else {
-                        $("#btnEventEdit").show();
-                        $("#btnEventDelete").show();
-                    }
-                } else {console.log('yes');
-                    $("#btnEventEdit").show();
-                    $("#btnEventDelete").show();
-                }
+	                    $("#btnEventEdit").show();
+	                    $("#btnEventDelete").show();
+	                }
+	            }
                 const scheduleId = info.event.id;
                 $('#scheduleId').val(scheduleId);
                 const scheduleCode = info.event.extendedProps.scheduleCode;

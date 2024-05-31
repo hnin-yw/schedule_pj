@@ -323,9 +323,9 @@ request.setAttribute("title", "スケジュールの編集");
 							</div>
 						</div>
 						<div class="form-group up-btn-gp col-sm-12">
-							<!-- <a href="/schedule/schedules">
+							<a href="/schedule/schedules">
 								<button type="button" class="btn btn-Light">キャンセル</button>
-							</a> -->
+							</a>
 							<button type="submit" class="btn btn-primary"
 								id="btnEditSchedule">編集</button>
 						</div>

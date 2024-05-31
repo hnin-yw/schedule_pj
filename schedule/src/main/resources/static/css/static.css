@@ -140,3 +140,7 @@ th {
     border-color: gray !important;
     background-color: gray !important;
 }
+
+.calendar{
+	margin-top:2px;
+}

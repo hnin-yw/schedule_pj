@@ -29,7 +29,7 @@ public interface UserService {
 
 	public List<User> findUserListByGroupCode(String groupCode);
 
-	List<User> getUserLists();
+	List<User> getUserLists(String userCode);
 
 	public String updateProvider(String userName, String provider);
 }

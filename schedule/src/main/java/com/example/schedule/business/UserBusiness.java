@@ -44,7 +44,7 @@ public class UserBusiness {
 	}
 
 	public List<User> getUserLists() {
-		List<User> listUsers = userService.getUserLists();
+		List<User> listUsers = userService.getUserLists(scheduleBusiness.getUserUserCode());
 		return listUsers;
 	}
 

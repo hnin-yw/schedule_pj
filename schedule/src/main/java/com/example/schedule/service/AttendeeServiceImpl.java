@@ -39,4 +39,11 @@ public class AttendeeServiceImpl implements AttendeeService {
 		attendeeDao.deleteBySchedulId(scheduleId);
 		return scheduleId;
 	}
+
+	@Override
+	@Transactional
+	public int deleteBySchedulIdAndUserCode(int scheduleId, String userCode) {
+		attendeeDao.deleteBySchedulIdAndUserCode(scheduleId, userCode);
+		return scheduleId;
+	}
 }

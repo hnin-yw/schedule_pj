@@ -30,8 +30,9 @@ public class UserDaoImpl implements UserDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(readOnly = true)
-	public List<User> getUserLists() {
-		Query query = entityManager.createQuery("from User WHERE delFlg = false");
+	public List<User> getUserLists(String userCode) {
+		Query query = entityManager.createQuery("from User WHERE delFlg = false AND userCode <>: userCode");
+		query.setParameter("userCode", userCode);
 		return query.getResultList();
 	}
 

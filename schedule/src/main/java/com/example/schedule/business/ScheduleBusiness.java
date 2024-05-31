@@ -296,6 +296,11 @@ public class ScheduleBusiness {
 		return "redirect:/schedules";
 	}
 
+	public int deleteAttendeeByIdAndUserCode(@PathVariable int scheduleId) {
+		attendeeService.deleteBySchedulIdAndUserCode(scheduleId,this.getUserUserCode());
+		return scheduleId;
+	}
+
 	public String deleteScheduleByCode(@PathVariable String scheduleCode) {
 		List<Schedule> schedules = scheduleService.findScheduleListByScheduleCode(scheduleCode);
 		for (Schedule schedule : schedules) {

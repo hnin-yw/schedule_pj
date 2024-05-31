@@ -29,13 +29,13 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	@Transactional(readOnly = true)
 	public Page<Schedule> findAlls(Pageable pageable, String userCode, String groupCode) {
 		Query query = entityManager.createQuery(
-				"SELECT COUNT(s) FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
+				"SELECT COUNT(s) FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.responseStatusFlg = true AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		long total = (long) query.getSingleResult();
 
 		query = entityManager.createQuery(
-				"FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
+				"FROM Schedule s WHERE (s.userCode =: userCode OR (s.userCode <>: userCode AND s.groupCode =: groupCode AND s.otherVisibilityFlg = false) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode =: userCode AND AND a.responseStatusFlg = true a.delFlg = false)) AND s.delFlg = false ORDER BY s.scheduleStartDateTime ASC");
 		query.setParameter("userCode", userCode);
 		query.setParameter("groupCode", groupCode);
 		int start = (int) pageable.getOffset();
@@ -51,9 +51,9 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	public List<Schedule> findAllSchedules(String userCode, String groupCode) {
 		String queryString;
 		if (groupCode != null) {
-			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR (s.userCode <> :userCode AND s.groupCode = :groupCode) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.delFlg = false)) AND s.delFlg = false";
+			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR (s.userCode <> :userCode AND s.groupCode = :groupCode) OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.responseStatusFlg = true AND a.delFlg = false)) AND s.delFlg = false";
 		} else {
-			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.delFlg = false)) AND s.delFlg = false";
+			queryString = "SELECT s FROM Schedule s WHERE (s.userCode = :userCode OR s.id IN (SELECT a.scheduleId FROM Attendee a WHERE a.userCode = :userCode AND a.responseStatusFlg = true AND a.delFlg = false)) AND s.delFlg = false";
 		}
 
 		Query query = entityManager.createQuery(queryString);

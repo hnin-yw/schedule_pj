@@ -58,4 +58,12 @@ public class AttendeeDaoImpl implements AttendeeDao {
 		q.setParameter("scheduleId", scheduleId);
 		q.executeUpdate();
 	}
+
+	@Override
+	public void deleteBySchedulIdAndUserCode(int scheduleId, String userCode) {
+		Query q = (Query) entityManager.createQuery("update Attendee SET responseStatusFlg = false WHERE scheduleId =: scheduleId AND userCode =: userCode");
+		q.setParameter("scheduleId", scheduleId);
+		q.setParameter("userCode", userCode);
+		q.executeUpdate();
+	}
 }

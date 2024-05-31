@@ -139,6 +139,15 @@ public class ScheduleController {
 		return ResponseEntity.ok().headers(headers).body(excelBytes);
 	}
 
+	@DeleteMapping("/attendee/deleteById/{scheduleId}")
+	public ResponseEntity<?> attendeeDeleteById(@PathVariable("scheduleId") int scheduleId) {
+		scheduleBusiness.deleteAttendeeByIdAndUserCode(scheduleId);
+
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "スケジュールは正常に削除されました。");
+		return ResponseEntity.ok(response);
+	}
+
 	@DeleteMapping("/deleteByCode/{scheduleCode}")
 	public ResponseEntity<?> deleteByCode(@PathVariable("scheduleCode") String scheduleCode) {
 		scheduleBusiness.deleteScheduleByCode(scheduleCode);

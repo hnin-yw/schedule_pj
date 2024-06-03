@@ -13,7 +13,7 @@
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav navbar-right">
 				<!-- Display user information -->
-				<li><a><span class="glyphicon glyphicon-user"></span> <sec:authentication
+				<li><a style="color:#fff;"><span class="glyphicon glyphicon-user"></span> <sec:authentication
 							var="principal" property="principal" /> <c:choose>
 							<c:when test="${isOauth2User}">
                                 ${oauth2User.getAttribute('userName')}
@@ -23,7 +23,7 @@
 							</c:otherwise>
 						</c:choose> </a></li>
 				<c:if test="<%= containsSchedules %>">
-					<li><a><span class="glyphicon glyphicon-bell"></span> <span
+					<li><a style="color:#fff;"><span class="glyphicon glyphicon-bell"></span> <span
 							id="showNotiCount"></span></a></li>
 				</c:if>
 				<li><a href="/schedule/login"><span

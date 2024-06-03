@@ -44,7 +44,7 @@ public class UserBusiness {
 	}
 
 	public List<User> getUserLists() {
-		List<User> listUsers = userService.getUserLists();
+		List<User> listUsers = userService.getUserLists(scheduleBusiness.getUserUserCode());
 		return listUsers;
 	}
 
@@ -56,8 +56,9 @@ public class UserBusiness {
 	public Map<String, ArrayList<String>> saveUser(User user) {
 		msgLists = new HashMap<>();
 		sucMsgLists = new ArrayList<>();
-		user.setPassword(toHexString(encodePassword(user.getPassword())));
 		user.setUserCode(this.getUserCode());
+		user.setPassword(toHexString(encodePassword(user.getPassword())));
+		user.setProvider("Local");
 		user.setDelFlg(false);
 		user.setCreatedAt(LocalDateTime.now());
 		user.setUpdatedAt(LocalDateTime.now());

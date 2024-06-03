@@ -13,10 +13,10 @@ public interface UserService {
 
 	public User findUserById(int id);
 
-	//public User save(User User);
-	
+	// public User save(User User);
+
 	public int save(User User);
-	
+
 	public int updateUser(User User);
 
 	public int deleteById(int id);
@@ -25,9 +25,11 @@ public interface UserService {
 
 	public User findUserByUserName(String userName);
 
-	User findUserByLoginData(String userName,String password);
+	User findUserByLoginData(String userName, String password);
 
 	public List<User> findUserListByGroupCode(String groupCode);
 
-	List<User> getUserLists();
+	List<User> getUserLists(String userCode);
+
+	public String updateProvider(String userName, String provider);
 }

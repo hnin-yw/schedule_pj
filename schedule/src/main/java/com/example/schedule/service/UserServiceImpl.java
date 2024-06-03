@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getUserLists() {
-		return userDao.getUserLists();
+	public List<User> getUserLists(String userCode) {
+		return userDao.getUserLists(userCode);
 	}
 
 	@Override
@@ -36,17 +36,12 @@ public class UserServiceImpl implements UserService {
 		return userDao.findUserById(id);
 	}
 
-//	@Override
-//	@Transactional
-//	public User save(User user) {
-//		return userDao.save(user);
-//	}
 	@Override
 	@Transactional
 	public int save(User user) {
 		return userDao.save(user);
 	}
-	
+
 	@Override
 	@Transactional
 	public int updateUser(User user) {
@@ -72,7 +67,6 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-
 	@Override
 	public User findUserByLoginData(String userName, String password) {
 		User user = userDao.findUserByLoginData(userName, password);
@@ -82,5 +76,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> findUserListByGroupCode(String groupCode) {
 		return userDao.findUserListByGroupCode(groupCode);
+	}
+
+	@Override
+	@Transactional
+	public String updateProvider(String userName, String provider) {
+		return userDao.updateProvider(userName, provider);
 	}
 }

@@ -8,6 +8,8 @@ public interface AttendeeService {
 
 	public int deleteBySchedulId(int scheduleId);
 
+	public int deleteBySchedulIdAndUserCode(int scheduleId,String userCode);
+
 	Attendee findAttendeeById(int id);
 
 	Attendee saveAttendee(Attendee attendee);
